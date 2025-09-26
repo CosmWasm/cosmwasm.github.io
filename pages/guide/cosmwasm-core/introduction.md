@@ -26,7 +26,7 @@ standard library. These primitives include:
 - interaction with the Cosmos SDK,
 - IBC connectivity.
 
-## What does CosmWasm _not_ provide?
+## What does CosmWasm NOT provide?
 
-- Abstractions to simplify contract development (for this, check out [Sylvia](/sylvia))
-- Storage abstractions (for this, check out [Storey](/storey))
+- Storage abstractions (for this, check out [cw-storage-plus](https://github.com/CosmWasm/cw-storage-plus).
+- Testing framework (for this, check out [cw-multi-test](https://github.com/CosmWasm/cw-multi-test).
