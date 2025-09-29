@@ -18,7 +18,7 @@ The deployed documentation is a [VitePress](https://vitepress.dev/) project host
 
 ## How can I run it locally?
 
-You can just clone this repo and run the following commands:
+You can just clone this repository and run the following commands:
 
 ```shell
 $ npm install
