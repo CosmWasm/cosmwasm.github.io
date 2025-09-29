@@ -6,57 +6,48 @@ export default withMermaid({
     title: "CosmWasm",
     description: "User guide for CosmWasm smart contract developers",
     head: [['link', {rel: 'icon', href: '/cosmwasm-small.svg'}]],
+    lastUpdated: true,
     themeConfig: {
         logo: '/cosmwasm-small.svg',
         nav: [
+            {text: 'Welcome', link: '/guide/welcome'},
             {
-                text: 'Guide',
+                text: 'CosmWasm Core',
                 items: [
-                    {text: 'Welcome', link: '/guide/welcome'},
+                    {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
+                    {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
                     {
-                        text: 'CosmWasm Core',
+                        text: 'Architecture',
                         items: [
-                            {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
-                            {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
+                            {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
                         ]
-                    },
-                ],
-
+                    }
+                ]
             },
         ],
         sidebar: [
+            {text: 'Welcome', link: '/guide/welcome'},
             {
-                text: 'Guide',
+                text: 'CosmWasm Core',
+                collapsed: true,
                 items: [
+                    {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
+                    {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
                     {
-                        text: 'Welcome', link: '/guide/welcome'
-                    },
-                    {
-                        text: 'CosmWasm Core',
-                        link: '/guide/cosmwasm-core/introduction',
+                        text: 'Architecture',
                         collapsed: true,
                         items: [
-                            {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
-                            {
-                                text: 'Architecture',
-                                link: '/guide/cosmwasm-core/architecture/architecture',
-                                collapsed: true,
-                                items: [
-                                    {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
-                                ]
-                            },
+                            {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
                         ]
                     },
-                ],
+                ]
             },
         ],
         search: {
             provider: 'local'
         }
     },
-    mermaid: {
-        // Refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options.
-    },
+    mermaid: {},
     markdown: {
         math: true
     },

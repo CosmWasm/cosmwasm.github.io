@@ -10,7 +10,10 @@ hero:
   actions:
       - theme: brand
         text: Welcome
-        link: /guide/welcome      
+        link: /guide/welcome
+      - theme: alt
+        text: CosmWasm Core
+        link: /guide/cosmwasm-core/introduction      
 
 features:
   - title: Security
