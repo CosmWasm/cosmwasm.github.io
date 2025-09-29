@@ -4,9 +4,9 @@ This chapter will give you an overview over CosmWasm from a contract developer p
 capabilities, and guide you through initializing your first smart contract.
 
 ::: tip :bulb: Tip 
-We assume you have basic knowledge of Rust and Cargo (Rust's standard build system). If not, have
-a look [here](https://www.rust-lang.org/learn/get-started). No worries, you don't need to be a
-Rust expert to write your first smart contract.
+We assume you have a basic knowledge of Rust and Cargo (Rust's standard build system).
+If not, have a look [here](https://www.rust-lang.org/learn/get-started).
+No worries, you don't need to be a Rust expert to write your first smart contract.
 :::
 
 
