@@ -13,6 +13,13 @@ export default withMermaid({
                 text: 'Guide',
                 items: [
                     {text: 'Welcome', link: '/guide/welcome'},
+                    {
+                        text: 'CosmWasm Core',
+                        items: [
+                            {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
+                            {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
+                        ]
+                    },
                 ],
 
             },
@@ -29,6 +36,7 @@ export default withMermaid({
                         link: '/guide/cosmwasm-core/introduction',
                         collapsed: true,
                         items: [
+                            {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
                             {
                                 text: 'Architecture',
                                 link: '/guide/cosmwasm-core/architecture/architecture',
@@ -47,7 +55,7 @@ export default withMermaid({
         }
     },
     mermaid: {
-      // Refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options.
+        // Refer https://mermaid.js.org/config/setup/modules/mermaidAPI.html#mermaidapi-configuration-defaults for options.
     },
     markdown: {
         math: true
