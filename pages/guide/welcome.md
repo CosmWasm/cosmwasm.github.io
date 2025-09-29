@@ -1,11 +1,15 @@
+[x/wasm]: https://github.com/CosmWasm/wasmd/tree/main/x/wasm
+[Cosmos SDK]: https://docs.cosmos.network/
+[IBC]: https://www.ibcprotocol.dev/
+[documentation repository]: https://github.com/CosmWasm/cosmwasm.github.io
+
 # Welcome
 
-The [x/wasm](https://github.com/CosmWasm/wasmd/tree/main/x/wasm) module, the root of CosmWasm,
-is a [Cosmos SDK](https://docs.cosmos.network/) module enabling smart contracts to execute on the
-CosmWasm virtual machine. CosmWasm itself refers to the whole ecosystem built around it with a
-mission to make smart contract development easy and reliable. The focus of the CosmWasm platform are
-security, performance, and interoperability. It is tailored for a tight integration with Cosmos SDK
-and to build IBC contracts.
+The [x/wasm] module, the root of CosmWasm, is a [Cosmos SDK] module enabling smart contracts
+to execute on the CosmWasm virtual machine. CosmWasm itself refers to the whole ecosystem
+built around it with a mission to make smart contract development easy and reliable.
+The focus of the CosmWasm platform are security, performance, and interoperability.
+It is tailored for a tight integration with Cosmos SDK and to build IBC contracts.
 
 We chose to target a Rust programming language as a smart contract development stack, as it is
 popular amongst blockchain developers and has the best Wasm compiler on the market so far. We do not
@@ -27,11 +31,11 @@ instance has its unique address on the chain, and it can act just like any other
 It is easy to implement communication between two smart contracts on the same chain. CosmWasm
 standard library provides simple utilities to communicate with non-CosmWasm modules on the chain.
 That includes common Cosmos modules like bank or staking and any custom module unique for a
-particular chain. Finally, CosmWasm is built around the [IBC](https://www.ibcprotocol.dev/) and
-provides a simple API to communicate with other chains and contracts using IBC-based protocols.
+particular chain. Finally, CosmWasm is built around the [IBC] and provides a simple API
+to communicate with other chains and contracts using IBC-based protocols.
 
-This documentation already covers most of the stack. Still, some parts are a work in progress. If
-there is something you remember being here in the old documentation, you can find its content at
-https://github.com/CosmWasm/docs-deprecated. Remember that the old documentation is deprecated,
+This documentation already covers most of the stack. Still, some parts are a work in progress.
+If there is something you remember being here in the old documentation, you can find its content
+at https://github.com/CosmWasm/docs-deprecated. Remember that the old documentation is deprecated,
 mostly outdated, and will not be maintained. We would appreciate any GitHub issues about missing
-parts in the [documentation repository](https://github.com/CosmWasm/docs).
+parts in the [documentation repository].
