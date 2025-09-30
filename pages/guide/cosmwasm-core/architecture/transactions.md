@@ -1,7 +1,3 @@
----
-tags: ["core", "architecture"]
----
-
 # Transactions
 
 Every contract invocation is wrapped into a transaction. If you know about transactions in SQL
@@ -26,7 +22,7 @@ However, we do this to prevent one of the most widespread and hardest to detect 
 Ethereum contracts - reentrancy. We do this by following the actor model, which doesn't nest
 function calls, but returns messages that will be executed later. This means all state that is
 carried over between one call and the next happens in storage and not in memory. For more
-information on this design, I recommend you read [our docs on the Actor Model](actor-model.mdx).
+information on this design, I recommend you read [our docs on the Actor Model](./actor-model).
 
 A common request was the ability to get the result from one of the messages you dispatched. For
 example, you want to create a new contract with
@@ -81,26 +77,29 @@ Submessages handling follows _depth first_ order rules. Let's see the following 
 ```mermaid
 
   sequenceDiagram
-    Note over Contract1: Contract1 returns two submessages:<br/> 1. Execute Contract2<br/> 2. Execute Contract4
-    Contract1->>Contract2: 1. Execute
-    Note over Contract2: Contract2 returns one submessage:<br/> 1. Execute Contract3
-    Contract2->>Contract3: 2. Execute
-    Contract3->>Contract2: 3. Response
-    Note over Contract2: Contract2 can handle the Response<br/>in the reply entrypoint or leave it
-    Contract2->>Contract1: 4. Response
-    Note over Contract1: Contract1 can handle the Response<br/>in the reply entrypoint or leave it
-    Contract1->>Contract4: 5. Execute
-    Contract4->>Contract1: 6. Response
-    Note over Contract1: Contract1 can handle the Response<br/>in the reply entrypoint or leave it
+    Note over Contract 1: Contract 1 returns two submessages:<br/> 1. Execute Contract 2<br/> 2. Execute Contract 4
+    Contract 1->>Contract 2: 1. Execute
+    Note over Contract 2: Contract 2 returns one submessage:<br/> 1. Execute Contract 3
+    Contract 2->>Contract 3: 2. Execute
+    Contract 3->>Contract 2: 3. Response
+    Note over Contract 2: Contract 2 can handle the Response<br/>in the reply entrypoint or leave it
+    Contract 2->>Contract 1: 4. Response
+    Note over Contract 1: Contract 1 can handle the Response<br/>in the reply entrypoint or leave it
+    Contract 1->>Contract 4: 5. Execute
+    Contract 4->>Contract 1: 6. Response
+    Note over Contract 1: Contract 1 can handle the Response<br/>in the reply entrypoint or leave it
 
 ```
 
-**Note1:** The
-[msg_responses](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.SubMsgResponse.html#structfield.msg_responses)
-of the response are not forwarded down the call path. It means that for e.g. if `Contract2` will not
-explicitly handle response from `Contract3` and forward any data, then `Contract1` will never learn
-about results from `Contract3`.
+**Note 1**
 
-**Note2:** If `Contract2` returns an error, the error message can be handled by the `Contract1`
-reply entry-point and prevent the whole transaction from rollback. In such a case only the
-`Contract2` and `Contract3` states changes are reverted.
+The [msg_responses](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.SubMsgResponse.html#structfield.msg_responses)
+of the response are not forwarded down the call path. It means that for e.g. if `Contract 2` will not
+explicitly handle response from `Contract 3` and forward any data, then `Contract 1` will never learn
+about results from `Contract 3`.
+
+**Note 2**
+
+If `Contract 2` returns an error, the error message can be handled by the `Contract 1`
+reply entrypoint and prevent the whole transaction from rollback. In such a case only the
+`Contract 2` and `Contract 3` states changes are reverted.
