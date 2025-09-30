@@ -16,6 +16,7 @@ export default withMermaid({
                 items: [
                     {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
                     {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
+                    {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
                     {
                         text: 'Architecture',
                         items: [
@@ -33,6 +34,7 @@ export default withMermaid({
                 items: [
                     {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
                     {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
+                    {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
                     {
                         text: 'Architecture',
                         collapsed: true,
