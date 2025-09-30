@@ -16,25 +16,8 @@ export default withMermaid({
                 items: [
                     {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
                     {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
-                    {
-                        text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints',
-                        items: [
-                            {text: 'Instantiate', link: '/guide/cosmwasm-core/entrypoints/instantiate'},
-                            {text: 'Execute', link: '/guide/cosmwasm-core/entrypoints/execute'},
-                            {text: 'Query', link: '/guide/cosmwasm-core/entrypoints/query'},
-                            {text: 'Migrate', link: '/guide/cosmwasm-core/entrypoints/migrate'},
-                            {text: 'Sudo', link: '/guide/cosmwasm-core/entrypoints/sudo'},
-                            {text: 'Reply', link: '/guide/cosmwasm-core/entrypoints/reply'},
-                        ]
-                    },
-                    {
-                        text: 'Architecture', link: '/guide/cosmwasm-core/architecture/architecture',
-                        items: [
-                            {text: 'Actor model', link: '/guide/cosmwasm-core/architecture/actor-model'},
-                            {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
-                            {text: 'Transactions', link: '/guide/cosmwasm-core/architecture/transactions'},
-                        ]
-                    }
+                    {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
+                    {text: 'Architecture', link: '/guide/cosmwasm-core/architecture/architecture'}
                 ]
             },
         ],
@@ -62,6 +45,13 @@ export default withMermaid({
                             {text: 'Actor model', link: '/guide/cosmwasm-core/architecture/actor-model'},
                             {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
                             {text: 'Transactions', link: '/guide/cosmwasm-core/architecture/transactions'},
+                        ]
+                    },
+                    {
+                        text: 'Conventions', collapsed: true, link: '/guide/cosmwasm-core/conventions/conventions',
+                        items: [
+                            {text: 'Library feature', link: '/guide/cosmwasm-core/conventions/library-feature'},
+                            {text: 'Enum dispatch', link: '/guide/cosmwasm-core/conventions/enum-dispatch'},
                         ]
                     },
                 ]
