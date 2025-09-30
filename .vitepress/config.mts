@@ -16,9 +16,19 @@ export default withMermaid({
                 items: [
                     {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
                     {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
-                    {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
                     {
-                        text: 'Architecture',
+                        text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints',
+                        items: [
+                            {text: 'Instantiate', link: '/guide/cosmwasm-core/entrypoints/instantiate'},
+                            {text: 'Execute', link: '/guide/cosmwasm-core/entrypoints/execute'},
+                            {text: 'Query', link: '/guide/cosmwasm-core/entrypoints/query'},
+                            {text: 'Migrate', link: '/guide/cosmwasm-core/entrypoints/migrate'},
+                            {text: 'Sudo', link: '/guide/cosmwasm-core/entrypoints/sudo'},
+                            {text: 'Reply', link: '/guide/cosmwasm-core/entrypoints/reply'},
+                        ]
+                    },
+                    {
+                        text: 'Architecture', link: '/guide/cosmwasm-core/architecture/architecture',
                         items: [
                             {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
                         ]
@@ -29,15 +39,23 @@ export default withMermaid({
         sidebar: [
             {text: 'Welcome', link: '/guide/welcome'},
             {
-                text: 'CosmWasm Core',
-                collapsed: true,
+                text: 'CosmWasm Core', collapsed: true,
                 items: [
                     {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
                     {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
-                    {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
                     {
-                        text: 'Architecture',
-                        collapsed: true,
+                        text: 'Entrypoints', collapsed: true, link: '/guide/cosmwasm-core/entrypoints/entrypoints',
+                        items: [
+                            {text: 'Instantiate', link: '/guide/cosmwasm-core/entrypoints/instantiate'},
+                            {text: 'Execute', link: '/guide/cosmwasm-core/entrypoints/execute'},
+                            {text: 'Query', link: '/guide/cosmwasm-core/entrypoints/query'},
+                            {text: 'Migrate', link: '/guide/cosmwasm-core/entrypoints/migrate'},
+                            {text: 'Sudo', link: '/guide/cosmwasm-core/entrypoints/sudo'},
+                            {text: 'Reply', link: '/guide/cosmwasm-core/entrypoints/reply'},
+                        ]
+                    },
+                    {
+                        text: 'Architecture', collapsed: true, link: '/guide/cosmwasm-core/architecture/architecture',
                         items: [
                             {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
                         ]
