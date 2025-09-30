@@ -79,7 +79,9 @@ setting up a new project in form of a template!
 
 In order to generate a fresh project, run this command and off we go:
 
-<Callout>Make sure to change `PROJECT_NAME` to the name of your contract!</Callout>
+::: tip :bulb: Tip    
+Make sure to change `PROJECT_NAME` to the name of your contract!
+:::
 
 ```shell
 $ cargo generate --git https://github.com/CosmWasm/cw-template.git --name PROJECT_NAME
