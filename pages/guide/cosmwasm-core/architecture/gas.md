@@ -55,9 +55,9 @@ $$ {10^{12} : {35138122 \over {6 \times 10^{-3}}}} = 171 $$
 
 This is rounded to $\lfloor 171 \rfloor = \mathbf{170}$ for simplicity.
 
-**Benchmarking system**
+## Benchmarking system
 
-- CPU: Intel(R) Core(TM) i7-6700 CPU @ 3.40GHz (4 cores, 8 threads)
+- CPU: Intel® Core™ i7-6700 CPU @ 3.40GHz (4 cores, 8 threads)
 - RAM: 32GB DDR4 2133 MHz
 
 Each machine is different, this is obvious. But the above model helps us in multiple ways:
