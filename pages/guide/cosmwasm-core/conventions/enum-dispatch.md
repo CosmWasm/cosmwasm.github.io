@@ -1,5 +1,3 @@
-<ChapterLabel label="core"></ChapterLabel>
-
 # Enum dispatch
 
 In most production contracts you want to handle multiple message types in a single contract.

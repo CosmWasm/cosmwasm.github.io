@@ -22,9 +22,6 @@ export default withMermaid({
                             {text: 'Architecture', link: '/guide/cosmwasm-core/architecture/architecture'},
                             {text: 'Conventions', collapsed: true, link: '/guide/cosmwasm-core/conventions/conventions'}
                         ]
-                    },
-                    {
-                        text: 'Wasmd'
                     }]
             },
         ],

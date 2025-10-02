@@ -1,5 +1,3 @@
-<ChapterLabel label="core"></ChapterLabel>
-
 # Introduction
 
 This chapter will give you an overview over CosmWasm from a contract developer perspective, its
@@ -28,7 +26,7 @@ standard library. These primitives include:
 - interaction with the Cosmos SDK,
 - IBC connectivity.
 
-## What does CosmWasm Core <ins>_not_</ins> provide?
+## What does CosmWasm NOT provide?
 
 - Storage abstractions (for this, check out [cw-storage-plus](https://github.com/CosmWasm/cw-storage-plus).
 - Testing framework (for this, check out [cw-multi-test](https://github.com/CosmWasm/cw-multi-test).

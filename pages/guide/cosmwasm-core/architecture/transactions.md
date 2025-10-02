@@ -1,5 +1,3 @@
-<ChapterLabel label="core"></ChapterLabel>
-
 # Transactions
 
 Every contract invocation is wrapped into a transaction. If you know about transactions in SQL

@@ -1,5 +1,3 @@
-<ChapterLabel label="core"></ChapterLabel>
-
 # Query
 
 In the previous section we talked about the [`execute`](./execute) entrypoint.

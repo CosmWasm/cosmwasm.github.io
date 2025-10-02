@@ -4,8 +4,6 @@
 [inspired by NEAR]: https://docs.near.org/concepts/protocol/gas
 [#1120]: https://github.com/CosmWasm/cosmwasm/pull/1120
 
-<ChapterLabel label="core"></ChapterLabel>
-
 # Gas
 
 Gas is a way to measure computational expense of a smart contract execution, including CPU time and

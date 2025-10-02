@@ -1,5 +1,3 @@
-<ChapterLabel label="core"></ChapterLabel>
-
 # Execute
 
 Execute pretty much does what it says on the tin: it executes some routine in your contract
