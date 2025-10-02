@@ -1,3 +1,5 @@
+<SectionLabel chapter="core" section="entrypoints"></SectionLabel>
+
 # Query
 
 In the previous section we talked about the [`execute`](./execute) entrypoint.

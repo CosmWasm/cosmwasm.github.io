@@ -3,7 +3,7 @@
 [CosmWasm Optimizing Compiler]: https://github.com/CosmWasm/optimizer
 [binaryen]: https://github.com/WebAssembly/binaryen
 
-<ChapterLabel label="core" bgColor=var(--bg-chapter)></ChapterLabel>
+<ChapterLabel label="core"></ChapterLabel>
 
 # Installation
 

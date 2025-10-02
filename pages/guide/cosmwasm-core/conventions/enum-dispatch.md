@@ -1,3 +1,5 @@
+<SectionLabel chapter="core" section="conventions"></SectionLabel>
+
 # Enum dispatch
 
 In most production contracts you want to handle multiple message types in a single contract.

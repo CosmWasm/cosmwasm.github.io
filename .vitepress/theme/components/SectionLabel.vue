@@ -1,18 +1,27 @@
 <script setup>
 defineProps({
-  label: {
+  chapter: {
     type: String,
     default: 'chapter',
   },
-  bgColor: {
+  section: {
+    type: String,
+    default: 'section',
+  },
+  bgChapter: {
     type: String,
     default: 'var(--bg-medium-blue)'
+  },
+  bgSection: {
+    type: String,
+    default: 'var(--bg-persian-pink)'
   }
 })
 </script>
 
 <template>
-  <span class="label" :style="{backgroundColor: bgColor}">{{ label }}</span>
+  <span class="label" :style="{backgroundColor: bgChapter}">{{ chapter }}</span>
+  <span class="label" :style="{backgroundColor: bgSection}">{{ section }}</span>
 </template>
 
 <style scoped>

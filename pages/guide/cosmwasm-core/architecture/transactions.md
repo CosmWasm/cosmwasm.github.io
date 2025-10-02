@@ -1,3 +1,5 @@
+<SectionLabel chapter="core" section="architecture"></SectionLabel>
+
 # Transactions
 
 Every contract invocation is wrapped into a transaction. If you know about transactions in SQL

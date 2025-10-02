@@ -1,3 +1,5 @@
+<SectionLabel chapter="core" section="entrypoints"></SectionLabel>
+
 # Sudo
 
 `sudo` is a special entrypoint that you will probably rarely use in practice.

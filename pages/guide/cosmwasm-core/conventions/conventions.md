@@ -1,3 +1,5 @@
+<SectionLabel chapter="core" section="conventions"></SectionLabel>
+
 # Conventions
 
 Just like with any platform, there are certain conventions on how to write contracts for CosmWasm.

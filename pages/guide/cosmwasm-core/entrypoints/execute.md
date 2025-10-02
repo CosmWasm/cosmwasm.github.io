@@ -1,3 +1,5 @@
+<SectionLabel chapter="core" section="entrypoints"></SectionLabel>
+
 # Execute
 
 Execute pretty much does what it says on the tin: it executes some routine in your contract

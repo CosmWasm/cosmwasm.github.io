@@ -1,5 +1,4 @@
-<ChapterLabel label="core" bgColor=var(--bg-chapter)></ChapterLabel>
-<ChapterLabel label="entrypoints" bgColor=var(--bg-chapter-sub)></ChapterLabel>
+<SectionLabel chapter="core" section="entrypoints"></SectionLabel>
 
 # Instantiate
 

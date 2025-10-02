@@ -1,6 +1,8 @@
 [its own page]: ../architecture/actor-model
 [transactions]: ../architecture/transactions
 
+<SectionLabel chapter="core" section="entrypoints"></SectionLabel>
+
 # Reply
 
 The `reply` entrypoint is another special one.

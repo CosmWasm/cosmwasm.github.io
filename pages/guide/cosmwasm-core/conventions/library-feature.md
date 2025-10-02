@@ -1,6 +1,8 @@
 [`cw-plus` contracts]: https://github.com/CosmWasm/cw-plus
 [`cw4-stake` contract]: https://github.com/CosmWasm/cw-plus/blob/48bec694521655d5b3e688c51e4185f740ea4640/contracts/cw4-stake/Cargo.toml#L22-L24
 
+<SectionLabel chapter="core" section="conventions"></SectionLabel>
+
 # Library feature
 
 In the ecosystem, there is the convention to gate the entrypoints of your contract behind a

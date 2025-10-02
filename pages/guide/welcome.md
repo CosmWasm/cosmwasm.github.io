@@ -3,7 +3,7 @@
 [IBC]: https://www.ibcprotocol.dev/
 [documentation repository]: https://github.com/CosmWasm/cosmwasm.github.io
 
-<ChapterLabel bgColor=var(--bg-maya-blue)></ChapterLabel>
+<ChapterLabel label="CosmWasm Docs" bgColor="var(--bg-maya-blue)"></ChapterLabel>
 
 # Welcome
 
