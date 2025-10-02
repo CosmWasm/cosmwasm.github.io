@@ -1,3 +1,5 @@
+<ChapterLabel label="core"></ChapterLabel>
+
 # Instantiate
 
 This is one of the most fundamental entrypoints. This entrypoint is called once during the contract lifecycle,

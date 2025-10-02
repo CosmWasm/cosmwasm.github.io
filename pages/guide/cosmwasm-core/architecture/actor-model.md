@@ -1,6 +1,8 @@
 [reentrancy issues]: https://ethereum.org/en/developers/docs/smart-contracts/security/#reentrancy
 [enum dispatch]: ../conventions/enum-dispatch
 [CEI pattern (Checks, Effects, Interactions)]: https://fravoll.github.io/solidity-patterns/checks_effects_interactions.html
+
+<ChapterLabel label="core"></ChapterLabel>
   
 # Actor model
 

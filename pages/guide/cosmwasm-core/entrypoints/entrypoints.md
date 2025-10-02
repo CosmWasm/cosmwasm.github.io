@@ -1,3 +1,5 @@
+<ChapterLabel label="core"></ChapterLabel>
+
 # Entrypoints
 
 Entrypoints are where your contract can be called from the outside world. You can equate that to

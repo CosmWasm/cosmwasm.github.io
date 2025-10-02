@@ -1,6 +1,8 @@
 [its own page]: ../architecture/actor-model
 [transactions]: ../architecture/transactions
 
+<ChapterLabel label="core"></ChapterLabel>
+
 # Reply
 
 The `reply` entrypoint is another special one.

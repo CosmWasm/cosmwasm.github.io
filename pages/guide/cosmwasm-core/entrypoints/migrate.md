@@ -1,3 +1,5 @@
+<ChapterLabel label="core"></ChapterLabel>
+
 # Migrate
 
 This is another special entrypoint. It is, just like [`instantiate`](./instantiate), not called frequently.

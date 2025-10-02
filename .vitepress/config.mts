@@ -3,23 +3,29 @@ import {withMermaid} from "vitepress-plugin-mermaid";
 export default withMermaid({
     lang: 'en-US',
     base: '/',
-    title: "CosmWasm",
+    title: "CosmWasm Docs",
     description: "User guide for CosmWasm smart contract developers",
     head: [['link', {rel: 'icon', href: '/cosmwasm-small.svg'}]],
     lastUpdated: true,
     themeConfig: {
         logo: '/cosmwasm-small.svg',
         nav: [
-            {text: 'Welcome', link: '/guide/welcome'},
             {
-                text: 'CosmWasm Core',
-                items: [
-                    {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
-                    {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
-                    {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
-                    {text: 'Architecture', link: '/guide/cosmwasm-core/architecture/architecture'},
-                    {text: 'Conventions', collapsed: true, link: '/guide/cosmwasm-core/conventions/conventions'}
-                ]
+                text: 'Chapters', items: [
+                    {text: 'Welcome', link: '/guide/welcome'},
+                    {
+                        text: 'CosmWasm Core',
+                        items: [
+                            {text: 'Introduction', link: '/guide/cosmwasm-core/introduction'},
+                            {text: 'Installation', link: '/guide/cosmwasm-core/installation'},
+                            {text: 'Entrypoints', link: '/guide/cosmwasm-core/entrypoints/entrypoints'},
+                            {text: 'Architecture', link: '/guide/cosmwasm-core/architecture/architecture'},
+                            {text: 'Conventions', collapsed: true, link: '/guide/cosmwasm-core/conventions/conventions'}
+                        ]
+                    },
+                    {
+                        text: 'Wasmd'
+                    }]
             },
         ],
         sidebar: [

@@ -1,3 +1,5 @@
+<ChapterLabel label="core"></ChapterLabel>
+
 # Sudo
 
 `sudo` is a special entrypoint that you will probably rarely use in practice.
