@@ -48,6 +48,7 @@ export default withMermaid({
                         items: [
                             {text: 'Semantics', link: '/guide/cosmwasm-core/architecture/semantics'},
                             {text: 'Actor model', link: '/guide/cosmwasm-core/architecture/actor-model'},
+                            {text: 'Events', link: '/guide/cosmwasm-core/architecture/events'},
                             {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
                             {text: 'Transactions', link: '/guide/cosmwasm-core/architecture/transactions'},
                         ]
