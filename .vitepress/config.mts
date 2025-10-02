@@ -50,6 +50,7 @@ export default withMermaid({
                             {text: 'Actor model', link: '/guide/cosmwasm-core/architecture/actor-model'},
                             {text: 'Events', link: '/guide/cosmwasm-core/architecture/events'},
                             {text: 'Gas', link: '/guide/cosmwasm-core/architecture/gas'},
+                            {text: 'Pinning', link: '/guide/cosmwasm-core/architecture/pinning'},
                             {text: 'Transactions', link: '/guide/cosmwasm-core/architecture/transactions'},
                         ]
                     },
