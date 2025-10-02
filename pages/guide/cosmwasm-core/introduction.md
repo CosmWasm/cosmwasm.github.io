@@ -1,3 +1,5 @@
+<ChapterLabel label="core"></ChapterLabel>
+
 # Introduction
 
 This chapter will give you an overview over CosmWasm from a contract developer perspective, its
