@@ -1,3 +1,6 @@
+<ChapterLabel label="core" bgColor=var(--bg-chapter)></ChapterLabel>
+<ChapterLabel label="entrypoints" bgColor=var(--bg-chapter-sub)></ChapterLabel>
+
 # Entrypoints
 
 Entrypoints are where your contract can be called from the outside world. You can equate that to

@@ -3,6 +3,8 @@
 [IBC]: https://www.ibcprotocol.dev/
 [documentation repository]: https://github.com/CosmWasm/cosmwasm.github.io
 
+<ChapterLabel bgColor=var(--bg-maya-blue)></ChapterLabel>
+
 # Welcome
 
 The [x/wasm] module, the root of CosmWasm, is a [Cosmos SDK] module enabling smart contracts

@@ -1,3 +1,6 @@
+<ChapterLabel label="core" bgColor=var(--bg-chapter)></ChapterLabel>
+<ChapterLabel label="entrypoints" bgColor=var(--bg-chapter-sub)></ChapterLabel>
+
 # Instantiate
 
 This is one of the most fundamental entrypoints. This entrypoint is called once during the contract lifecycle,

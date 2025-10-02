@@ -1,6 +1,12 @@
 :root {
-    --dt-light-background: #A855F7;
-    --dt-dark-background: #334155;
+    --bg-maya-blue: #70BCFF;
+    --bg-medium-blue: #7954FF;
+    --bg-persian-pink: #FC8ADC;
+    --bg-congo-pink: #FF8B89;
+    --bg-champagne: #FCECB2;
+
+    --dt-light-background: var(--bg-persian-pink);
+    --dt-dark-background: var(--bg-medium-blue);
     --vp-home-hero-name-color: transparent;
     --vp-home-hero-name-background: -webkit-linear-gradient(120deg, var(--dt-dark-background), var(--dt-light-background));
 }
