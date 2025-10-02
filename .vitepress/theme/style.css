@@ -9,6 +9,10 @@
     --dt-dark-background: var(--bg-medium-blue);
     --vp-home-hero-name-color: transparent;
     --vp-home-hero-name-background: -webkit-linear-gradient(120deg, var(--dt-dark-background), var(--dt-light-background));
+    --vp-code-font-size: 16px;
     --vp-custom-block-font-size: 16px;
-    --vp-code-font-size: 0.9em;
+    --vp-custom-block-code-font-size: 16px;
+    --vp-custom-block-tip-text: #9A3412;
+    --vp-custom-block-tip-bg: #FFF7ED;
+    --vp-custom-block-tip-code-bg: #FFF7ED;
 }
