@@ -22,7 +22,7 @@ You can just clone this repository and run the following commands:
 
 ```shell
 $ npm install
-$ task serve
+$ npm run start
 ```
 
 You will now be able to visit the locally served website at http://localhost:3000/
