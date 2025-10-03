@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcosmwasmsauru=self.webpackChunkcosmwasmsauru||[]).push([[4504],{4504:(s,e,a)=>{a.d(e,{createTreemapServices:()=>u.d});var u=a(3758);a(8198)}}]);

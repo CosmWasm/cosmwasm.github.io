@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkcosmwasmsauru=self.webpackChunkcosmwasmsauru||[]).push([[2068],{2068:(s,e,a)=>{a.d(e,{createInfoServices:()=>u.v});var u=a(1366);a(8198)}}]);

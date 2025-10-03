@@ -1,0 +1,101 @@
+[its own page]: ../architecture/actor-model
+[transactions]: ../architecture/transactions
+
+<SectionLabel chapter="core" section="entrypoints"></SectionLabel>
+
+# Reply
+
+The `reply` entrypoint is another special one.
+
+It relates to CosmWasm's actor model which dictates how you call other contracts and interact with them.
+
+::: tip :bulb: Tip
+If you are not familiar with the actor model, you can find out more about it on [its own page].
+:::
+
+This endpoint gets invoked when you receive a response to a message you sent out over the chain.
+The reply parameter then allows you to inspect and work with the response that was produced.
+
+## Request a reply
+
+To request a reply, you need to use the `reply_on` field in the message you send and set it to one
+of the following values:
+
+- `ReplyOn::Always`
+- `ReplyOn::Error`
+- `ReplyOn::Success`
+
+::: tip :bulb: Tip
+The `reply_on` value has an impact on when a transaction is cancelled.
+For more info, check the page about [transactions].
+:::
+
+::: code-group
+
+```Rust [contract.rs]
+const CONTRACT_ADDR: &str = "other_contract";
+const SUBMSG_ID: u64 = 1; // This is a unique identifier so we can associate a reply with a specific submessage. It can be any numeric value.
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, env: Env, msg: cosmwasm_std::Reply) -> StdResult<Response> {
+    if msg.id != SUBMSG_ID {
+        return Err(StdError::generic_err("Invalid submsg id"));
+    }
+
+    // We received a message! From the contract we invoked earlier.
+
+    Ok(Response::default())
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn execute(deps: DepsMut, env: Env, msg: ExecuteMsg) -> StdResult<Response> {
+    let msg = WasmMsg::Execute {
+        contract_addr: CONTRACT_ADDR.into(),
+        msg: to_json_binary(&OtherContractMsg::DoSomething {}).unwrap(),
+        funds: vec![],
+    };
+
+    let submsg = SubMsg::reply_always(msg, SUBMSG_ID);
+    Ok(Response::new().add_submessage(submsg))
+}
+```
+
+:::
+
+## Definition
+
+::: code-group
+
+```Rust [contract.rs]
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(
+    deps: DepsMut, 
+    env: Env, 
+    msg: cosmwasm_std::Reply) -> StdResult<Response> {
+    // TODO: Put you reply logic here.
+    Ok(Response::default())
+}
+```
+
+:::
+
+## Handling the reply
+
+Once the submessage handling is finished, the caller will get a chance to handle the result.
+It will get the original `id` of the subcall and the `Result` of the execution, both success and error.
+Note that it includes all events returned by the submessage, which applies to native SDK modules
+(like bank) as well as the contracts. If you need more state, you must save it in the local store during
+the `execute` entrypoint call, and load it in the `reply` entrypoint.
+
+The `reply` call may return `Err` itself, in which case it is treated like the caller errored,
+and aborting the sub-transaction. However, on successful processing, `reply` may return a normal
+[`Response`](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.Response.html), which will be
+processed as normal - events added to the `EventManager`, and all `messages` dispatched as described above.
+When `Err` is returned by a message handler, all changes made by the handler up to the reply
+entrypoint that returns the `Ok` response are reverted. More information can be found in the following section.
+
+The responses emitted by the submessage are gathered in the
+[`msg_responses`](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.SubMsgResponse.html#structfield.msg_responses)
+field of the [SubMsgResponse](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.SubMsgResponse.html) structure.
+**wasmd** allows chains to translate a single contract message into multiple SDK messages.
+In that case all the message responses from each are concatenated into this flattened `Vec`.
