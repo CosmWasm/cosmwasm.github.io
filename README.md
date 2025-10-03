@@ -14,7 +14,7 @@ to storage, testing, IBC, and beyond.
 
 ## How is it made?
 
-The deployed documentation is a [VitePress](https://vitepress.dev/) project hosted on GitHub pages.
+The deployed documentation is a [Docusaurus](https://docusaurus.io) project hosted on GitHub pages.
 
 ## How can I run it locally?
 
@@ -25,7 +25,7 @@ $ npm install
 $ task serve
 ```
 
-You will now be able to visit the locally served website at http://localhost:5173/
+You will now be able to visit the locally served website at http://localhost:3000/
 
 ## How can I contribute?
 
