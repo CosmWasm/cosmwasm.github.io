@@ -10,16 +10,43 @@ The following overview shows how to convert between integers and decimals of dif
 only shows the unsigned case but the signed types work the same way.
 
 ```mermaid
-graph TD
-    Decimal ---> |From| Decimal256
-    Decimal256 ---> |TryFrom| Decimal
-    Uint128 ---> |"::from_atomics(n,0)"| Decimal
-    Decimal ---> |::to_uint_floor| Uint128
-    Decimal ---> |::to_uint_ceil| Uint128
-    Uint256 ---> |"::from_atomics(n,0)"| Decimal256
-    Decimal256 ---> |::to_uint_floor| Uint256
-    Decimal256 ---> |::to_uint_ceil| Uint256
+graph LR
+    Decimal <---> Decimal256
+    Uint64 <---> Uint128
+    Uint64 <---> u64
+    Uint128 <---> u128
+    Uint128 <---> Decimal
+    Uint128 <---> Uint256
+    Uint256 <---> Decimal256
+    Uint512 <---> Uint256
+    
+    subgraph "Rust integer types"
+      u64
+      u128
+    end
+    
+    subgraph "Integer types"
+      Uint64
+      Uint128
+      Uint256
+      Uint512
+    end
+    
+    subgraph "Decimal types"
+      Decimal
+      Decimal256
+    end
 ```
+
+| Destination type | Source type: Decimal               |
+|-----------------:|:-----------------------------------|
+|       Decimal256 | From                               |
+|           Uint64 |                                    |
+|          Uint128 | ::to_uint_floor<br/>::to_uint_ceil |
+|          Uint256 |                                    |
+|          Uint512 |                                    |
+|              u64 |                                    |
+|             u128 |                                    |
 
 |                |              Decimal               |             Decimal256             | Uint64 |       Uint128       |       Uint256       | Uint512 | u64 | u128 |
 |---------------:|:----------------------------------:|:----------------------------------:|:------:|:-------------------:|:-------------------:|:-------:|:---:|:----:|
