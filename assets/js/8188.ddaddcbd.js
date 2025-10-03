@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcosmwasmsauru=self.webpackChunkcosmwasmsauru||[]).push([[8188],{8188:(s,e,a)=>{a.d(e,{createPieServices:()=>u.f});var u=a(9786);a(8198)}}]);

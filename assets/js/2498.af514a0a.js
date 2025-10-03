@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkcosmwasmsauru=self.webpackChunkcosmwasmsauru||[]).push([[2498],{2498:(s,e,c)=>{c.d(e,{createArchitectureServices:()=>u.S});var u=c(3009);c(8198)}}]);
