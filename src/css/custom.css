@@ -1,0 +1,56 @@
+:root {
+  --ifm-color-primary: #7954ff;
+  --ifm-color-primary-dark: #5e32ff;
+  --ifm-color-primary-darker: #5121ff;
+  --ifm-color-primary-darkest: #3300ed;
+  --ifm-color-primary-light: #9476ff;
+  --ifm-color-primary-lighter: #a187ff;
+  --ifm-color-primary-lightest: #c9baff;
+
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-footer-background-color: transparent;
+
+  .footer {
+    border-top: 1px solid #dadde1;
+  }
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #9476ff;
+  --ifm-color-primary-dark: #7751ff;
+  --ifm-color-primary-darker: #683eff;
+  --ifm-color-primary-darkest: #3d06ff;
+  --ifm-color-primary-light: #b19bff;
+  --ifm-color-primary-lighter: #c0aeff;
+  --ifm-color-primary-lightest: #ebe6ff;
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-footer-background-color: transparent;
+
+  .footer {
+    border-top: 1px solid #444950;
+  }
+}
+
+.hero__title {
+  font-family: 'Iceland', sans-serif;
+  font-weight: normal;
+  font-size: 3.2em;
+}
+
+.hero__subtitle {
+  font-size: 1.5em;
+}
+
+.navbar__title {
+  font-family: 'Iceland', sans-serif;
+  font-weight: normal;
+  font-size: 1.5rem;
+}
+
+.footer__title {
+  font-family: 'Iceland', sans-serif;
+  font-weight: normal;
+  font-size: 1.5em;
+}
