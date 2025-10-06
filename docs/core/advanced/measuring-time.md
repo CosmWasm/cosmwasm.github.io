@@ -1,0 +1,37 @@
+---
+sidebar_position: 1
+---
+
+# Measuring time
+
+Accessing the current time is useful in a lot of different contexts but time is hard.
+It is hard to coordinate, hard to keep in sync, and this gets worse in distributed settings such as blockchains.
+
+In CosmWasm, we solve this by passing you some information about the blockchain you are running on
+whenever an entrypoint is invoked.
+
+In each of the entrypoints, you get a parameter of the type `Env` and this struct contains the field `block`.
+The struct contained in this field has a bunch of different information about the current state of the blockchain
+you are running on.
+
+:::tip
+
+The documentation for the `BlockInfo` struct can be [found here].
+
+:::
+
+The timestamp contained in this struct can be safely used in your program as the source of the current time.
+Well, kinda. It won't be 100% matching the current time, as it is the timestamp of the block we are currently
+operating on.
+
+But you can rely on this timestamp to have the following properties:
+
+- Consistent across the chain (every validator on the chain has the same info)
+- Monotonic (it will only ever increase or stay the same; never decrease)
+
+Read more about [BFT Time] and [Proposer-Based Timestamps (PBTS)][PBTS] if you want to better understand
+where the time value comes from.
+
+[found here]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.BlockInfo.html
+[BFT Time]: https://docs.cometbft.com/main/spec/consensus/bft-time
+[PBTS]: https://informal.systems/blog/introducing-proposer-based-timestamps-pbts-in-cometbft
