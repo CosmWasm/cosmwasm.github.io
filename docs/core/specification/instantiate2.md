@@ -1,0 +1,56 @@
+---
+title: Instantiate2
+sidebar_position: 1
+---
+
+
+
+# Instantiate2 algorithm
+
+With the instantiate2 algorithm you can create a contract address in a predictable and deterministic
+way. The underlying algorithm is rather simple.
+
+We use SHA-256 as the underlying hashing algorithm.
+
+You need to provide the following inputs:
+
+- **checksum**: this is the checksum of the contract code (the Wasm module, for example); this
+  **has** to be a SHA-256 hash,
+- **creator**: this is the canonicalized address of the user instantiating the contract,
+- **salt**: this is some byte string allowing you to distinguish multiple instantiations of the same
+  contract by the same creator; this parameter has to be under 64 bytes in length,
+- **msg**: the initialization message is usually unused; CosmWasm sets this to an empty byte string.
+
+Assuming that the macro `concat!` joins two byte slices and the function `hash_sha256`
+returns the SHA-256 hash of the provided input, the Instantiate2 algorithm would look like this:
+
+```rust title="instantiate2.rs"
+let c_checksum = concat!((checksum.len() as u64).to_be_bytes(), checksum);
+let c_creator = concat!((creator.len() as u64).to_be_bytes(), creator);
+let c_salt = concat!((salt.len() as u64).to_be_bytes(), salt);
+let c_msg = concat!((msg.len() as u64).to_be_bytes(), msg);
+
+let canonical_address = hash_sha256(
+    concat!(
+        hash_sha256(b"module"),
+        b"wasm\0",
+        c_checksum,
+        c_creator,
+        c_salt,
+        c_msg,
+    ),
+);
+```
+
+:::tip
+
+Please note that an implementation of this [function][instantiate2_address] is already
+available for you to use, just add the import:
+
+```rust
+use cosmwasm_std::instantiate2_address;
+```
+
+:::
+
+[instantiate2_address]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/fn.instantiate2_address.html

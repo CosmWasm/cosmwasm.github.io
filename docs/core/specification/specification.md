@@ -1,0 +1,6 @@
+# Specification
+
+This section contains specifications of CosmWasm specific algorithms.
+
+Whenever you want to port one of those algorithms into a different programming language,
+you can refer to their pages and treat them as their canonical specifications.
