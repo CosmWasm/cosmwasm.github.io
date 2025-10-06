@@ -1,0 +1,4 @@
+# Getting started
+
+This part of the documentation describes how to set up wasmd, start a node, and interact with it
+using the CLI.
