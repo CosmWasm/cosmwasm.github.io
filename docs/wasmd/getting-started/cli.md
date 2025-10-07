@@ -1,0 +1,763 @@
+---
+sidebar_position: 3
+---
+
+# Interact via CLI
+
+## Upload
+
+In this section, you will upload a Wasm contract to the blockchain. This involves using the
+`wasmd tx wasm store` command to upload the contract file, and then querying the blockchain to
+obtain the unique code ID for the uploaded contract.
+
+### Upload code
+
+You can upload your contract by running the command: `wasmd tx wasm store`. In the following
+example, we upload the `hackatom.wasm` contract:
+
+```shell
+wasmd tx wasm store "./x/wasm/keeper/testdata/hackatom.wasm" \
+  --from alice \
+  --gas 1500000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test
+```
+
+- `./x/wasm/keeper/testdata/hackatom.wasm` is the path to the Wasm file to upload,
+- `--from alice` specifies the sender's account, in this case it is **alice**,
+- `--gas 1500000` sets the gas limit for the transaction,
+- `-y` automatically accepts the transaction,
+- `--chain-id=docs-chain-1` specifies the chain ID of the blockchain,
+- `-o json` outputs the result in JSON format,
+- `--keyring-backend=test` specifies the keyring backend to use.
+
+The output looks like this:
+
+```json
+{
+  "height": "0",
+  "txhash": "57514909E7654EE7A1F90036ABDBDFF0B411C43ECC32315CD7759894337B6C4F",
+  "codespace": "",
+  "code": 0,
+  "data": "",
+  "raw_log": "",
+  "logs": [],
+  "info": "",
+  "gas_wanted": "0",
+  "gas_used": "0",
+  "tx": null,
+  "timestamp": "",
+  "events": []
+}
+```
+
+From this output, we can get the transaction hash `txhash`. Using this hash, we can fetch the code
+ID.
+
+```shell
+wasmd q tx 2C19314D369E7EF3C77CBD1B33E02DB0401619B5C8E1B1E5BD15AB46C3704E96 -o json
+```
+
+The command will return a JSON object similar to the following:
+
+```json
+{
+  ...
+  "events": [
+    ...
+    {
+      "type": "store_code",
+      "attributes": [
+        {
+          "key": "code_checksum",
+          "value": "3f4cd47c39c57fe1733fb41ed176eebd9d5c67baf5df8a1eeda1455e758f8514",
+          "index": true
+        },
+        {
+          "key": "code_id",
+          "value": "1",
+          "index": true
+        },
+        {
+          "key": "msg_index",
+          "value": "0",
+          "index": true
+        }
+      ]
+    }
+  ]
+}
+```
+
+Inside the `store_code` event, you can find the `code_id`. To extract it, you can use the following command:
+
+```shell
+RESP=$(wasmd q tx 2C19314D369E7EF3C77CBD1B33E02DB0401619B5C8E1B1E5BD15AB46C3704E96 -o json)
+echo "$RESP" | jq -r '.events[]| select(.type=="store_code").attributes[]| select(.key=="code_id").value'
+```
+
+Below is the full script that uploads the code and fetches the code ID:
+
+```shell
+# Upload the contract
+RESP=$(wasmd tx wasm store "./x/wasm/keeper/testdata/hackatom.wasm" \
+  --from alice \
+  --gas 1500000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test)
+
+# Wait for the transaction to be processed
+sleep 6
+
+# Fetch the transaction details
+RESP=$(wasmd q tx $(echo "$RESP"| jq -r '.txhash') -o json)
+
+# Extract the code ID
+CODE_ID=$(echo "$RESP" | jq -r '.events[]| select(.type=="store_code").attributes[]| select(.key=="code_id").value')
+
+# Print code id
+echo "* Code id: $CODE_ID"
+```
+
+### Query Code ID Metadata
+
+To query the metadata of a specific code ID, use the following command:
+
+```shell
+wasmd q wasm code-info $CODE_ID -o json
+```
+
+The command will return a JSON object similar to the following:
+
+```json
+{
+  "code_id": "1",
+  "creator": "wasm1zxevglcy90hq49x8vvdckfrgd9ffndxf70ut0z",
+  "data_hash": "3F4CD47C39C57FE1733FB41ED176EEBD9D5C67BAF5DF8A1EEDA1455E758F8514",
+  "instantiate_permission": {
+    "permission": "Everybody",
+    "addresses": []
+  }
+}
+```
+
+- `"code_id"` is the reference to the stored Wasm code,
+- `"creator"` is the address of the account that uploaded the code,
+- `"data_hash"` is the checksum of the stored Wasm code,
+- `"instantiate_permission"` is the instantiate permission configuration. It is optional, and the
+  default value is `Everybody`, which means everybody can create an instance of the uploaded Wasm code.
+
+### Download code
+
+You can download the code associated with a specific code ID by running the following command:
+
+```shell
+wasmd q wasm code $CODE_ID downloaded_code.wasm
+```
+
+This command retrieves the Wasm code from the blockchain and saves it to a file named `downloaded_code.wasm`.
+
+## Instantiation
+
+In this section, you will create a new instance of the uploaded Wasm contract. This involves using
+the `wasmd tx wasm instantiate` command to instantiate the contract, and then querying the
+blockchain to obtain the contract's address.
+
+### Create a new contract instance
+
+First, set up the addresses for the accounts involved in the contract using `wasmd keys show` command:
+
+```shell
+# Retrieve the address of Alice's account
+ALICE_ADDR=$(wasmd keys show alice -a --keyring-backend=test)
+
+# Retrieve the address of Bob's account
+BOB_ADDR=$(wasmd keys show bob -a --keyring-backend=test)
+
+# Define init parameters for the contract
+INIT="{\"verifier\":\"$ALICE_ADDR\", \"beneficiary\":\"$BOB_ADDR\"}"
+```
+
+Run the following command to instantiate the contract:
+
+```shell
+wasmd tx wasm instantiate "$CODE_ID" "$INIT" \
+  --admin="$ALICE_ADDR" \
+  --from alice \
+  --amount="100stake" \
+  --label "local0.1.0" \
+  --gas 1000000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test
+```
+
+- `wasmd tx wasm instantiate "$CODE_ID" "$INIT"` instantiates the contract using the specified code ID and initial parameters,
+- `--admin="$ALICE_ADDR"` specifies Alice as the admin who can later update the contract,
+- `--from alice` specifies Alice as the sender of the transaction,
+- `--amount="100stake"`: Sends `100 stake` to the contract upon instantiation,
+- `--label "local0.1.0"` assigns a label to this contract instance for easy identification,
+- `--gas 1000000` sets the gas limit for the transaction,
+- `-y` automatically accepts the transaction without prompting for confirmation,
+- `--chain-id=docs-chain-1` specifies the chain ID of the blockchain,
+- `-o json` outputs the result in JSON format,
+- `--keyring-backend=test` specifies the keyring backend to use.
+
+### Query the Contract Address
+
+To retrieve the address of the newly instantiated contract you can use `wasmd query wasm list-contract-by-code` command:
+
+```shell
+wasmd query wasm list-contract-by-code "$CODE_ID" -o json
+```
+
+The output lists all contracts instantiated from the specified code ID:
+
+```json
+{
+  "contracts": ["wasm1suhgf5svhu4usrurvxzlgn54ksxmn8gljarjtxqnapv8kjnp4nrss5maay"],
+  "pagination": {
+    "next_key": null,
+    "total": "0"
+  }
+}
+```
+
+Below is the full script that combines all the steps:
+
+```shell
+# Set up addresses
+ALICE_ADDR=$(wasmd keys show alice -a --keyring-backend=test)
+BOB_ADDR=$(wasmd keys show bob -a --keyring-backend=test)
+INIT="{\"verifier\":\"$ALICE_ADDR\", \"beneficiary\":\"$BOB_ADDR\"}"
+
+# Instantiate the contract
+RESP=$(wasmd tx wasm instantiate "$CODE_ID" "$INIT" \
+  --admin="$ALICE_ADDR" \
+  --from alice \
+  --amount="100stake" \
+  --label "local0.1.0" \
+  --gas 1000000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test)
+
+# Wait for the transaction to be processed
+sleep 6
+
+# Query the contract address
+CONTRACT=$(wasmd query wasm list-contract-by-code "$CODE_ID" -o json | jq -r '.contracts[-1]')
+
+# Print the contract address
+echo "* Contract address: $CONTRACT"
+```
+
+### Query Contract Metadata
+
+To query the metadata of a specific contract, use the following command:
+
+```shell
+wasmd q wasm contract $CONTRACT -o json
+```
+
+The command will return a JSON object similar to the following:
+
+```json
+{
+  "address": "wasm14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s0phg4d",
+  "contract_info": {
+    "code_id": "1",
+    "creator": "wasm1zxevglcy90hq49x8vvdckfrgd9ffndxf70ut0z",
+    "admin": "wasm1zxevglcy90hq49x8vvdckfrgd9ffndxf70ut0z",
+    "label": "local0.1.0",
+    "created": {
+      "block_height": "787",
+      "tx_index": "0"
+    },
+    "ibc_port_id": "",
+    "extension": null
+  }
+}
+```
+
+- `"address"` is the address of the contract on the blockchain. It uniquely identifies the contract and is used for interacting with it,
+- `"code_id"` is the reference to the stored Wasm code from which the contract was instantiated,
+- `"creator"` is the blockchain address of the account that initially instantiated the contract; it indicates who created the contract instance,
+- `"admin"` is the address of the account that has administrative privileges over the contract, such as the ability to execute migrations;
+  this field is optional and can be set during instantiation.
+- `"label"` is an optional field used to give a human-readable label to the contract; it helps in identifying the contract instance,
+  especially when multiple instances of the same code are deployed,
+- `"created"` section provides details about the transaction in which the contract was instantiated, including the block height
+  at which the contract was created and the index of the transaction within the block,
+- `"ibc_port_id"` is the Port ID for Inter-Blockchain Communication [IBC](../../ibc/introduction). If the contract is set up to interact with
+  other blockchains via IBC, this field will contain the relevant port ID,
+- `"extension"` is an extension point to store custom metadata within the persistence model.
+
+## Instantiation with Predictable Address
+
+Instantiation with a predictable address refers to the process of deploying a smart contract on a
+blockchain such that the resulting contract address can be determined in advance. This is
+particularly useful in scenarios where you need to know the contract address before its actual
+deployment for purposes like pre-configuring other contracts or systems to interact with it.
+
+### Create a new contract instance with predictable address
+
+First, we need to define a salt value. The salt is a unique value that, when combined with the
+contract's code ID and initialization parameters, helps derive a unique and predictable contract
+address. This ensures that even if the same contract code and initialization parameters are used,
+different salt values will result in different contract addresses.
+
+```shell
+SALT=10
+```
+
+Run the following command to instantiate the contract with predictable address:
+
+```shell
+wasmd tx wasm instantiate2 "$CODE_ID" "$INIT" "$SALT" \
+  --admin="$ALICE_ADDR" \
+  --from alice \
+  --amount="100stake" \
+  --label "local0.1.0" \
+  --gas 1000000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test
+```
+
+- `wasmd tx wasm instantiate2 "$CODE_ID" "$INIT" "$SALT"` instantiates a new contract instance with the specified code ID, initialization parameters, and the salt value,
+- `--admin="$ALICE_ADDR"` specifies Alice as the admin who can later update the contract,
+- `--from alice` specifies Alice as the sender of the transaction,
+- `--amount="100stake"`: Sends `100 stake` to the contract upon instantiation,
+- `--label "local0.1.0"` assigns a label to this contract instance for easy identification,
+- `--gas 1000000` sets the gas limit for the transaction,
+- `-y` automatically accepts the transaction without prompting for confirmation,
+- `--chain-id=docs-chain-1` specifies the chain ID of the blockchain,
+- `-o json` outputs the result in JSON format,
+- `--keyring-backend=test` specifies the keyring backend to use.
+
+### Query contracts by code id
+
+To get a list of contracts instantiated from a specific Code ID, you can use the following command.
+This will query the blockchain and return a JSON object containing the addresses of the contracts
+associated with the given Code ID.
+
+```shell
+wasmd q wasm list-contract-by-code $CODE_ID -o json
+```
+
+The command will return a JSON object similar to the following:
+
+```json
+{
+  "contracts": [
+    "wasm1wug8sewp6cedgkmrmvhl3lf3tulagm9hnvy8p0rppz9yjw0g4wtqhs9hr8",
+    "wasm19ph090ka8tzrd2wrp8gnn7lachwt7r2npvf6rdnd3ha3jv5n5gqquzcpd0"
+  ],
+  "pagination": {
+    "next_key": null,
+    "total": "0"
+  }
+}
+```
+
+In this example, there are two contracts associated with the Code ID.
+
+### Query contracts by creator
+
+To get a list of contracts instantiated by a specific creator, you can use the following command.
+This will query the blockchain and return a JSON object containing the addresses of the contracts
+associated with the given creator's address.
+
+```shell
+wasmd q wasm list-contracts-by-creator $BOB_ADDR -o json
+```
+
+The command will return a JSON object similar to the following:
+
+```json
+{
+  "contract_addresses": [],
+  "pagination": {
+    "next_key": null,
+    "total": "0"
+  }
+}
+```
+
+In this example, there are no contract addresses associated with Bob's address.
+
+## Execution
+
+Executing a command on a Wasm contract involves sending a message to the contract.
+
+### Execute a command on a wasm contract
+
+First, we have to define the message to send to the contract. In this example we want to call the
+release function of the contract:
+
+```shell
+MSG='{"release":{}}'
+```
+
+Run the following command to execute the message on the contract:
+
+```shell
+wasmd tx wasm execute "$CONTRACT" "$MSG" \
+  --from alice \
+  --gas 1000000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test
+```
+
+- `"$CONTRACT"` specifies the address of the contract,
+- `"$MSG"` specifies the message to execute,
+- `--from alice` specifies Alice as the sender of the transaction,
+- `--gas 1000000` sets the gas limit for the transaction,
+- `-y` automatically accepts the transaction without prompting for confirmation,
+- `--chain-id=docs-chain-1` specifies the chain ID of the blockchain,
+- `-o json` outputs the result in JSON format,
+- `--keyring-backend=test` specifies the keyring backend to use.
+
+By querying the transaction using the `txhash`, we can check the events emitted by the contract.
+The output will look similar to the following:
+
+```json
+{
+  ...
+  "events": [
+    ...
+    {
+      "type": "message",
+      "attributes": [
+        {
+          "key": "action",
+          "value": "/cosmwasm.wasm.v1.MsgExecuteContract",
+          "index": true
+        },
+        {
+          "key": "sender",
+          "value": "wasm1hvgm6p76gccgg4dl4caa8a7v03dsqww6r9sk4g",
+          "index": true
+        },
+        {
+          "key": "module",
+          "value": "wasm",
+          "index": true
+        },
+        {
+          "key": "msg_index",
+          "value": "0",
+          "index": true
+        }
+      ]
+    },
+    {
+      "type": "execute",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "wasm1wug8sewp6cedgkmrmvhl3lf3tulagm9hnvy8p0rppz9yjw0g4wtqhs9hr8",
+          "index": true
+        },
+        {
+          "key": "msg_index",
+          "value": "0",
+          "index": true
+        }
+      ]
+    },
+  ]
+}
+```
+
+`"events"` are logs emitted by the contract during its execution, providing detailed information
+about the actions performed and the resulting state changes.
+
+Below is the full script that combines all the steps for executing a command on a Wasm contract and
+querying the events:
+
+```shell
+# Define the message to send to the contract, in this case a "release" command
+MSG='{"release":{}}'
+
+# Execute the contract with the specified message
+RESP=$(wasmd tx wasm execute "$CONTRACT" "$MSG" \
+  --from alice \
+  --gas 1000000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test)
+
+# Wait for the transaction to be processed
+sleep 6
+
+# Query the transaction using its hash to check the events emitted by the contract
+wasmd q tx $(echo "$RESP" | jq -r '.txhash') -o json | jq
+```
+
+### Query contract state
+
+To query the state of a Wasm contract, you can use the following command.
+
+```shell
+wasmd query wasm contract-state all "$CONTRACT" -o json
+```
+
+The output will look similar to this:
+
+```json
+{
+  "models": [
+    {
+      "key": "636F6E666967",
+      "value": "eyJ2ZXJpZmllciI6Indhc20xaHZnbTZwNzZnY2NnZzRkbDRjYWE4YTd2MDNkc3F3dzZyOXNrNGciLCJiZW5lZmljaWFyeSI6Indhc20xcGEyOWxhYzVzODVrZ2o3cG45ejZnYzB0NHNxZ3psbGNndWhmMjQiLCJmdW5kZXIiOiJ3YXNtMWh2Z202cDc2Z2NjZ2c0ZGw0Y2FhOGE3djAzZHNxd3c2cjlzazRnIn0="
+    }
+  ],
+  "pagination": {
+    "next_key": null,
+    "total": "0"
+  }
+}
+```
+
+`Models` are key-value pairs representing the state data of the contract base64-encoded.
+
+We can decode the contract state using the following command:
+
+```shell
+wasmd query wasm contract-state all "$CONTRACT" -o json | jq -r '.models[0].value' | base64 -d
+```
+
+The output will be similar to the following:
+
+```json
+{
+  "verifier": "wasm1hvgm6p76gccgg4dl4caa8a7v03dsqww6r9sk4g",
+  "beneficiary": "wasm1pa29lac5s85kgj7pn9z6gc0t4sqgzllcguhf24",
+  "funder": "wasm1hvgm6p76gccgg4dl4caa8a7v03dsqww6r9sk4g"
+}
+```
+
+## Migration
+
+Migration is the process of upgrading an existing contract to a new version without changing its
+address or losing its state. This ensures that the contract can evolve over time while preserving
+the data of the original contract.
+
+### Migrate a wasm contract to a new code version
+
+First, upload the new contract code to the blockchain:
+
+```shell
+RESP=$(wasmd tx wasm store "./x/wasm/keeper/testdata/burner.wasm" \
+  --from alice \
+  --gas 1100000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test)
+```
+
+Query the transaction to get the code ID of the newly uploaded code:
+
+```shell
+RESP=$(wasmd q tx $(echo "$RESP" | jq -r '.txhash') -o json)
+BURNER_CODE_ID=$(echo "$RESP" | jq -r '.events[] | select(.type=="store_code").attributes[] | select(.key=="code_id").value')
+```
+
+Set up the migration message that will be used during the migration process.
+
+```shell
+DEST_ACCOUNT=$(wasmd keys show bob -a --keyring-backend=test)
+MIGRATION_MSG="{\"payout\": \"$DEST_ACCOUNT\"}"
+```
+
+Next, migrate the existing contract to use the new code ID.
+
+```shell
+RESP=$(wasmd tx wasm migrate "$CONTRACT" "$BURNER_CODE_ID" "$MIGRATION_MSG" \
+  --from alice \
+  --chain-id=docs-chain-1 \
+  -y \
+  -o json \
+  --keyring-backend=test)
+```
+
+Finally, query the transaction to check its status and view the results
+
+```shell
+wasmd q tx $(echo "$RESP" | jq -r '.txhash') -o json
+```
+
+The output will be similar to the following:
+
+```json
+{
+  ...
+  "events": [
+    ...
+    {
+      "type": "migrate",
+      "attributes": [
+        {
+          "key": "code_id",
+          "value": "3",
+          "index": true
+        },
+        {
+          "key": "_contract_address",
+          "value": "wasm1wug8sewp6cedgkmrmvhl3lf3tulagm9hnvy8p0rppz9yjw0g4wtqhs9hr8",
+          "index": true
+        },
+        {
+          "key": "msg_index",
+          "value": "0",
+          "index": true
+        }
+      ]
+    },
+  ]
+}
+```
+
+In this case, the contract was migrated to use code ID 3.
+
+Below is the full script that combines all the steps for a wasm contract to a new code version
+
+```shell
+# Upload the new contract code
+RESP=$(wasmd tx wasm store "./x/wasm/keeper/testdata/burner.wasm" \
+  --from alice \
+  --gas 1100000 \
+  -y \
+  --chain-id=docs-chain-1 \
+  -o json \
+  --keyring-backend=test)
+
+# Wait for the transaction to be processed
+sleep 6
+
+# Query the transaction to get the code ID
+RESP=$(wasmd q tx $(echo "$RESP" | jq -r '.txhash') -o json)
+BURNER_CODE_ID=$(echo "$RESP" | jq -r '.events[] | select(.type=="store_code").attributes[] | select(.key=="code_id").value')
+
+# Get the destination account address
+DEST_ACCOUNT=$(wasmd keys show bob -a --keyring-backend=test)
+# Define the migration message
+MIGRATION_MSG="{\"payout\": \"$DEST_ACCOUNT\"}"
+
+# Migrate the contract to the new code ID
+RESP=$(wasmd tx wasm migrate "$CONTRACT" "$BURNER_CODE_ID" "$MIGRATION_MSG" \
+  --from alice \
+  --chain-id=docs-chain-1 \
+  -y \
+  -o json \
+  --keyring-backend=test)
+
+# Wait for the transaction to be processed
+sleep 6
+
+# Query the migration transaction
+wasmd q tx $(echo "$RESP" | jq -r '.txhash') -o json | jq
+```
+
+### Query contract history
+
+You can query the history entries for a contract by running the following command:
+
+```shell
+wasmd q wasm contract-history $CONTRACT -o json
+```
+
+This command retrieves the history of changes made to the specified contract, including initial
+instantiation and subsequent migrations. The command will return a JSON object similar to the
+following:
+
+```json
+{
+  "entries": [
+    {
+      "operation": "CONTRACT_CODE_HISTORY_OPERATION_TYPE_INIT",
+      "code_id": "1",
+      "updated": {
+        "block_height": "787",
+        "tx_index": "0"
+      },
+      "msg": {
+        "verifier": "wasm1zxevglcy90hq49x8vvdckfrgd9ffndxf70ut0z",
+        "beneficiary": "wasm1xxt02kmatpk5gwhmkrnpql02mfe0h4zcqvqeg0"
+      }
+    },
+    {
+      "operation": "CONTRACT_CODE_HISTORY_OPERATION_TYPE_MIGRATE",
+      "code_id": "2",
+      "updated": {
+        "block_height": "1718",
+        "tx_index": "0"
+      },
+      "msg": {
+        "payout": "wasm1xxt02kmatpk5gwhmkrnpql02mfe0h4zcqvqeg0"
+      }
+    }
+  ],
+  "pagination": {
+    "next_key": null,
+    "total": "0"
+  }
+}
+```
+
+Each `entry` provides details about a specific operation performed on the contract. Entry Fields:
+
+- `"operation"` is the type of operation performed, such as initialization or migration.
+- `"code_id"` is the code ID associated with the operation.
+- `"updated"` contains information about when the operation was performed.
+- `"msg"` is the message payload associated with the operation.
+
+### Set contract admin
+
+The admin is the only address that can migrate a contract. The admin can be updated by the current
+admin with the following command:
+
+```shell
+wasmd tx wasm set-contract-admin \
+  "$CONTRACT" \
+  "$BOB_ADDR" \
+  --from alice \
+  --keyring-backend=test \
+  --chain-id=docs-chain-1 \
+  -y
+```
+
+After running this command, Bob will be the new admin of the contract, and only he will have the
+authority to migrate the contract to a new code version or further update the admin role.
+
+### Clear contract admin
+
+Clearing the admin address from a Wasm contract removes the ability to migrate the contract to a new
+code version. This action effectively locks the contract, preventing any further migrations.
+
+Run the following command to clear the contract admin:
+
+```shell
+wasmd tx wasm clear-contract-admin \
+  "$CONTRACT" \
+  --from bob \
+  --keyring-backend=test \
+  --chain-id=docs-chain-1 \
+  -y
+```
+
+After running this command, the contract will no longer have an admin, and no one will be able to
+migrate the contract to a new code version.
