@@ -1,0 +1,4 @@
+# Extensions
+
+In this chapter we will cover various extensions to IBC that are not part of the core IBC protocol,
+but can be used in combination with either your own protocol or an existing one (like [ICS20](./ics20)).

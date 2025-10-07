@@ -46,6 +46,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
+          showLastUpdateTime: true,
         },
         theme: {
           customCss: './src/css/custom.css',

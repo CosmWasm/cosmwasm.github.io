@@ -1,0 +1,19 @@
+---
+sidebar_position: 1
+---
+
+# Getting started
+
+To get started, you need to enable the `stargate` feature of the `cosmwasm-std` crate.
+This will enable additional functionality that is not available on all chains, including IBC support.
+
+```toml
+cosmwasm-std = { version = "2", features = ["stargate"] }
+```
+
+:::info
+
+The naming "stargate" is somewhat confusing. It is a reference to the Cosmos SDK 0.40 upgrade with the same name.
+This upgrade introduced (among other things) IBC.
+
+:::
