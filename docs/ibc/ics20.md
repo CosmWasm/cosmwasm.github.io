@@ -45,7 +45,7 @@ the packet.
 
 The `memo` is an optional field that can be used to attach a message to the transfer. It is often
 used for additional functionality like [packet-forward-middleware] or
-[IBC Callbacks](./extensions/callbacks).
+[IBC Callbacks](./extensions/callbacks.mdx).
 
 [ICS20]: https://github.com/cosmos/ibc/blob/main/spec/app/ics-020-fungible-token-transfer/README.md
 [packet-forward-middleware]: https://github.com/cosmos/ibc-apps/tree/main/middleware/packet-forward-middleware
