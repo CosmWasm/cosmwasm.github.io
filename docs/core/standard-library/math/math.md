@@ -16,5 +16,5 @@ only shows the unsigned case but the signed types work the same way.
 `::to_*` are functions on the source type and `::new`/`::from_*` are functions on the destination
 type.
 
-[integers]: ./integers
-[decimals]: ./decimals
+[integers]: ./integers.md
+[decimals]: ./decimals.md

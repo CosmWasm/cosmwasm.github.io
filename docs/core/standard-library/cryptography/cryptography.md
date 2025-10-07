@@ -71,5 +71,5 @@ Keep in mind that, thanks to Wasm being our execution environment, contract exec
 In most cases the perceived need to move hashing into a host function is premature optimization and
 not actually needed.
 
-[check this page]: ../../architecture/gas
+[check this page]: ../../architecture/gas.md
 [source code]: https://github.com/CosmWasm/cosmwasm/blob/main/packages/vm/src/environment.rs#L62-L101
