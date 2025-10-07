@@ -1,0 +1,35 @@
+---
+sidebar_position: 1
+---
+
+# Getting started
+
+The CosmWasm module leverages the [ibc-go](https://ibc.cosmos.network/main/) implementation to
+enable interaction with other blockchains through the Inter-Blockchain Communication (IBC) protocol.
+With the release of ibc-go version 10,
+a new protocol version - [IBCv2](https://ibcprotocol.dev/blog/ibc-v2-announcement) - was introduced.
+IBCv2 expands the interoperability of the Cosmos ecosystem to include non-Cosmos blockchains.
+To support this broader scope, the protocol team simplified the communication model and reduced
+the number of required entry points. This streamlining makes it more practical to implement IBC
+support on chains such as Ethereum. As a result, smart contract developers now need to implement
+only a few well-defined entry points to fully harness cross-chain capabilities.
+
+:::info
+
+To use IBCv2 entry points and messages in your smart contract, ensure that the `ibc2` feature is
+enabled in your `cosmwasm-std` dependency. Add the following to your `Cargo.toml`:
+
+```toml
+cosmwasm-std = { version = "3.0", features = ["ibc2"] }
+```
+
+:::
+
+:::tip
+
+This section of the documentation provides a basic overview of how to configure smart contracts
+to use IBCv2 entry points and communicate with services and contracts on other chains.
+For a deeper understanding of the IBC architecture,
+refer to the [official ibc-go documentation](https://ibc.cosmos.network/main/).
+
+:::
