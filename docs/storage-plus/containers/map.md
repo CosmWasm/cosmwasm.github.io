@@ -1,0 +1,296 @@
+---
+sidebar_position: 2
+---
+
+# Map
+
+A `Map` is a key-value store. Unlike the raw storage backend, the keys and values of a map are typed.
+
+## Keys
+
+The key type has to implement the [`PrimaryKey`](https://docs.rs/cw-storage-plus/latest/cw_storage_plus/trait.PrimaryKey.html) trait.
+Most commonly, the key is simply a `String` or [`Addr`](https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.Addr.html).
+Other types include binary strings (`Vec<u8>`, `[u8; N]`, `&[u8]`), numerical types, or even tuples, which can be used
+to create composite keys.
+
+:::tip
+
+Unlike values, keys do **not** need to implement anything like `serde::Serialize` or `serde::Deserialize`.
+Key encoding is handled by the `PrimaryKey` trait. Please see the [Advanced](#advanced) section below for details.
+
+:::
+
+## Values
+
+The values, as usual, are serialized as JSON and must implement the
+[`Serialize`](https://docs.serde.rs/serde/trait.Serialize.html) and
+[`Deserialize`](https://docs.serde.rs/serde/trait.Deserialize.html) traits.
+
+## Operations
+
+Similar to an [`Item`](./item), a `Map` defines methods like `load`, `save`, and `may_load`. The
+difference is that `Map`'s methods take a key as an argument.
+
+Most CosmWasm chains will enable iteration. If they do, it is possible to iterate over the
+entries in a map using methods like
+[`keys`](https://docs.rs/cw-storage-plus/latest/cw_storage_plus/struct.Map.html#method.keys) or
+[`range`](https://docs.rs/cw-storage-plus/latest/cw_storage_plus/struct.Map.html#method.range).
+
+:::tip
+
+[For each bound, it's possible to decide if it's meant to be inclusive or exclusive.](https://docs.rs/cw-storage-plus/latest/cw_storage_plus/enum.Bound.html)
+
+:::
+
+More information can be found in the [API docs](https://docs.rs/cw-storage-plus/latest/cw_storage_plus/struct.Map.html).
+
+## Usage examples
+
+### Keeping users' balances
+
+#### Checking a user's balance
+
+```rust
+use cw_storage_plus::Map;
+
+let balances: Map<String, u128> = Map::new("balances");
+
+let alice_balance = balances
+    .may_load(&storage, "alice".to_string())
+    .unwrap()
+    .unwrap_or(0); // if the entry does not exist yet, assume the balance is 0
+
+assert_eq!(alice_balance, 0);
+```
+
+#### Updating a user's balance
+
+```rust
+use cw_storage_plus::Map;
+
+let balances: Map<String, u128> = Map::new("balances");
+
+let mut alice_balance = balances
+    .may_load(&storage, "alice".to_string())
+    .unwrap()
+    .unwrap_or(0); // if the entry does not exist yet, assume the balance is 0
+
+alice_balance += 100;
+
+balances.save(&mut storage, "alice".to_string(), &alice_balance).unwrap();
+assert_eq!(balances.load(&storage, "alice".to_string()).unwrap(), 100);
+```
+
+### Keeping users' balances with a composite key
+
+#### Basic use
+
+```rust
+use cw_storage_plus::Map;
+
+// The first string is the user's address, the second is the denomination
+let balances: Map<(String, String), u128> = Map::new("balances");
+
+let mut alice_balance = balances
+    .may_load(&storage, ("alice".to_string(), "uusd".to_string()))
+    .unwrap()
+    .unwrap_or(0); // if the entry does not exist yet, assume the balance is 0
+
+alice_balance += 100;
+
+balances
+    .save(&mut storage, ("alice".to_string(), "uusd".to_string()), &alice_balance)
+    .unwrap();
+
+assert_eq!(
+    balances
+        .load(&storage, ("alice".to_string(), "uusd".to_string()))
+        .unwrap(),
+    100
+);
+```
+
+#### Iterating over composite keys
+
+```rust
+use cw_storage_plus::Map;
+
+let balances: Map<(String, String), u128> = Map::new("balances");
+
+balances.save(&mut storage, ("alice".to_string(), "uusd".to_string()), &100).unwrap();
+balances.save(&mut storage, ("alice".to_string(), "osmo".to_string()), &200).unwrap();
+balances.save(&mut storage, ("bob".to_string(), "uusd".to_string()), &300).unwrap();
+
+let all_balances: Vec<_> = balances
+    .range(&storage, None, None, Order::Ascending)
+    .collect::<Result<_, _>>()
+    .unwrap();
+
+assert_eq!(
+    all_balances,
+    vec![
+        (("bob".to_string(), "uusd".to_string()), 300),
+        (("alice".to_string(), "osmo".to_string()), 200),
+        (("alice".to_string(), "uusd".to_string()), 100),
+    ]
+);
+
+let alices_balances: Vec<_> = balances
+    .prefix("alice".to_string())
+    .range(&storage, None, None, Order::Ascending)
+    .collect::<Result<_, _>>()
+    .unwrap();
+
+assert_eq!(alices_balances, vec![("osmo".to_string(), 200), ("uusd".to_string(), 100)]);
+```
+
+:::warning
+
+As seen here, the order of keys isn't always lexicographic.
+
+If you need to rely on iteration order in maps with composite keys, here's how things work: under
+the hood, every component of a composite key is length-prefixed except for the last one. If you're
+only iterating over the last component, you can expect things to be ordered lexicographically. For
+non-final components, shorter strings will always come before longer ones.
+
+In the example, note how `"bob"` (a non-last component) comes before `"alice"`. Also note how once
+we lock the first component to `"alice"`, entries are ordered lexicographically by the second
+component.
+
+:::
+
+## Advanced
+
+### Using custom types as a Key in a Map storage
+
+The current section provides an example of an implementation for
+[`PrimaryKey`](https://docs.rs/cw-storage-plus/latest/cw_storage_plus/trait.PrimaryKey.html) (and
+`KeyDeserialize`) traits.
+
+Let's imagine that we would like to use `Denom` as a key in a map like `Map<Denom, Uint64>`. Denom
+is a widely used enum that represents either a CW20 token or a Native token.
+
+Here is a complete implementation.
+
+```rust
+use cosmwasm_std::{Addr, StdError, StdResult};
+use cw_storage_plus::{split_first_key, Key, KeyDeserialize, Prefixer, PrimaryKey};
+use std::u8;
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+enum Denom {
+    Native(String),
+    Cw20(Addr),
+}
+
+const NATIVE_PREFIX: u8 = 1;
+const CW20_PREFIX: u8 = 2;
+
+impl PrimaryKey<'_> for Denom {
+    type Prefix = u8;
+    type SubPrefix = ();
+    type Suffix = String;
+    type SuperSuffix = Self;
+
+    fn key(&self) -> Vec<Key> {
+        let (prefix, value) = match self {
+            Denom::Native(name) => (NATIVE_PREFIX, name.as_bytes()),
+            Denom::Cw20(addr) => (CW20_PREFIX, addr.as_bytes()),
+        };
+        vec![Key::Val8([prefix]), Key::Ref(value)]
+    }
+}
+
+impl Prefixer<'_> for Denom {
+    fn prefix(&self) -> Vec<Key> {
+        let (prefix, value) = match self {
+            Denom::Native(name) => (NATIVE_PREFIX.prefix(), name.prefix()),
+            Denom::Cw20(addr) => (CW20_PREFIX.prefix(), addr.prefix()),
+        };
+
+        let mut result: Vec<Key> = vec![];
+        result.extend(prefix);
+        result.extend(value);
+        result
+    }
+}
+
+impl KeyDeserialize for Denom {
+    type Output = Self;
+
+    const KEY_ELEMS: u16 = 2;
+
+    #[inline(always)]
+    fn from_vec(value: Vec<u8>) -> StdResult<Self::Output> {
+        let (prefix, value) = split_first_key(Self::KEY_ELEMS, value.as_ref())?;
+        let value = value.to_vec();
+
+        match u8::from_vec(prefix)? {
+            NATIVE_PREFIX => Ok(Denom::Native(String::from_vec(value)?)),
+            CW20_PREFIX => Ok(Denom::Cw20(Addr::from_vec(value)?)),
+            _ => Err(StdError::generic_err("Invalid prefix")),
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::Denom;
+    use cosmwasm_std::testing::MockStorage;
+    use cosmwasm_std::{Addr, Uint64};
+    use cw_storage_plus::Map;
+
+    #[test]
+    fn round_trip_tests() {
+        let test_data = vec![
+            Denom::Native("cosmos".to_string()),
+            Denom::Native("some_long_native_value_with_high_precise".to_string()),
+            Denom::Cw20(Addr::unchecked("contract1")),
+            Denom::Cw20(Addr::unchecked(
+                "cosmos1p7d8mnjttcszv34pk2a5yyug3474mhffasa7tg",
+            )),
+        ];
+
+        for denom in test_data {
+            verify_map_serde(denom);
+        }
+    }
+
+    fn verify_map_serde(denom: Denom) {
+        let mut storage = MockStorage::new();
+        let map: Map<Denom, Uint64> = Map::new("denom_map");
+        let mock_value = Uint64::from(123u64);
+
+        map.save(&mut storage, denom.clone(), &mock_value).unwrap();
+
+        assert!(map.has(&storage, denom.clone()), "key should exist");
+
+        let value = map.load(&storage, denom).unwrap();
+        assert_eq!(value, mock_value, "value should match");
+    }
+}
+```
+
+The idea is to store the Denom in the storage as a composite key with 2 elements:
+
+1. The prefix which is either `NATIVE_PREFIX` or `CW20_PREFIX` to differentiate between the two
+   types on a raw bytes level.
+2. The value which is either the native token name or the cw20 token address
+
+:::tip
+
+The example implementation is based on a so-called composite key i.e. with KEY_ELEMS=2.
+  
+:::
+
+#### Choosing between single element key and composite key
+
+The composite key approach in our example was chosen for demonstration purpose rather than a common
+logic. Because such a prefix with only 2 unique values doesn't give much profit in terms of index
+lookup performance vs full-collection lookup. Also, Denom's type and its value are logically coupled
+with each other so there is not much need to split them into prefixes and suffixes.
+
+Another example is a User entity with `first_name` and `last_name` fields where such a separation
+for prefixes and suffixes would be natural. In this case, if you define `first_name` as a prefix and
+`last_name` as a suffix you will be able to have indexed search to query all John's; and have to
+fetch all keys to find all Doe's.
