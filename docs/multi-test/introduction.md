@@ -1,0 +1,41 @@
+# Introduction
+
+**MultiTest** is a testing tool designed to facilitate multi-contract interactions within the
+CosmWasm ecosystem. Its primary focus is on providing developers with a robust framework for
+off-chain testing of complex smart contract interactions and operations involving various Cosmos
+modules.
+
+:::info
+
+**MultiTest** is a _**blockchain simulator**_, allowing tested smart contracts to interact
+as if they were operating on a real blockchain.
+  
+:::
+
+The most valuable advantages of using **MultiTest** is that it allows for testing and debugging
+smart contracts with access to the Rust source code and eliminates the need to run a complete
+blockchain node to begin designing the functionality of the contract. Additionally, **MultiTest**
+enables the execution of tests significantly faster than on a real blockchain, as it bypasses the
+overhead associated with network consensus and block production. This results in a more efficient
+development cycle, allowing for quicker iterations and faster identification of issues, even before
+the smart contract is deployed on the blockchain.
+
+While **MultiTest** is a blockchain simulator, it may happen, that the behavior of the real
+blockchain might slightly differ in some edge cases. We strongly encourage you to [file an issue]
+with a detailed description of such use case to help us improve the **MultiTest**.
+
+In the upcoming chapters, we provide detailed instructions on installing and getting started with
+**MultiTest**, writing integration tests for smart contracts, testing complex interactions between
+smart contracts, and testing smart contract interactions with several Cosmos modules.
+
+By the end of these chapters, you will have a comprehensive understanding of how to use
+**MultiTest** for testing and debugging smart contracts in various scenarios.
+
+:::tip
+
+To successfully follow the upcoming chapters, a basic knowledge of [Rust and Cargo] is necessary.
+
+:::
+
+[Rust and Cargo]: https://www.rust-lang.org/tools/install
+[file an issue]: https://github.com/CosmWasm/cw-multi-test/issues
