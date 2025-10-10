@@ -8,7 +8,7 @@
   --ifm-color-primary-lightest: #c9baff;
 
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --docusaurus-highlighted-code-line-bg: rgba(229, 240, 252, 1);
   --ifm-footer-background-color: transparent;
 
   .footer {
@@ -25,7 +25,7 @@
   --ifm-color-primary-lighter: #c0aeff;
   --ifm-color-primary-lightest: #ebe6ff;
 
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --docusaurus-highlighted-code-line-bg: rgba(229, 240, 252, 0.1);
   --ifm-footer-background-color: transparent;
 
   .footer {
@@ -53,4 +53,12 @@
   font-family: 'Iceland', sans-serif;
   font-weight: normal;
   font-size: 1.5em;
+}
+
+.code-block-no-coverage {
+  background-color: #ff000020;
+}
+
+.code-block-with-coverage {
+  background-color: #00ff0020;
 }

@@ -102,6 +102,23 @@ const config: Config = {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
       additionalLanguages: ['Bash', 'TOML', 'Rust', 'JSON'],
+      magicComments: [
+        {
+          className: 'theme-code-block-highlighted-line',
+          line: 'highlight-next-line',
+          block: {start: 'highlight-start', end: 'highlight-end'},
+        },
+        {
+          className: 'code-block-no-coverage',
+          line: 'no-coverage',
+          block: {start: 'no-coverage-start', end: 'no-coverage-end'},
+        },
+        {
+          className: 'code-block-with-coverage',
+          line: 'with-coverage',
+          block: {start: 'with-coverage-start', end: 'with-coverage-end'},
+        },
+      ],
     },
   } satisfies Preset.ThemeConfig,
 
