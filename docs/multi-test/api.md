@@ -1,0 +1,72 @@
+---
+sidebar_position: 7
+---
+
+# Api
+
+**MultiTest** provides three implementations of the [Api][Api] trait:
+
+- [`cosmwasm_std::testing::MockApi`][MockApi],
+- [`cw_multi_test::MockApiBech32`][MockApiBech32],
+- [`cw_multi_test::MockApiBech32m`][MockApiBech32m].
+
+Additionally, [`MockApi`][MockApi], [`MockApiBech32`][MockApiBech32] and
+[`MockApiBech32m`][MockApiBech32m] implement `addr_make` method, allowing for
+convenient creation of user addresses in tests. You can find multiple examples of `addr_make`
+method usage in the [Addresses](addresses/user-address#app) chapter. Depending on your needs, you
+can use any implementation of the [Api][Api] trait in your tests by utilizing the
+[`AppBuilder::with_api`](app-builder#with_api) method to create a chain simulator.
+
+## `Api` trait
+
+The table below summarizes all methods of the [Api][Api] trait with short descriptions:
+
+| Methods of [Api] trait                                     | Description                                                                                                                                         |
+|------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`addr_canonicalize`][addr_canonicalize]                   | Converts a human-readable address into its canonical binary representation.                                                                         |
+| [`addr_humanize`][addr_humanize]                           | Converts a canonical address into human-readable address.                                                                                           |
+| [`addr_validate`][addr_validate]                           | Checks if the human-readable address is valid.                                                                                                      |
+| [`secp256k1_verify`][secp256k1_verify]                     | Verifies a message hash against a signature, with the public key of the signer, using the **secp256k1** elliptic curve digital signature algorithm. |
+| [`secp256k1_recover_pubkey`][secp256k1_recover_pubkey]     | Recovers a public key from a message hash and a signature in compressed form, which can be used in `secp256k1_verify` directly.                     |
+| [`secp256r1_verify`][secp256r1_verify]                     | Verifies a message hash against a signature, with the public key of the signer, using the **secp256r1** elliptic curve digital signature algorithm. |
+| [`secp256r1_recover_pubkey`][secp256r1_recover_pubkey]     | Recovers a public key from a message hash and a signature in compressed form, which can be used in `secp256r1_verify` directly.                     |
+| [`ed25519_verify`][ed25519_verify]                         | Verifies message against a signature, with the public key of the signer, using the **ed25519** elliptic curve digital signature algorithm.          |
+| [`ed25519_batch_verify`][ed25519_batch_verify]             | Performs batch **ed25519** signature verification.                                                                                                  |
+| [`bls12_381_aggregate_g1`][bls12_381_aggregate_g1]         | Adds up points (48 bytes each) of the G1 subgroup on the BLS12-381 curve.                                                                           |
+| [`bls12_381_aggregate_g2`][bls12_381_aggregate_g2]         | Adds up points (96 bytes each) of the G2 subgroup on the BLS12-381 curve.                                                                           |
+| [`bls12_381_pairing_equality`][bls12_381_pairing_equality] | Checks the pairing equality of the BLS12-381 curve.                                                                                                 |
+| [`bls12_381_hash_to_g1`][bls12_381_hash_to_g1]             | Takes some arbitrary data and hashes it to a point (48 bytes long) on the G1 subgroup of the BLS12-381 curve.                                       |
+| [`bls12_381_hash_to_g2`][bls12_381_hash_to_g2]             | Takes some arbitrary data and hashes it to a point (96 bytes long) on the G2 subgroup of the BLS12-381 curve.                                       |
+| [`debug`][debug]                                           | Emits a debugging message.                                                                                                                          |
+
+## `Api` trait implementations
+
+A concise comparison of different [Api][Api] trait implementations is shown in the table below:
+
+|                                     |  MockApi   | MockApiBech32 | MockApiBech32m |
+|-------------------------------------|:----------:|:-------------:|:--------------:|
+| Implements [Api][Api] trait         |    Yes     |      Yes      |      Yes       |
+| Implements **`addr_make`** function |    Yes     |      Yes      |      Yes       |
+| Address format                      |   Bech32   |    Bech32     |    Bech32m     |
+| Default prefix (HRP)                | `cosmwasm` |      No       |       No       |
+| Supports custom prefixes            |    Yes     |      Yes      |      Yes       |
+
+[Api]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html
+[addr_canonicalize]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.addr_canonicalize
+[addr_humanize]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.addr_humanize
+[addr_validate]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.addr_validate
+[secp256k1_verify]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.secp256k1_verify
+[secp256k1_recover_pubkey]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.secp256k1_recover_pubkey
+[secp256r1_verify]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.secp256r1_verify
+[secp256r1_recover_pubkey]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.secp256r1_recover_pubkey
+[ed25519_verify]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.ed25519_verify
+[ed25519_batch_verify]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.ed25519_batch_verify
+[bls12_381_aggregate_g1]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.bls12_381_aggregate_g1
+[bls12_381_aggregate_g2]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.bls12_381_aggregate_g2
+[bls12_381_pairing_equality]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.bls12_381_pairing_equality
+[bls12_381_hash_to_g1]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.bls12_381_hash_to_g1
+[bls12_381_hash_to_g2]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#method.bls12_381_hash_to_g2
+[debug]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/trait.Api.html#tymethod.debug
+[MockApi]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/testing/struct.MockApi.html
+[MockApiBech32]: https://docs.rs/cw-multi-test/latest/cw_multi_test/type.MockApiBech32.html
+[MockApiBech32m]: https://docs.rs/cw-multi-test/latest/cw_multi_test/type.MockApiBech32m.html
