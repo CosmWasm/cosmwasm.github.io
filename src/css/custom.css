@@ -54,3 +54,11 @@
   font-weight: normal;
   font-size: 1.5em;
 }
+
+.code-block-no-coverage {
+  background-color: #ff000020;
+}
+
+.code-block-with-coverage {
+  background-color: #00ff0020;
+}

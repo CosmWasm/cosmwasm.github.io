@@ -7,14 +7,14 @@ cargo build
 ```
 
 ```text title="output"
- [32;1mUpdating[0m crates.io index
-  [32;1mLocking[0m 112 packages to latest compatible versions
-    ⋮
-[32;1mCompiling[0m cosmwasm-crypto v2.1.3
-[32;1mCompiling[0m cosmwasm-std v2.1.3
-[32;1mCompiling[0m cw-storage-plus v2.0.0
-[32;1mCompiling[0m counter v0.1.0 (/home/user/my-contracts/counter)
- [32;1mFinished[0m `dev` profile [unoptimized + debuginfo] target(s) in 3.27s
+ Updating crates.io index
+  Locking 112 packages to latest compatible versions
+    ⋮
+Compiling cosmwasm-crypto v2.1.3
+Compiling cosmwasm-std v2.1.3
+Compiling cw-storage-plus v2.0.0
+Compiling counter v0.1.0 (/home/user/my-contracts/counter)
+ Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.27s
 ```
 
 If the output is similar to the one shown above, it looks like the **counter** smart contract has
@@ -28,12 +28,12 @@ cargo clippy
 ```
 
 ```text title="output"
-    ⋮
-[32;1mChecking[0m cosmwasm-crypto v2.1.3
-[32;1mChecking[0m cosmwasm-std v2.1.3
-[32;1mChecking[0m cw-storage-plus v2.0.0
-[32;1mChecking[0m counter v0.1.0 (/home/user/mt-test-examples/mte-counter)
-[32;1mFinished[0m `dev` profile [unoptimized + debuginfo] target(s) in 17.28s
+    ⋮
+Checking cosmwasm-crypto v2.1.3
+Checking cosmwasm-std v2.1.3
+Checking cw-storage-plus v2.0.0
+Checking counter v0.1.0 (/home/user/mt-test-examples/mte-counter)
+Finished `dev` profile [unoptimized + debuginfo] target(s) in 17.28s
 ```
 
 Luckily, `clippy` reports no issues for the **counter** smart contract.
@@ -43,18 +43,18 @@ Luckily, `clippy` reports no issues for the **counter** smart contract.
 Before we start writing tests, we need to set up the directories and files for the test cases. The
 final directory and file structure are shown below.
 
-```ansi showLineNumbers {7-11} filename="counter (directory)"
-[34;1m.[0m
-├── Cargo.toml
-├── [34;1msrc[0m
-│   ├── contract.rs
-│   ├── lib.rs
-│   └── msg.rs
-└── [34;1mtests[0m
-    ├── mod.rs
-    └── [34;1mmultitest[0m
-        ├── mod.rs
-        └── test_counter.rs
+```text title="counter directory" showLineNumbers {7-11} 
+.
+├── Cargo.toml
+├── src
+│   ├── contract.rs
+│   ├── lib.rs
+│   └── msg.rs
+└── tests
+    ├── mod.rs
+    └── multitest
+        ├── mod.rs
+        └── test_counter.rs
 ```
 
 :::tip
@@ -72,44 +72,44 @@ Note, that both directories **`src`** and **`tests`** are placed at the root of 
 
 Let's begin by creating the `tests` directory:
 
-```shell copy filename="TERMINAL"
+```shell
 mkdir tests
 ```
 
 Then create an empty `mod.rs` file inside the `tests` directory:
 
-```shell copy filename="TERMINAL"
+```shell
 touch tests/mod.rs
 ```
 
 Now, copy and paste the following content to `tests/mod.rs` file:
 
-```rust copy filename="tests/mod.rs"
+```rust title="tests/mod.rs"
 mod multitest;
 ```
 
-By convention, we place all **`MultiTest`** test cases under the `multitest` directory, so let's
+By convention, we place all **MultiTest** test cases under the `multitest` directory, so let's
 create it:
 
-```shell copy filename="TERMINAL"
+```shell
 mkdir tests/multitest
 ```
 
 Inside the `tests/multitest` directory we should also create an empty file named `mod.rs`:
 
-```shell copy filename="TERMINAL"
+```shell
 touch tests/multitest/mod.rs
 ```
 
 And populate it with the following content (just copy and paste it):
 
-```rust copy filename="tests/multitest/mod.rs"
+```rust title="tests/multitest/mod.rs"
 mod test_counter;
 ```
 
 Finally, inside the `tests/multitest` directory, we create a file named `test_counter.rs`:
 
-```shell copy filename="TERMINAL"
+```shell
 touch tests/multitest/test_counter.rs
 ```
 
@@ -121,37 +121,37 @@ Now that the directory structure for tests is ready, it's time to run all tests.
 
 Once the directories and files are set up for tests, let's execute them:
 
-```shell copy filename="TERMINAL"
+```shell
 cargo test
 ```
 
 The expected output should be similar to the one shown below:
 
-```ansi {6,12,16} showLineNumbers filename="OUTPUT"
-    [32;1mFinished[0m `test` profile [unoptimized + debuginfo] target(s) in 17.96s
-     [32;1mRunning[0m unittests src/lib.rs (target/debug/deps/counter-f350df45a1cd1c74)
+```text title="output" showLineNumbers {6,12,16} 
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 17.96s
+     Running unittests src/lib.rs (target/debug/deps/counter-f350df45a1cd1c74)
 
 running 0 tests
 
-test result: [32mok[0m[0m. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
-     [32;1mRunning[0m tests/mod.rs (target/debug/deps/mod-54761c1d31e6d0fe)
-
-running 0 tests
-
-test result: [32mok[0m. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-
-   [32;1mDoc-tests[0m counter
+     Running tests/mod.rs (target/debug/deps/mod-54761c1d31e6d0fe)
 
 running 0 tests
 
-test result: [32mok[0m. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests counter
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 ```
 
 Rust testing framework searches for several types of tests in the project, counts all test cases and
 executes them. In our example - while we haven't written any single test yet - there is nothing to
-execute. The reported number of executed tests is **0** for unit tests (line 2), **0** for
-integration tests (line 12) and **0** for documentation tests (line 16).
+execute. The reported number of executed tests is **0** for unit tests (**line 6**), **0** for
+integration tests (**line 12**) and **0** for documentation tests (**line 16**).
 
 Similarly, to execute all tests using [cargo-nextest](https://nexte.st), type:
 
@@ -162,10 +162,10 @@ cargo nextest run
 The expected output is:
 
 ```ansi {4} showLineNumbers filename="OUTPUT"
-    [32;1mFinished[0m `test` profile [unoptimized + debuginfo] target(s) in 0.06s
-    [32;1mStarting[0m 0 tests across 2 binaries (run ID: 3e0cbabb-3ef9-4b2f-98a8-d375bc510845, nextest profile: default)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+    Starting 0 tests across 2 binaries (run ID: 3e0cbabb-3ef9-4b2f-98a8-d375bc510845, nextest profile: default)
 ------------
-     [32;1mSummary[0m [   0.000s] 0 tests run: 0 [32;1mpassed[0m, 0 [33;1mskipped[0m
+     Summary [   0.000s] 0 tests run: 0 passed, 0 skipped
 ```
 
 [cargo-nextest](https://nexte.st) reports in a user-friendly manner that there were no tests to run (**line 4**).
@@ -180,13 +180,13 @@ quite tedious, so let's prepare a short script to automate this task.
 
 Create an empty file named `coverage.sh` in the `counter` directory:
 
-```shell copy filename="TERMINAL"
+```shell
 touch coverage.sh
 ```
 
 Populate it with the following content:
 
-```shell copy filename="coverage.sh"
+```bash title="coverage.sh"
 #!/usr/bin/env bash
 
 # generate coverage report
@@ -198,43 +198,42 @@ echo "Report: file://$(pwd)/target/coverage-report/tarpaulin-report.html"
 
 Finally, make this file executable:
 
-```shell filename="TERMINAL"
+```shell
 chmod +x coverage.sh
 ```
 
 The complete file structure of the **counter** smart contract project, with the code coverage script
 should now look like this:
 
-```shell filename="TERMINAL"
-tree
-```
-
-```ansi {3} filename="counter (directory)"
-[34;1m.[0m
-├── Cargo.toml
-├── [32;1mcoverage.sh[0m
-├── [34;1msrc[0m
-│   ├── contract.rs
-│   ├── lib.rs
-│   └── msg.rs
-└── [34;1mtests[0m
-    ├── mod.rs
-    └── [34;1mmultitest[0m
-        ├── mod.rs
-        └── test_counter.rs
+```text title="counter directory"
+.
+├── Cargo.toml
+//highlight-next-line
+├── coverage.sh
+├── src
+│   ├── contract.rs
+│   ├── lib.rs
+│   └── msg.rs
+//highlight-next-line
+└── tests
+    ├── mod.rs
+//highlight-next-line    
+    └── multitest
+        ├── mod.rs
+        └── test_counter.rs
 ```
 
 ## Measuring code coverage
 
 With the code coverage script at hand, measuring code coverage is now as simple as typing:
 
-```shell copy filename="TERMINAL"
+```shell
 ./coverage.sh
 ```
 
 The result should be similar to this (only the last few lines are shown):
 
-```ansi filename="OUTPUT"
+```text title="output"
 ⋮
 || Tested/Total Lines:
 || src/contract.rs: 0/18
@@ -247,7 +246,7 @@ Additionally, Tarpaulin generates a coverage report in HTML format, that can be 
 As expected, the current code coverage for the **counter** smart contract is **0.00%** since we haven't written
 any tests yet. Follow the next chapters, and make the code coverage report shine green.
 
-```rust title="Code coverage report" showLineNumbers {11-25,28-42,45-51} 
+```text title="Code coverage report" showLineNumbers 
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 
@@ -258,6 +257,7 @@ use cw_storage_plus::Item;
 const COUNTER: Item<u8> = Item::new("value");
 
 #[cfg_attr(not(feature = "library"), entry_point)]
+//no-coverage-start
 pub fn instantiate(
     deps: DepsMut,
     _env: Env,
@@ -273,8 +273,10 @@ pub fn instantiate(
     )?;
     Ok(Response::default())
 }
+//no-coverage-end
 
 #[cfg_attr(not(feature = "library"), entry_point)]
+//no-coverage-start
 pub fn execute(
     deps: DepsMut,
     _env: Env,
@@ -290,8 +292,10 @@ pub fn execute(
     })?;
     Ok(Response::default())
 }
+//no-coverage-end
 
 #[cfg_attr(not(feature = "library"), entry_point)]
+//no-coverage-start
 pub fn query(deps: Deps, _env: Env, msg: CounterQueryMsg) -> Result<Binary, StdError> {
     match msg {
         CounterQueryMsg::Value => Ok(to_json_binary(&CounterResponse {
@@ -299,6 +303,7 @@ pub fn query(deps: Deps, _env: Env, msg: CounterQueryMsg) -> Result<Binary, StdE
         })?),
     }
 }
+//no-coverage-end
 ```
 
 ## Writing tests for smart contracts
