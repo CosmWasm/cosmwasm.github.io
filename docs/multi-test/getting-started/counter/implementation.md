@@ -388,7 +388,7 @@ represented as an 8-bit unsigned integer. The `"value"` string is the key used t
 retrieve the counter value in the contract's persistent storage. This is used for tracking a counter
 value that can be incremented, decremented, queried, or reset by the smart contract. More details
 about the [Item](../../../storage-plus/containers/item.md) type can be found in
-[cw-storage-plus](../../../storage-plus) documentation.
+[StoragePlus](../../../storage-plus/introduction.md) documentation.
 
 ### _instantiate_ entrypoint
 

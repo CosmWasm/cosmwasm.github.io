@@ -367,7 +367,7 @@ assert_eq!(value, app.storage().get(key).unwrap().as_slice());
 In the examples above, to keep the simple, we accessed the storage directly and focused on the chain
 initialization part involving the `with_storage` method of `AppBuilder`.
 Please note, that inside smart contract code, the storage used by the chain should be accessed through
-libraries like [StoragePlus](../storage-plus).
+libraries like [StoragePlus](../storage-plus/introduction.md).
   
 :::
 

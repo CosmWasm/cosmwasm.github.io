@@ -5,8 +5,8 @@ smart contracts using **MultiTest**. It provides a practical example and best pr
 a smooth start with using **MultiTest** for testing smart contracts.
 In the following chapters, you will be:
 
-- designing an example [**counter**](./counter) smart contract,
-- [**writing tests**](./counter) for the counter smart contract.
+- designing an example [**counter**](./counter/introduction.md) smart contract,
+- [**writing tests**](./writing-tests/introduction.md) for the counter smart contract.
 
 The example **counter** smart contract and all test cases are provided in two versions: one using
 pure CosmWasm libraries and the other using the Sylvia framework. The functionality of the

@@ -2,7 +2,7 @@
 
 The following sections describe how to create an example smart contract,
 which manages a **counter** that can be `initialized`, `incremented`, `decremented`, and `queried`.
-Later on, you will be [writing tests](writing-tests.mdx) for this smart contract using **MultiTest**.
+Later on, you will be [writing tests](../writing-tests/introduction.md) for this smart contract using **MultiTest**.
 
 :::info
 
