@@ -64,7 +64,7 @@ cw-multi-test = { version = "3", features = ["staking", "stargate", "cosmwasm_3_
 [Storage]: ./storage.md
 [Bank]: ./bank.md
 [Staking]: ./staking.md
-[Distribution]: ./introduction.md
+[Distribution]: ./distribution.md
 [Governance]: ./governance.md
 [Stargate]: ./introduction.md
 [Wasm]: ./introduction.md
