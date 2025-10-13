@@ -44,13 +44,13 @@ running tests faster with a clean and beautiful user interface.
 
 Installing **Tarpaulin**:
 
-```shell
+```shell title="terminal"
 cargo install cargo-tarpaulin
 ```
 
 Installing **cargo-nextest**:
 
-```shell
+```shell title="terminal"
 cargo install cargo-nextest
 ```
 

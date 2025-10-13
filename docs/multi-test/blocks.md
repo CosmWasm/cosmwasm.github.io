@@ -1,0 +1,224 @@
+
+# Blocks
+
+There are several cases when testing CosmWasm smart contracts requires simulating delays on the
+blockchain, like:
+
+- staking and unstaking processes,
+- governance voting periods,
+- validator set changes,
+- token vesting schedules,
+- incentive distribution, or
+- IBC packet timeouts.
+
+## Operations on blocks
+
+**MultiTest** provides several operations to initialize and update current block properties, such
+as height and timestamp, in order to test delays on the blockchain.
+
+:::tip
+
+Although it is possible to modify **only** the height or **only** the timestamp of the block in
+**MultiTest**, this is not feasible in a real-life blockchain and may lead to unpredictable test
+results that do not reflect the blockchain's real-life behavior.
+
+:::
+
+:::warning
+
+  Always increment the height **and** the timestamp of the block in tests.
+  
+:::
+
+In the following chapters, you will find practical examples of several operations on blocks, such as
+block initialization and generating a new block.
+
+## Initialization with the default block
+
+In **MultiTest**, the chain is initialized with a default block that has the following properties:
+
+- `height`: **12345**,
+- `time`: **1571797419879305533** (Wed Oct 23 2019 02:23:39 GMT+0000),
+- `chain_id`: **cosmos-testnet-14002**.
+
+These properties constitute the [`BlockInfo`][BlockInfo] structure, which is defined in the
+CosmWasm library for representing block metadata. [`BlockInfo`][BlockInfo] can be retrieved
+at any point in a test by calling the [`block_info`][block_info] method provided by
+`App`.
+
+The following example illustrates this case in detail.
+
+```rust showLineNumbers {4,7,10,13,16}
+use cw_multi_test::App;
+
+// create the default chain simulator
+let app = App::default();
+
+// get the initial block properties
+let block = app.block_info();
+
+// default block height is 12345
+assert_eq!(12345, block.height);
+
+// default block timestamp is Wed Oct 23 2019 02:23:39 GMT+0000
+assert_eq!(1571797419879305533, block.time.nanos());
+
+// default chain identifier is "cosmos-testnet-14002"
+assert_eq!("cosmos-testnet-14002", block.chain_id);
+```
+
+In line 4, the chain is initialized and _started_ with the default settings by calling the function
+[`default`][app_default] on `App`. In line 7, the current block metadata (of type
+[`BlockInfo`][BlockInfo]) is retrieved and assigned to variable `block`. In the next
+few lines, the default values are checked:
+
+- line 10: block `height` is `12345`,
+- line 13: block `time` is a Unix timestamp of value `1571797419879305533`, which is
+  the numeric representation of `Wednesday, October 23, 2019 02:23:39 GMT`,
+- line 16: block `chain_id` has a default value `"cosmos-testnet-14002"`.
+
+## Initialization with the custom block
+
+Although the chain initialization with the default block may be suitable for most test cases, it is
+possible to initialize the chain with a custom [`BlockInfo`][BlockInfo] using the
+[`set_block`][set_block] method provided by `App`. The following example explains this
+case in detail.
+
+```rust showLineNumbers {8-12}
+use cosmwasm_std::{BlockInfo, Timestamp};
+use cw_multi_test::App;
+
+// create the default chain simulator
+let mut app = App::default();
+
+// create and use a custom block
+app.set_block(BlockInfo {
+    height: 1,
+    time: Timestamp::from_seconds(1723627489),
+    chain_id: "starship-testnet".to_string(),
+});
+
+// get the custom block properties
+let block = app.block_info();
+
+// now the block height is 1
+assert_eq!(1, block.height);
+
+// now the block timestamp is Wed Aug 14 2024 09:24:49 GMT+0000
+assert_eq!(1723627489, block.time.seconds());
+
+// now the chain identifier is "starship-testnet"
+assert_eq!("starship-testnet", block.chain_id);
+```
+
+The chain is started with the default settings in line 5. Then in line 8, the
+[`set_block`][set_block] method is called with custom block properties provided as
+[`BlockInfo`][BlockInfo] structure. The current block metadata is retrieved in line 12 and in
+the next few lines the detailed values are checked:
+
+- line 18: block `height` is now `1`,
+- line 21: new block `time` is a Unix timestamp of value `1723627489`, which is the
+  numeric representation (in seconds) of `Wednesday, August 14, 2024 09:24:49 GMT`,
+- line 24: block `chain_id` has now a value `"starship-testnet"`.
+
+This way, you can initialize the current block in tests to best suit your requirements.
+
+:::info
+
+You can also initialize the blockchain simulator with the custom block using [AppBuilder], as
+shown in this [example](app-builder#with_block).
+
+:::
+
+## Generating next block with the default step
+
+To generate a new block in tests, you can use the [`update_block`][update_block] method
+provided by `App`. In the following example, [`update_block`][update_block] method
+takes a function [`next_block`][next_block] as an argument. [`next_block`][next_block]
+function - provided by **`MultiTest`** - increases the block height by `1` and advances the block
+time by `5` seconds, simulating the generation of a new block every `5` seconds in a real-life
+blockchain. The `chain_id` remains unchanged.
+
+```rust showLineNumbers {7}
+use cw_multi_test::{next_block, App};
+
+// create the default chain simulator
+let mut app = App::default();
+
+// update the block by `generating` next block
+app.update_block(next_block);
+
+// get the current block properties
+let block = app.block_info();
+
+// now the block height is 1 after the initial value
+assert_eq!(12346, block.height);
+
+// now the block timestamp is 5 seconds after the initial value
+// current value is:   Wed Oct 23 2019 02:23:44 GMT+0000
+// initial value was:  Wed Oct 23 2019 02:23:39 GMT+0000
+assert_eq!(1571797424879305533, block.time.nanos());
+
+// chain identifier remains unchanged
+assert_eq!("cosmos-testnet-14002", block.chain_id);
+```
+
+In line 7 the [`update_block`][update_block] method is called and in the next few lines the
+current block properties are checked. In line 10 the block metadata is retrieved and assigned to
+variable `block`. In line 13, we check if the block height has changed. The default block
+height is `12345`, and we check it against the value `12346`. As this assertion
+passes, you can see that the block height was indeed incremented by `1`. Similarly, the block's time
+is checked against the Unix timestamp, which is 5 seconds later than the default value:
+`1571797424879305533` - `1571797419879305533` = `5000000000` = 5 seconds.
+
+## Generating next block with the custom step
+
+Several events on the blockchain occur after a period longer than a few seconds. In such cases,
+incrementing the block time multiple times until the desired time is reached would be impractical.
+In **`MultiTest`**, it is possible to advance the block using a specific block height and time. To
+achieve this, pass a custom closure to the [`update_block`][update_block] method. This
+closure takes a mutable [`BlockInfo`][BlockInfo] structure as an argument and modifies its
+properties, as shown in the example below.
+
+```rust showLineNumbers {7-10}
+use cw_multi_test::App;
+
+// create the default chain simulator
+let mut app = App::default();
+
+// 'generate' custom block
+app.update_block(|block| {
+    block.time = block.time.plus_days(6);
+    block.height += 10000;
+});
+
+// get the block properties after updating
+let block = app.block_info();
+
+// now the block height is 10000 after the initial value
+assert_eq!(22345, block.height);
+
+// now the block timestamp is 6 days after the initial value
+// current value is:   Wed Oct 23 2019 02:23:44 GMT+0000
+// initial value was:  Tue Oct 29 2019 02:23:39 GMT+0000
+assert_eq!(1572315819879305533, block.time.nanos());
+
+// chain identifier remains unchanged
+assert_eq!("cosmos-testnet-14002", block.chain_id);
+```
+
+In line 4, the default block is initialized during the chain start. Then in line 7, the
+[`update_block`][update_block] method takes a custom closure as an argument. This closure
+increments the block height by **10000** and advances the block time by **6 days**. Similarly like
+in previous examples, the new block metadata is retrieved and the current properties are checked.
+The new block height should be `12345` + `10000` = `22345`. The new block time
+should be `1572315819879305533` -`1571797419879305533` = `518400000000000` =
+518400 seconds = 8640 minutes = 144 hours = **6 days**. The chain identifier remains unchanged.
+
+[BlockInfo]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/struct.BlockInfo.html
+[AppBuilder]: https://docs.rs/cw-multi-test/latest/cw_multi_test/struct.AppBuilder.html
+[block_info]: https://docs.rs/cw-multi-test/latest/cw_multi_test/struct.App.html#method.block_info
+[set_block]: https://docs.rs/cw-multi-test/latest/cw_multi_test/struct.App.html#method.set_block
+[update_block]: https://docs.rs/cw-multi-test/latest/cw_multi_test/struct.App.html#method.update_block
+[next_block]: https://docs.rs/cw-multi-test/latest/cw_multi_test/fn.next_block.html
+[app_default]: app#default

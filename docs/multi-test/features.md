@@ -15,8 +15,8 @@ you can provide your own, using `AppBuilder`'s function listed in **AppBuilder&n
 column. Names of **MultiTest** feature flags required to enable specific functionality are shown
 in the column **Feature&nbsp;flag**.
 
-| Feature        | Default<br/>implementation                        | Feature<br/>flag | AppBuilder<br/>constructor                           | Functionality                                      |
-|----------------|---------------------------------------------------|:----------------:|------------------------------------------------------|----------------------------------------------------|
+| Feature        | Default<br/>implementation                 | Feature<br/>flag | AppBuilder<br/>constructor                           | Functionality                                      |
+|----------------|--------------------------------------------|:----------------:|------------------------------------------------------|----------------------------------------------------|
 | [Blocks]       | [`mock_env().block`][mock_env_block]       |                  | [`with_block`](app-builder#with_block)               | Operations on blocks.                              |
 | [Api]          | [`MockApi`][MockApi]                       |                  | [`with_api`](app-builder#with_api)                   | Access to CosmWasm API.                            |
 | [Storage]      | [`MockStorage`][MockStorage]               |                  | [`with_storage`](app-builder#with_storage)           | Access to storage.                                 |
@@ -59,13 +59,13 @@ cosmwasm-std = "3"
 cw-multi-test = { version = "3", features = ["staking", "stargate", "cosmwasm_3_0"] }
 ```
 
-[Blocks]: ./introduction.md
-[Api]: ./introduction.md
-[Storage]: ./introduction.md
+[Blocks]: ./blocks.md
+[Api]: ./api.md
+[Storage]: ./storage.md
 [Bank]: ./introduction.md
 [Staking]: ./introduction.md
 [Distribution]: ./introduction.md
-[Governance]: ./introduction.md
+[Governance]: ./governance.md
 [Stargate]: ./introduction.md
 [Wasm]: ./introduction.md
 [Custom]: ./introduction.md
