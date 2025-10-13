@@ -66,10 +66,10 @@ cw-multi-test = { version = "3", features = ["staking", "stargate", "cosmwasm_3_
 [Staking]: ./staking.md
 [Distribution]: ./distribution.md
 [Governance]: ./governance.md
-[Stargate]: ./introduction.md
-[Wasm]: ./introduction.md
-[Custom]: ./introduction.md
-[IBC]: ./introduction.md
+[Stargate]: ./stargate.md
+[Wasm]: ./wasm.md
+[Custom]: ./custom.md
+[IBC]: ./ibc.md
 [mock_env_block]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/testing/fn.mock_env.html
 [MockApi]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/testing/struct.MockApi.html
 [MockStorage]: https://docs.rs/cosmwasm-std/latest/cosmwasm_std/testing/struct.MockStorage.html

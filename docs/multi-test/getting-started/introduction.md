@@ -7,7 +7,3 @@ In the following chapters, you will be:
 
 - designing an example [**counter**](./counter/introduction.md) smart contract,
 - [**writing tests**](./writing-tests/introduction.md) for the counter smart contract.
-
-The example **counter** smart contract and all test cases are provided in two versions: one using
-pure CosmWasm libraries and the other using the Sylvia framework. The functionality of the
-**counter** smart contract is the same in both versions.
