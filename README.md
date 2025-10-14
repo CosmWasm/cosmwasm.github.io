@@ -14,7 +14,7 @@ to storage, testing, IBC, and beyond.
 
 ## How is it made?
 
-The deployed documentation is a [Docusaurus](https://docusaurus.io) project hosted on GitHub pages.
+The deployed documentation is a [Docusaurus] project hosted on GitHub pages.
 
 ## How can I run it locally?
 
@@ -30,3 +30,5 @@ You will now be able to visit the locally served website at http://localhost:300
 ## How can I contribute?
 
 Clone this repo, commit your changes to a new branch, push and open a new PR.
+
+[Docusaurus]: https://docusaurus.io
