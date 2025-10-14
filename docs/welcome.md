@@ -18,11 +18,22 @@ support that.
 Here is where to find CosmWasm in the whole Cosmos stack:
 
 ```mermaid
-erDiagram
-    "Cosmos SDK" ||--|| CometBFT: Uses
-    "Cosmos SDK" ||--|| "CosmWasm": Includes
-    "Cosmos SDK" ||--o{ "Custom Module" : Includes
-    "CosmWasm" ||--o{ "Smart Contract": Executes
+graph TD
+    A["Cosmos SDK"]:::cosmos -->|"_uses_"| B[CometBFT]
+    A -->|"_includes_"| C["CosmWasm"]
+    A -->|"_includes_"| D["Custom Module"]
+    C -->|"_executes_"| E["Smart Contract"]
+
+    classDef cosmos fill:#e0f7fa,stroke:#00796b,stroke-width:2px;
+    classDef wasm fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px;
+    classDef custom fill:#fff9c4,stroke:#fbc02d,stroke-width:2px;
+    classDef contract fill:#fbe9e7,stroke:#d84315,stroke-width:2px;
+
+    class A cosmos;
+    class B cosmos;
+    class C wasm;
+    class D cosmos;
+    class E wasm;
 ```
 
 The important thing about CosmWasm smart contracts is their transparency. Every smart contract
