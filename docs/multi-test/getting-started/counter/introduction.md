@@ -36,31 +36,31 @@ library named **counter**.
 
 Change the working directory to your home directory:
 
-```shell
+```shell title="terminal"
 cd ~
 ```
 
 Create a dedicated directory to store your example smart contract:
 
-```shell
+```shell title="terminal"
 mkdir my-contracts
 ```
 
 Change the working directory to `my-contracts`:
 
-```shell
+```shell title="terminal"
 cd my-contracts
 ```
 
 Create a new Rust library named **counter**:
 
-```shell
+```shell title="terminal"
 cargo init --lib counter
 ```
 
 Change the working directory to `counter`:
 
-```shell
+```shell title="terminal"
 cd counter
 ```
 
@@ -80,13 +80,13 @@ should be stored in `src` directory.
 
 Let's create an empty **contract.rs** file...
 
-```shell
+```shell title="terminal"
 touch src/contract.rs
 ```
 
 ...and empty **msg.rs** file:
 
-```shell
+```shell title="terminal"
 touch src/msg.rs
 ```
 
@@ -103,6 +103,6 @@ The final structure of the smart contract project placed in the `counter` direct
 
 ## Filling the content
 
-In the previous section you have created a project structure for **counter** smart contract,
+In this section you have created a project structure for **counter** smart contract,
 but the source files are still empty. In the following chapter, we provide an example
 [**implementation**](./implementation.md) of the **counter** smart contract.

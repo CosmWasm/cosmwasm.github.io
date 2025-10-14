@@ -2,7 +2,7 @@
 
 Having the **counter** smart contract set up, let's first check if the project compiles:
 
-```shell
+```shell title="terminal"
 cargo build
 ```
 
@@ -23,7 +23,7 @@ been built successfully.
 It is a very good habit to run [Rust linter](https://doc.rust-lang.org/clippy) after each code
 change, so let's run it before we move forward.
 
-```shell
+```shell title="terminal"
 cargo clippy
 ```
 
@@ -72,13 +72,13 @@ Note, that both directories **`src`** and **`tests`** are placed at the root of 
 
 Let's begin by creating the `tests` directory:
 
-```shell
+```shell title="terminal"
 mkdir tests
 ```
 
 Then create an empty `mod.rs` file inside the `tests` directory:
 
-```shell
+```shell title="terminal"
 touch tests/mod.rs
 ```
 
@@ -91,13 +91,13 @@ mod multitest;
 By convention, we place all **MultiTest** test cases under the `multitest` directory, so let's
 create it:
 
-```shell
+```shell title="terminal"
 mkdir tests/multitest
 ```
 
 Inside the `tests/multitest` directory we should also create an empty file named `mod.rs`:
 
-```shell
+```shell title="terminal"
 touch tests/multitest/mod.rs
 ```
 
@@ -109,7 +109,7 @@ mod test_counter;
 
 Finally, inside the `tests/multitest` directory, we create a file named `test_counter.rs`:
 
-```shell
+```shell title="terminal"
 touch tests/multitest/test_counter.rs
 ```
 
@@ -121,7 +121,7 @@ Now that the directory structure for tests is ready, it's time to run all tests.
 
 Once the directories and files are set up for tests, let's execute them:
 
-```shell
+```shell title="terminal"
 cargo test
 ```
 
@@ -155,7 +155,7 @@ integration tests (**line 12**) and **0** for documentation tests (**line 16**).
 
 Similarly, to execute all tests using [cargo-nextest](https://nexte.st), type:
 
-```shell copy filename="TERMINAL"
+```shell title="terminal"
 cargo nextest run
 ```
 
@@ -180,7 +180,7 @@ quite tedious, so let's prepare a short script to automate this task.
 
 Create an empty file named `coverage.sh` in the `counter` directory:
 
-```shell
+```shell title="terminal"
 touch coverage.sh
 ```
 
@@ -198,7 +198,7 @@ echo "Report: file://$(pwd)/target/coverage-report/tarpaulin-report.html"
 
 Finally, make this file executable:
 
-```shell
+```shell title="terminal"
 chmod +x coverage.sh
 ```
 
@@ -227,7 +227,7 @@ should now look like this:
 
 With the code coverage script at hand, measuring code coverage is now as simple as typing:
 
-```shell
+```shell title="terminal"
 ./coverage.sh
 ```
 
@@ -308,4 +308,6 @@ pub fn query(deps: Deps, _env: Env, msg: CounterQueryMsg) -> Result<Binary, StdE
 
 ## Writing tests for smart contracts
 
-Now it is time to start implementing tests for the **counter** smart contract.
+Now it is time to start implementing tests for the **[counter]** smart contract.
+
+[counter]: ../counter/introduction.md

@@ -141,7 +141,7 @@ The `lib.rs` file in a Rust project serves as the main entry point for defining 
 library. In the context of our example **counter** smart contract, the `lib.rs` file is defining and
 organizing the modules that make up the contract. Recall the **counter** project file structure:
 
-```text {4,6} title="counter directory content"
+```text {4,6} title="counter directory"
 .
 ├── Cargo.toml
 └── src
@@ -390,7 +390,7 @@ value that can be incremented, decremented, queried, or reset by the smart contr
 about the [Item](../../../storage-plus/containers/item.md) type can be found in
 [StoragePlus](../../../storage-plus/introduction.md) documentation.
 
-### _instantiate_ entrypoint
+### `instantiate` entrypoint
 
 The `instantiate` function (entry-point) is called during the instantiation of the smart
 contract. Depending on the value of the message passed in `msg` argument, the counter will be
@@ -417,7 +417,7 @@ pub fn instantiate(
 }
 ```
 
-### _execute_ entrypoint
+### `execute` entrypoint
 
 The `execute` function (entry-point) is called whenever the user wants to interact with the
 contract, especially when the value of the counter should be incremented, decremented or reset.
@@ -446,7 +446,7 @@ pub fn execute(
 }
 ```
 
-### _query_ entrypoint
+### `query` entrypoint
 
 The `query` function (entry-point) is called whenever the user asks the counter smart
 contract for the current value. The counter value is retrieved from the contract's persistent

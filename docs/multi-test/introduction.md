@@ -37,5 +37,5 @@ To successfully follow the upcoming chapters, a basic knowledge of [Rust and Car
 
 :::
 
-[Rust and Cargo]: https://www.rust-lang.org/tools/install
+[Rust and Cargo]: https://rust-lang.org/learn
 [file an issue]: https://github.com/CosmWasm/cw-multi-test/issues

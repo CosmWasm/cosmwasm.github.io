@@ -19,8 +19,12 @@ cw-multi-test = "3"
 
 **MultiTest** is a **TESTING** library and should **ALWAYS** be added to your project
 as a **DEVELOPMENT DEPENDENCY** in section **`[dev-dependencies]`** of the **Cargo.toml** file.
+
+:::
   
-**MultiTest** <u>**IS NOT**</u> designed to be used in production code on a real-life blockchain.
+:::warning
+
+**MultiTest** <span style={{color:'red'}}>**IS NOT**</span> designed to be used in production code on a real-life blockchain.
 
 :::
 
