@@ -244,7 +244,8 @@ Report: file:///home/user/counter/target/coverage-report/tarpaulin-report.html
 
 Additionally, Tarpaulin generates a coverage report in HTML format, that can be viewed directly in a browser.
 As expected, the current code coverage for the **counter** smart contract is **0.00%** since we haven't written
-any tests yet. Follow the next chapters, and make the code coverage report shine green.
+any tests yet. Follow the next chapters, and make the code coverage report
+<span style={{color:'green'}}>shine green</span>.
 
 ```text title="Code coverage report" showLineNumbers 
 #[cfg(not(feature = "library"))]
