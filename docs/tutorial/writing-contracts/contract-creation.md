@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Contract creation
 
-The easiest and recommended way to start working on a new CøsmWasm contract is to generate it from
+The easiest and recommended way to start working on a new CosmWasm contract is to generate it from
 the [`cw-template`](https://github.com/CosmWasm/cw-template).
 
 ```shell title="terminal"

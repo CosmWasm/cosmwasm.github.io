@@ -1,3 +1,3 @@
-# Writing CøsmWasm contracts
+# Writing CosmWasm contracts
 
-This section is a step-by-step guide on how to write CøsmWasm contracts.
+This section is a step-by-step guide on how to write CosmWasm contracts.
