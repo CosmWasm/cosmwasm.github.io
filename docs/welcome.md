@@ -1,8 +1,12 @@
 ---
+slug: /
+title: Welcome
 sidebar_position: 1
 ---
 
-# Welcome
+![CosmWasm](/img/cosmwasm.svg)
+
+# Welcome to CosmWasm 
 
 The [x/wasm] module, the root of CosmWasm, is a [Cosmos SDK] module enabling smart contracts
 to execute on the CosmWasm virtual machine. CosmWasm itself refers to the whole ecosystem
