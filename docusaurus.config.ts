@@ -7,7 +7,7 @@ import rehypeKatex from 'rehype-katex';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'CosmWasm',
+  title: 'CosmWasm Docs',
   favicon: 'img/cosmwasm-small.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -42,7 +42,7 @@ const config: Config = {
       'classic',
       {
         docs: {
-          path: 'docs',
+          routeBasePath: '/',
           sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
@@ -62,18 +62,12 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'CosmWasm',
+      title: 'CosmWasm Docs',
       logo: {
         alt: 'CosmWasm Logo',
         src: 'img/cosmwasm-small.svg',
       },
       items: [
-        {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
-          position: 'left',
-          label: 'Docs',
-        },
         {
           href: 'https://github.com/CosmWasm',
           label: 'GitHub',
@@ -84,12 +78,7 @@ const config: Config = {
     footer: {
       links: [
         {
-          title: 'CosmWasm',
           items: [
-            {
-              label: 'Docs',
-              to: '/docs/welcome',
-            },
             {
               label: 'GitHub',
               href: 'https://github.com/CosmWasm',
