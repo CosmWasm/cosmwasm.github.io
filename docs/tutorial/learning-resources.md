@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+---
+
 # Learning Resources
 
 This page contains curated learning resources to help you on your CosmWasm journey.
