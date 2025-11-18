@@ -1,6 +1,8 @@
 # Learning Resources
 
-This page contains curated learning resources to help you on your CosmWasm journey. Whether you're just getting started or looking to deepen your knowledge, these resources will help you master smart contract development with CosmWasm.
+This page contains curated learning resources to help you on your CosmWasm journey.
+Whether you're just getting started or looking to deepen your knowledge,
+these resources will help you master smart contract development with CosmWasm.
 
 ## Video Tutorials
 
@@ -44,7 +46,7 @@ Advanced training and certification for CosmWasm developers.
 
 A complete step-by-step series covering CosmWasm development from fundamentals to advanced topics, with 19 progressive tutorials.
 
-- [View Platform Tutorials](./platform/) - Comprehensive hands-on learning path
+- [View Platform Tutorials](./platform) - Comprehensive hands-on learning path
 
 ## Chain-Specific Tutorials
 

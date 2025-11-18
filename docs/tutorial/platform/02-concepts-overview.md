@@ -5,7 +5,8 @@ description: CosmWasm concepts overview
 
 # CosmWasm concepts overview
 
-The creators of the CosmWasm pieces had the benefit of hindsight and so reused and/or modified concepts found in other smart contracting systems, and invented others.
+The creators of the CosmWasm pieces had the benefit of hindsight and so reused and/or modified concepts found
+in other smart contracting systems, and invented others.
 
 ## Bytecode lifecycle
 

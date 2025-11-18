@@ -1,38 +1,45 @@
 ---
-title: Use the Ownable Library
+title: Use the ownable library
 description: Add a feature by incorporating code from elsewhere.
 ---
 
-# Use the Ownable Library
+# Use the ownable library
 
-Your smart contract lets anyone register names. This sounds a bit too much like the dot-com rush and its notorious domain parking. You may want to introduce some order. For instance, in the future, only an auction smart contract may eventually be allowed to register names to auction winners.
+Your smart contract lets anyone register names. This sounds a bit too much like the dot-com rush and its notorious domain parking.
+You may want to introduce some order. For instance, in the future, only an auction smart contract may eventually be allowed
+to register names to auction winners.
 
-A regular word used for such a _name registerer_ is **minter**. In this section you add a minter to your smart contract, and have it gatekeep the register function.
+A regular word used for such a _name registerer_ is **minter**. In this section you add a minter to your smart contract,
+and have it gatekeep the register function.
 
-Ideally, your smart contract should make it possible to update the minter, or have the minter be able to pass the baton. This sounds a lot like the _ownable_ pattern found in blockchain, for instance in Ethereum.
+Ideally, your smart contract should make it possible to update the minter, or have the minter be able to pass the baton.
+This sounds a lot like the _ownable_ pattern found in blockchain, for instance in Ethereum.
 
-In fact, there is [such a thing](https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable) too in the CosmWasm ecosystem. In this section, you delegate to it:
+In fact, there is [such a thing] too in the CosmWasm ecosystem. In this section, you delegate to it:
 
 * The storage definition.
 * The update mechanics.
 * The message types.
 
-<HighlightBox type="info" title="Exercise progression">
+:::note Exercise progression
 
-If you skipped the previous section, you can just switch the project to its [`first-event`](https://github.com/b9lab/cw-my-nameservice/tree/first-event) branch and take it from there.
+If you skipped the previous section, you can just switch the project to its [first-event] branch and take it from there.
 
-</HighlightBox>
+:::
+
 
 ## Add the dependency
 
+<!--
+
 <TabGroup sync>
     <TabGroupItem title="Local" active>
-        ```sh
+        ```shell
         cargo add cw-ownable@2.1.0
         ```
     </TabGroupItem>
     <TabGroupItem title="Docker">
-        ```sh
+        ```shell
         docker run --rm -it \
             -v $(pwd):/root/ -w /root \
             rust:1.80.1 \
@@ -40,6 +47,7 @@ If you skipped the previous section, you can just switch the project to its [`fi
         ```
     </TabGroupItem>
 </TabGroup>
+
 
 ## Add the storage element
 
@@ -530,3 +538,9 @@ What you have done is all within a single smart contract, it is not cross-contra
 At this stage, you should have something similar to the [`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch, with [this](https://github.com/b9lab/cw-my-nameservice/compare/first-event..add-first-library) as the diff.
 
 </HighlightBox>
+
+-->
+
+
+[such a thing]: https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable
+[first-event]: https://github.com/b9lab/cw-my-nameservice/tree/first-event
