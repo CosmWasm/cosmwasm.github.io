@@ -1,0 +1,128 @@
+---
+title: Concepts
+description: CosmWasm concepts overview
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# CosmWasm concepts overview
+
+The creators of the CosmWasm pieces had the benefit of hindsight and so reused and/or modified concepts found
+in other smart contracting systems, and invented others.
+
+## Bytecode lifecycle
+
+At the risk of pushing an open door, a smart contract has an associated **bytecode**, and that bytecode has to be stored somewhere.
+
+If you come from Ethereum, then it sounds natural to you that each smart contract instance has its own bytecode.
+
+<details>
+  <summary>Side-note on Ethereum</summary>
+
+  Indeed, with the EVM, the bytecode is stored in the `code` sub-area of the smart contract instance's account.
+  Different instances may effectively have the same bytecode, as can be confirmed by their identical bytecode hashes.
+  And although identical bytecode may be stored only once at the node level, it still costs users in full for each instance
+  to deploy their own bytecode, although to a lesser extent when using bytecode-reuse techniques such as _proxying_.
+
+  ```mermaid
+  ---
+  config: {}
+  title: The Ethereum Way
+  ---
+  flowchart TB
+   subgraph Tx1["Signed Deploy Tx1"]
+          BytecodeTx1["Bytecode"]
+    end
+   subgraph Instance1["Smart Contract Instance1"]
+      direction TB
+          State1["Instance Store"]
+          Bytecode1["Stored Bytecode"]
+          Bal1["Eth Balance"]
+          Stor1["State"]
+    end
+   subgraph Tx2["Signed Deploy Tx2"]
+          BytecodeTx2["Bytecode"]
+    end
+   subgraph Instance2["Smart Contract Instance2"]
+      direction TB
+          State2["Instance Store"]
+          Bytecode2["Stored Bytecode"]
+          Bal2["Eth Balance"]
+          Stor2["State"]
+    end
+      Tx1 --> Deploy1{"Instantiate"}
+      Tx2 --> Deploy2{"Instantiate"}
+      Deploy1 --> Instance1
+      Deploy2 --> Instance2
+      State1 --> Bytecode1 & Bal1 & Stor1
+      State2 --> Bytecode2 & Bal2 & Stor2
+      Bytecode["Bytecode"] --> Tx1 & Tx2
+      Code["Code"] --> Compile
+      Compile{"Compile"} --> Bytecode
+      style Bytecode1 fill:#E1BEE7
+      style BytecodeTx1 fill:#E1BEE7
+      style Bytecode2 fill:#E1BEE7
+      style BytecodeTx2 fill:#E1BEE7
+  ```
+</details>
+
+CosmWasm, on the other hand, separates **[storing]** of the bytecode on chain, and **[instantiating]** a smart contract
+instance using said bytecode. A stored bytecode is identified by an **id**, which is just a good old [auto-incrementing integer].
+Optionally, you can also apply permissions to [control the use] of this stored bytecode, and [change these permissions] at a later stage.
+Thereafter, when you instantiate a smart contract instance, you mention the [bytecode id] to use.
+
+Here is what these actions would look like on the command line:
+
+<Tabs>
+  <TabItem value="Store bytecode" default>
+    Sending a transaction to store a bytecode on-chain looks like this:
+      ```sh title="Command line"
+      wasmd tx wasm store path/to/compiled_smart_contract.wasm --from ...
+      ```
+
+    After the transaction has been validated, you can find the bytecode id in the events, as it looks something like that:
+      ```json  title="Transaction event"
+      …
+      "type": "store_code",
+      "attributes": [
+        {
+          "key": "code_id",
+          "value": "8",
+          "index": true
+        },
+      ]
+      …
+      ```
+      This tells you that the just-stored bytecode has the id **8**.
+
+  </TabItem>
+  <TabItem value="Instantiate smart contract">
+    Sending a transaction to instantiate a smart contract looks like this:
+      ```sh title="Command line"
+      wasmd tx wasm instantiate 8 '{"constructor_field1":...}' --from ...
+      ```
+    Where **8** is the bytecode id that your instance will use.
+    After the transaction has been validated, you can find the smart contract's address in the events, as it looks something like that:
+      ```json  title="Transaction event"
+      …
+      "type": "instantiate",
+      "attributes": [
+        {
+          "key": "_contract_address",
+          "value": "wasm14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s0phg4d",
+          "index": true
+        },
+      ]
+      …
+      ```
+    To understand how the `wasm14hj...` address was created for your smart contract instance, head to the [hello world](./04-hello-world.html) where these is a deep-dive named "How was this address computed?".
+  </TabItem>
+</Tabs>
+
+[storing]: https://github.com/CosmWasm/wasmd/blob/v0.53.0/proto/cosmwasm/wasm/v1/tx.proto#L89
+[instantiating]: https://github.com/CosmWasm/wasmd/blob/v0.53.0/proto/cosmwasm/wasm/v1/tx.proto#L113
+[auto-incrementing integer]: https://github.com/CosmWasm/wasmd/blob/v0.53.0/x/wasm/keeper/keeper.go#L183
+[control the use]: https://github.com/CosmWasm/wasmd/blob/v0.53.0/x/wasm/keeper/keeper.go#L152-L159
+[change these permissions]: https://github.com/CosmWasm/wasmd/blob/v0.53.0/proto/cosmwasm/wasm/v1/tx.proto#L273-L283
+[bytecode id]: https://github.com/CosmWasm/wasmd/blob/v0.53.0/proto/cosmwasm/wasm/v1/tx.proto#L122
