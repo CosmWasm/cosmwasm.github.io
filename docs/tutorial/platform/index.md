@@ -46,7 +46,7 @@ Each tutorial builds upon the previous ones, making it easy to follow along and 
 
 ## Getting started
 
-:::caution Version compatibility
+:::warning Version compatibility
 
 These tutorials reference specific versions of wasmd and CosmWasm:
 - The tutorials use **wasmd v0.53.2** with some code links referencing v0.52.0/v0.53.0
