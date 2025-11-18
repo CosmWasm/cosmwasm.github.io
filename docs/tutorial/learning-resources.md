@@ -2,13 +2,13 @@
 sidebar_position: 2
 ---
 
-# Learning Resources
+# Learning resources
 
 This page contains curated learning resources to help you on your CosmWasm journey.
 Whether you're just getting started or looking to deepen your knowledge,
 these resources will help you master smart contract development with CosmWasm.
 
-## Video Tutorials
+## Video tutorials
 
 ### LearnWeb3Dev (Odie)
 
@@ -30,29 +30,29 @@ Comprehensive video series covering CosmWasm development from basics to deployme
 - 5 videos for Neutron deployment
 - [Watch on YouTube](https://www.youtube.com/watch?v=vLkJLUwklYY&list=PLdXjxuqotg2g2lkyPMtXd5chNOo6Lw7ke)
 
-## Interactive Courses
+## Interactive courses
 
 ### B9Lab
 
 Comprehensive CosmWasm development course covering smart contract development from the ground up.
 
-- [CosmWasm Course](https://cosmwasm.b9lab.com/)
+- [CosmWasm course](https://cosmwasm.b9lab.com/)
 
 ### Area-52
 
 Advanced training and certification for CosmWasm developers.
 
-- [Area-52 Platform](https://area-52.io/)
+- [Area-52 platform](https://area-52.io/)
 
-## Comprehensive Tutorial Series
+## Comprehensive tutorial series
 
-### CosmWasm Developer Platform Tutorials
+### CosmWasm developer platform tutorials
 
 A complete step-by-step series covering CosmWasm development from fundamentals to advanced topics, with 19 progressive tutorials.
 
-- [View Platform Tutorials](./platform) - Comprehensive hands-on learning path
+- [View platform tutorials](./platform) - Comprehensive hands-on learning path
 
-## Chain-Specific Tutorials
+## Chain-specific tutorials
 
 ### Neutron
 
@@ -64,6 +64,6 @@ Comprehensive introduction to developing CosmWasm contracts on Neutron.
 
 Looking to connect with other CosmWasm developers? Consider joining the CosmWasm community to share knowledge, get help, and collaborate on projects.
 
-## Next Steps
+## Next steps
 
 After exploring these resources, check out our [tutorials](./introduction.mdx) to start building your first CosmWasm smart contract.
