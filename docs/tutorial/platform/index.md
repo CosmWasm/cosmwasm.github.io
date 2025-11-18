@@ -12,7 +12,7 @@ Each tutorial builds upon the previous ones, making it easy to follow along and 
 
 ### Introduction and concepts
 
-1. [Introduction](./01-intro) - Learn what CosmWasm is and why it exists.
+1. [Introduction](./01-intro.md) - Learn what CosmWasm is and why it exists.
 2. [Concepts Overview](./02-concepts-overview) - Deep dive into CosmWasm's architecture and concepts.
 3. [Integration into Cosmos](./03-integration) - Understand how CosmWasm integrates with the Cosmos SDK.
 4. [Hello World](./04-hello-world) - Build your first CosmWasm smart contract.
