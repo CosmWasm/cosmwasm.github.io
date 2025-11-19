@@ -3,9 +3,10 @@ title: Best Practices
 description: A collection of what to do and not to do.
 ---
 
-# Best Practices
+# Best practices
 
-Going through the concepts and the exercises should have given you an idea of what to do and not to do. Nonetheless, it is always a good idea to collect these ideas into a singular place, here.
+Going through the concepts and the exercises should have given you an idea of what to do and not to do.
+Nonetheless, it is always a good idea to collect these ideas into a singular place, here.
 
 ## Preparing code
 
@@ -92,4 +93,3 @@ If you want your smart contract to send messages to a Cosmos SDK module for whic
 
 * The Protobuf [`type_url` is declared](https://github.com/noislabs/nois-contracts/blob/v0.13.6/contracts/nois-payment/src/contract.rs#L115) following [its declaration](https://github.com/cosmos/cosmos-sdk/blob/v0.52.0-rc.1/x/distribution/proto/cosmos/distribution/v1beta1/tx.proto#L2).
 * The elements of the message [are appended](https://github.com/noislabs/nois-contracts/blob/v0.13.6/contracts/nois-payment/src/contract.rs#L135-L136) according to [the definition](https://github.com/cosmos/cosmos-sdk/blob/v0.52.0-rc.1/x/distribution/proto/cosmos/distribution/v1beta1/tx.proto#L142-L148).
-
