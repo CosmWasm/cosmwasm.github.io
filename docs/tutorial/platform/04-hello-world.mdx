@@ -1,0 +1,203 @@
+---
+title: Hello World
+description: All on your machine
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# Hello World
+
+As always, the goal of this hello world exercise is to give you a feel of the technology,
+but also to superficially experience how the concepts you learned map to something more tangible.
+Don't hesitate to expand the collapsed sections if you want to dive deep on certain points,
+with a view to better understand the mechanics of it.
+
+These first steps take inspiration from the CosmWasm [docs' hello world](https://docs.cosmwasm.com/docs/getting-started/intro),
+and from the [Cosmos SDK's basic tutorial](https://tutorials.cosmos.network/tutorials/3-run-node/).
+The difference is that after you have downloaded all the packages and dependencies,
+you no longer need access to other online resources.
+
+It offers two tracks, you can either do all your compilations and running natively on your computer,
+or achieve the same in Docker. If you choose the Docker path, that allows you to hold off installing anything other than Docker.
+
+## What will happen
+
+Here are the steps you are going to complete:
+
+- Build the blockchain code.
+- Create a running Cosmos blockchain:
+  - With a single running node.
+  - With CosmWasm installed
+- Compile a smart contract code.
+- Store the code and deploy a smart contract instance.
+- Interact with it.
+
+Let's get started.
+
+[Install pre-requisites](https://docs.cosmwasm.com/core/installation). Either on your computer, or install Docker.
+Including [JQ](https://jqlang.github.io/jq/).
+
+## Build your blockchain code
+
+Clone **wasmd**, which is the _simd_ of CosmWasm, at [v0.53.2](https://github.com/CosmWasm/wasmd/tree/v0.53.2).
+
+```shell
+git clone https://github.com/CosmWasm/wasmd --branch v0.53.2
+cd wasmd
+```
+
+Build the blockchain application.
+
+<Tabs groupId="local-docker">
+  <TabItem value="Local" default>
+    ```shell
+    make build
+    ```
+  </TabItem>
+  <TabItem value="Docker">
+    ```shell
+    docker build --tag wasmd:0.53.2 .
+    ```
+  </TabItem>
+</Tabs>
+
+With this done, `.build/wasmd` or Docker's `wasmd:0.53.2` is your blockchain executable.
+
+
+## Prepare your blockchain
+
+After you have compiled your blockchain code, and before you can turn your focus to CosmWasm, you need a running blockchain.
+This step has you prepare the blockchain application, test keys and a genesis file.
+
+:::warning Are you a validator?
+
+If you have previously used wasmd, you may already have data in your `~/.wasmd` folder.
+It is typically safe to erase the `config` sub-folder. But **if you are a validator** on one of the wasmd networks,
+this exercise is not safe, so stop right there or proceed at your own risks.
+
+The Docker track also uses your local folder, by sharing it as a volume with the flag `-v $HOME/.wasmd:/root/.wasmd`,
+so that you can switch to the local track at a later stage. Make space in the `~/.wasmd` folder:
+
+```shell
+rm -rf ~/.wasmd/config \
+    ~/.wasmd/data \
+    ~/.wasmd/wasm
+```
+
+:::
+
+Initialize the blockchain application's genesis file and other configuration files.
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd init validator-1 \
+            --chain-id learning-chain-1
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker run --rm -it \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd init validator-1 \
+                --chain-id learning-chain-1
+        ```
+    </TabItem>
+</Tabs>
+
+If you are curious, you can see what was created in `~/.wasmd`.
+
+Then you can add a convenient but low-safety key for Alice, who shall become the validator operator.
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd keys add alice \
+            --keyring-backend test
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker run --rm -it \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd keys add alice \
+                --keyring-backend test
+        ```
+    </TabItem>
+</Tabs>
+
+Make a note of the seed phrase so that you can reuse it in a Node.js REPL console.
+
+To become a validator, Alice needs an initial balance in the staking token. Give her one:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd genesis \
+            add-genesis-account alice 100000000stake \
+            --keyring-backend test
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker run --rm -it \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd genesis \
+                add-genesis-account alice 100000000stake \
+                --keyring-backend test
+        ```
+    </TabItem>
+</Tabs>
+
+Have Alice create and sign the token-staking transaction that will make Alice an initial validator.
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd genesis \
+            gentx alice 70000000stake \
+            --keyring-backend test \
+            --chain-id learning-chain-1
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker run --rm -it \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd genesis \
+                gentx alice 70000000stake \
+                --keyring-backend test \
+                --chain-id learning-chain-1
+        ```
+    </TabItem>
+</Tabs>
+
+The system tells you that a file has been created with a signed transaction in it.
+Add this signed transaction to the genesis file so that Alice starts indeed as a validator.
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd genesis collect-gentxs
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker run --rm -it \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd genesis collect-gentxs
+        ```
+    </TabItem>
+</Tabs>
+
+:::info
+
+The blockchain preparation is now done, and you need not redo the above steps if you restart this exercise at a later date.
+
+:::
