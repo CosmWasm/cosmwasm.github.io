@@ -707,7 +707,7 @@ Now you have your bytecode stored on-chain, but no smart contract has been deplo
 You can confirm this with:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm list-contract-by-code $ns_code_id
         ```
@@ -742,7 +742,7 @@ To make it easy, you pick Alice as the minter.
 Get her address:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         alice=$(./build/wasmd keys show alice \
             --keyring-backend test \
@@ -787,7 +787,7 @@ Which should return something like:
 With the message ready, you can send the command to instantiate your first smart contract:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd tx wasm instantiate $ns_code_id "$ns_init_msg_1" \
             --label "name service" --no-admin \
@@ -825,7 +825,7 @@ ns_instantiate_txhash_1=9881879B2A7663638D6DA81D6F9ECC7DBF8AA12B105817B06A761749
 Now that the transaction has likely been confirmed, you can retrieve it:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query tx $ns_instantiate_txhash_1 \
             --output json | jq
@@ -852,7 +852,7 @@ The authoritative way to get this information is to get it from the events,
 more precisely at the event of type `"instantiate"`:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query tx $ns_instantiate_txhash_1 \
             --output json | jq '.events[] | select(.type == "store_code") .attributes[] | select(.key == "code_id") .value'
@@ -897,7 +897,7 @@ Your smart contract address is `wasm14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr
 which you can retrieve with:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ns_addr1=$(./build/wasmd query tx $ns_instantiate_txhash_1 \
             --output json | jq -r '.events[] | select(.type == "instantiate") .attributes[] | select(.key == "_contract_address") .value')
@@ -921,7 +921,7 @@ With the contract instantiated, you can query a few things about it.
 It is possible to get the same information by code id.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm list-contract-by-code $ns_code_id
         ```
@@ -953,7 +953,7 @@ so the correct method is to use the transaction's event proper.
 CosmWasm has kept some information about your new instance. At any time, you can retrieve it with:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm contract $ns_addr1
         ```
@@ -990,7 +990,7 @@ contract_info:
 At a later stage, your contract instances may hold a token balance. At any time, you can fetch this information with:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query bank balances $ns_addr1
         ```
@@ -1022,7 +1022,7 @@ The instance keeps its state in storage. If you come from Ethereum, you are fami
 The equivalent command in CosmWasm is `query wasm contract-state`. Conveniently, it also has the `all` subcommand. So let's see what the instance has in storage with:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm contract-state all $ns_addr1
         ```
@@ -1100,7 +1100,7 @@ Now that you know that:
 You can query the instance's state directly, without the `all` keyword. Either with the key in ASCII:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm contract-state raw $ns_addr1 \
             name_minter --ascii \
@@ -1124,7 +1124,7 @@ You can query the instance's state directly, without the `all` keyword. Either w
 Or with the key in hex:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm contract-state raw $ns_addr1 \
             6E616D655F6D696E746572 --hex \
@@ -1219,7 +1219,7 @@ Press _Encode_ and on the right you see `wasm14hj2tavq8fpesdwxxcu44rty3hh90vhujr
 Alternatively, you can do the same with wasmd:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd keys parse ade4a5f5803a439835c636395a8d648dee57b2fc90d98dc17fa887159b69638b
         ```
@@ -1243,7 +1243,7 @@ the aptly-named [`PredictableAddressGenerator`](https://github.com/CosmWasm/wasm
 If you want to pre-calculate a future address, you can use the command:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm build-address --help
         ```
@@ -1312,7 +1312,7 @@ This smart contract does not need funds, but as a vehicle to demonstrate the con
 you attach funds of **100 stake** to the call:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd tx wasm execute $ns_addr1 "$ns_register_queen_to_alice" \
             --amount 100stake \
@@ -1347,7 +1347,7 @@ ns_register_queen_to_alice_txhash=7966EBDD3766243FFFFE70D0A360305DE11B0BE77A3054
 What happened? Let's look at the events that were emitted as part of this registration:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query tx $ns_register_queen_to_alice_txhash \
             --output json \
@@ -1397,7 +1397,7 @@ There comes a long list of events. Note this particular one:
 It is emitted by the bank module and is the trace that tells you that Alice paid the name service contract `100stake`. And indeed, you can confirm that now the smart contract instance holds tokens:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query bank balance $ns_addr1 stake
         ```
@@ -1428,7 +1428,7 @@ Better care next time...
 Now, if you look at how the transaction is built:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query tx $ns_register_queen_to_alice_txhash \
             --output json \
@@ -1487,7 +1487,7 @@ Although you see the word `funds` as a field of the message, it does not mean th
 You can use the same way you used earlier. Call up all storage:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm contract-state all $ns_addr1
         ```
@@ -1569,7 +1569,7 @@ ns_resolve_queen='{"resolve_record":{"name":"queen-of-the-hill"}}'
 Then you pass it as a query to the smart contract:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd query wasm contract-state smart $ns_addr1 "$ns_resolve_queen"
         ```

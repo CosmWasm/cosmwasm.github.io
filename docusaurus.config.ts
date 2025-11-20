@@ -107,6 +107,16 @@ const config: Config = {
           line: 'with-coverage',
           block: {start: 'with-coverage-start', end: 'with-coverage-end'},
         },
+        {
+          className: 'code-block-diff-add',
+          line: 'diff-add',
+          block: {start: 'diff-add-start', end: 'diff-add-end'},
+        },
+        {
+          className: 'code-block-diff-del',
+          line: 'diff-del',
+          block: {start: 'diff-del-start', end: 'diff-del-end'},
+        },
       ],
     },
   } satisfies Preset.ThemeConfig,

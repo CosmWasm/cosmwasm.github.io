@@ -25,7 +25,7 @@ It was built with Rust 1.80.1 for CosmWasm 2.1.3. It may work with other version
 Most likely, you will start your CosmWasm project as a Rust project. Use `cargo` to initialize a new one.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo new my-nameservice --lib --edition 2021
         ```
@@ -68,9 +68,9 @@ pub struct InstantiateMsg {}
 You use the attribute macro [`cw_serde`](https://docs.cosmwasm.com/core/entrypoints#defining-your-own-messages) in order to make your for-now-empty _instantiate_ message serializable. Make its content available to the Rust project by replacing the sample code in `src/lib.rs` with:
 
 ```rust title="src/lib.rs"
-//with-coverage
+//diff-add
 + pub mod msg;
-//no-coverage-start
+//diff-del-start
 - pub fn add(left: u64, right: u64) -> u64 {
 -     left + right
 - }
@@ -79,7 +79,7 @@ You use the attribute macro [`cw_serde`](https://docs.cosmwasm.com/core/entrypoi
 - mod tests {
 -     ...
 - }
-//no-coverage-end
+//diff-del-end
 ```
 
 Note that it says `pub` as the message needs to be known outside of the project, including tests.
@@ -87,7 +87,7 @@ Note that it says `pub` as the message needs to be known outside of the project,
 Back in `src/msg.rs` you will notice that `cosmwasm_schema` now appears as an `unresolved import`. You see the same message if you try to build:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo build
         ```
@@ -115,7 +115,7 @@ error[E0432]: unresolved import `cosmwasm_schema`
 Indeed, you need to add the relevant dependency:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo add cosmwasm-schema@2.1.3
         ```
@@ -181,7 +181,7 @@ The module is also marked as public because the CosmWasm system needs to be able
 Once again, there is a missing dependency: `cosmwasm_std`. Add it:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo add cosmwasm-std@2.1.3
         ```
@@ -222,7 +222,7 @@ Again, add the following line to `src/lib.rs`.
 
 ```rust title="src/lib.rs"
 pub mod contract;
-//with-coverage
+//diff-add
 + mod error;
 pub mod msg;
 ```
@@ -232,7 +232,7 @@ Note that it is not `pub` as it only needs to be available within the Rust libra
 And don't forget to add the corresponding dependency:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo add thiserror@1.0.63
         ```
@@ -250,23 +250,23 @@ And don't forget to add the corresponding dependency:
 Now that the new error type has been declared, you can use it in `src/contract.rs`:
 
 ```diff-rs title="src/contract.rs"
-//no-coverage-start
+//diff-del-start
 - use crate::msg::InstantiateMsg;
 - use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response, StdError};
-//no-coverage-end
-//with-coverage-start
+//diff-del-end
+//diff-add-start
 + use crate::{error::ContractError, msg::InstantiateMsg};
 + use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response};
 + 
 + type ContractResult = Result<Response, ContractError>;
-//with-coverage-end
+//diff-add-end
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     ...
-//no-coverage    
+//diff-del    
 - ) -> Result<Response, StdError> {
-//with-coverage
+//diff-add
 + ) -> ContractResult {
     ...
 }
@@ -288,7 +288,7 @@ At this stage, you should have something similar to the [`improve-error-reportin
 You can already build with the `cargo build` command. How about building to WebAssembly? You need to add the WebAssembly compiling target for that, if it was not yet installed.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         rustup target add wasm32-unknown-unknown
         ```
@@ -315,7 +315,7 @@ You can already build with the `cargo build` command. How about building to WebA
 With the target installed, you can compile to WebAssembly with:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo build --release --target wasm32-unknown-unknown
         ```
@@ -347,7 +347,7 @@ wasm = "build --release --target wasm32-unknown-unknown"
 With this alias defined, you can now use `cargo wasm` instead of writing `cargo build --release --target wasm32-unknown-unknown`. Change your command to:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo wasm
         ```
@@ -372,7 +372,7 @@ name = "my-nameservice"
 version = "0.1.0"
 edition = "2021"
 
-//with-coverage-start
+//diff-add-start
 + # Linkage options. More information: https://doc.rust-lang.org/reference/linkage.html
 + [lib]
 + crate-type = ["cdylib", "rlib"]
@@ -392,7 +392,7 @@ edition = "2021"
 + panic = 'abort'
 + incremental = false
 + overflow-checks = true
-//with-coverage-end
+//diff-add-end
 
 [dependencies]
 ...
@@ -453,7 +453,7 @@ Note how:
 With the test ready, you can run it with the following command:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo test
         ```

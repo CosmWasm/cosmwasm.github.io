@@ -62,3 +62,11 @@
 .code-block-with-coverage {
   background-color: #00ff0020;
 }
+
+.code-block-diff-del {
+  background-color: rgba(255, 0, 0, 0.12);
+}
+
+.code-block-diff-add {
+  background-color: rgba(0, 255, 0, 0.12);
+}
