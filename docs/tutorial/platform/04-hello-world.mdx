@@ -90,7 +90,7 @@ rm -rf ~/.wasmd/config \
 Initialize the blockchain application's genesis file and other configuration files.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd init validator-1 \
             --chain-id learning-chain-1
@@ -112,7 +112,7 @@ If you are curious, you can see what was created in `~/.wasmd`.
 Then you can add a convenient but low-safety key for Alice, who shall become the validator operator.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd keys add alice \
             --keyring-backend test
@@ -134,7 +134,7 @@ Make a note of the seed phrase so that you can reuse it in a Node.js REPL consol
 To become a validator, Alice needs an initial balance in the staking token. Give her one:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd genesis \
             add-genesis-account alice 100000000stake \
@@ -156,7 +156,7 @@ To become a validator, Alice needs an initial balance in the staking token. Give
 Have Alice create and sign the token-staking transaction that will make Alice an initial validator.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd genesis \
             gentx alice 70000000stake \
@@ -181,7 +181,7 @@ The system tells you that a file has been created with a signed transaction in i
 Add this signed transaction to the genesis file so that Alice starts indeed as a validator.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         ./build/wasmd genesis collect-gentxs
         ```
@@ -213,7 +213,7 @@ If you stopped `wasmd` earlier, you can come back here and restart `wasmd` where
 Run Alice's validating node to start the blockchain system and to interact with it.
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```sh
         ./build/wasmd start
         ```
@@ -239,7 +239,7 @@ increasing in the log, a simple verification is to check Alice's balance if it i
 First, store her address:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```sh
         alice=$(./build/wasmd keys show alice \
             --keyring-backend test \
@@ -268,7 +268,7 @@ Which returns something like **wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as**.
 With that, you can query for her balance:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```sh
         ./build/wasmd query bank balances $alice
         ```
@@ -295,3 +295,51 @@ Indeed, she started with **100,000,000** and staked **70,000,000**, so she now h
 remaining available. The staking rewards that she has accumulated are not available until they are collected.
 
 </details>
+
+## Compile your smart contract
+
+With a running chain, you can start interacting with the CosmWasm module.
+First you are going to download and compile a smart contract.
+
+We will use the same `nameservice` smart contract of the [long running exercise](./05-first-contract.md)
+but at the intermediate [`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch.
+In another terminal, start by cloning it and changing the directory.
+
+```sh
+git clone https://github.com/b9lab/cw-my-nameservice --branch add-first-library
+cd cw-my-nameservice/contracts/nameservice
+```
+
+At this version of the contract, it compiles with Rust v1.80.1 to the WASM target.
+
+<Tabs sync>
+    <TabItem value="Local" default>
+        ```sh
+        rustup install 1.80.1
+        rustup target add wasm32-unknown-unknown --toolchain 1.80.1
+        RUSTFLAGS='-C link-arg=-s' cargo +1.80.1 wasm
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```sh
+        docker run --rm -it \
+            -v $(pwd):/root \
+            -w /root \
+            rust:1.80.1 \
+            sh -c "rustup target add wasm32-unknown-unknown && \
+            RUSTFLAGS='-C link-arg=-s' cargo +1.80.1 wasm"
+        ```
+    </TabItem>
+</Tabs>
+
+The compiled WebAssembly is located relative to the contract dir in `./target/wasm32-unknown-unknown/release/cw_my_nameservice.wasm`. The file ends up at about 221 KB in size. In fact, the `RUSTFLAGS='-C link-arg=-s'` flag is there to reduce its size, always a concern in blockchain. You can remove the flag as a test, and you should see that it then ends up at 1.5 MB in size.
+
+Copy the file to the `~/.wasmd` so as to reuse it when storing the code on-chain. Make the folder if it is missing:
+
+```sh
+mkdir -p $HOME/.wasmd/wasm/code
+cp $(pwd)/target/wasm32-unknown-unknown/release/cw_my_nameservice.wasm \
+    $HOME/.wasmd/wasm/code/cw_my_nameservice.wasm
+```
+
+Note that the `~/.wasmd` path is also accessible by the Docker container running the blockchain app, which makes it convenient for this exercise.
