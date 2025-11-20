@@ -599,7 +599,7 @@ Flags:
 Global Flags:
       --home string         directory for config and data (default "/root/.wasmd")
       --log_format string   The logging format (json|plain) (default "plain")
-      --log_level string    The logging level (trace|debug|info|warn|error|fatal|panic|disabled or '*:<level>,<key>:<level>') (default "info")
+      --log_level string    The logging level (trace|debug|info|warn|error|fatal|panic|disabled or '*:≺level≻,≺key≻:≺level≻') (default "info")
       --log_no_color        Disable colored logs
       --trace               print out full stack trace on errors
 
@@ -655,7 +655,7 @@ Make a mental note of the `instantiate_permission` as this is an advanced featur
 
 Which yields:
 
-```txt
+```text
 --instantiate-anyof-addresses strings   Any of the addresses can instantiate a contract from the code, optional
 --instantiate-everybody string          Everybody can instantiate a contract from the code, optional
 --instantiate-nobody string             Nobody except the governance process can instantiate a contract from the code, optional
@@ -698,5 +698,148 @@ pagination: ...
 
 For the avoidance of doubt, trying to get the code id of your just-deployed bytecode is wrong.
 In a real setting, you are not alone on the blockchain and you can easily get confused as to which code is yours.
+
+</details>
+
+## Deploy your contract instance
+
+Now you have your bytecode stored on-chain, but no smart contract has been deployed using this code.
+You can confirm this with:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd query wasm list-contract-by-code $ns_code_id
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query wasm list-contract-by-code $ns_code_id
+        ```
+    </TabItem>
+</Tabs>
+
+This returns:
+
+```yaml
+contracts: []
+pagination: ...
+```
+
+Time to instantiate your first CosmWasm smart contract.
+The [constructor requires](https://github.com/b9lab/cw-my-nameservice/blob/add-first-library/src/contract.rs#L18)
+a [specific message](https://github.com/b9lab/cw-my-nameservice/blob/add-first-library/src/msg.rs#L5-L7):
+
+```rust title="msg.rs/InstantiateMsg"
+pub struct InstantiateMsg {
+    pub minter: String,
+}
+```
+
+Which has to be serialized as JSON. The `minter` is the account that will be allowed to register new names.
+To make it easy, you pick Alice as the minter.
+Get her address:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        alice=$(./build/wasmd keys show alice \
+            --keyring-backend test \
+            --address)
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        alice=$(docker run --rm -i \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd keys show alice \
+                --keyring-backend test \
+                --address | tr -d '\r')
+        ```
+    </TabItem>
+</Tabs>
+
+The next action is to prepare the instantiate message by setting the right value:
+
+```shell
+ns_init_msg_1='{"minter":"'$alice'"}'
+```
+
+<details>
+    <summary>Confirm that the message looks right</summary>
+
+With:
+
+```shell
+echo $ns_init_msg_1
+```
+
+Which should return something like:
+
+```text
+{"minter":"wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as"}
+```
+
+</details>
+
+With the message ready, you can send the command to instantiate your first smart contract:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd tx wasm instantiate $ns_code_id "$ns_init_msg_1" \
+            --label "name service" --no-admin \
+            --from alice --keyring-backend test \
+            --chain-id learning-chain-1 \
+            --gas-prices 0.25stake --gas auto --gas-adjustment 1.3 \
+            --yes
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd tx wasm instantiate $ns_code_id "$ns_init_msg_1" \
+                --label "name service" --no-admin \
+                --from alice --keyring-backend test \
+                --chain-id learning-chain-1 \
+                --gas-prices 0.25stake --gas auto --gas-adjustment 1.3 \
+                --yes
+        ```
+    </TabItem>
+</Tabs>
+
+Note that the meat of the command is `instantiate $ns_code_id "$ns_init_msg_1"`,
+which would read as `instantiate 1 "{"minter":"wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as"}"`.
+
+Once again, you get a transaction hash. Make a note of it with your own hash, for instance:
+
+```shell
+ns_instantiate_txhash_1=9881879B2A7663638D6DA81D6F9ECC7DBF8AA12B105817B06A761749A22764E1
+```
+
+<details>
+    <summary>The full content of the transaction</summary>
+
+Now that the transaction has likely been confirmed, you can retrieve it:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
+        ./build/wasmd query tx $ns_instantiate_txhash_1 \
+            --output json | jq
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query tx $ns_instantiate_txhash_1 \
+                --output json | jq
+        ```
+    </TabItem>
+</Tabs>
+
+This returns a lot of elements, but don't miss the event of type `"instantiate"`.
 
 </details>

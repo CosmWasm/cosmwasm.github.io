@@ -1,164 +1,25 @@
-## Deploy your contract instance
-
-Now you have your bytecode stored on-chain, but no smart contract has been deployed using this code. You can confirm this with:
-
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
-        ./build/wasmd query wasm list-contract-by-code $ns_code_id
-        ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
-        docker exec val-alice-1 \
-            wasmd query wasm list-contract-by-code $ns_code_id
-        ```
-    </TabGroupItem>
-</TabGroup>
-
-This returns:
-
-```yaml
-contracts: []
-pagination: ...
-```
-
-Time to instantiate your first CosmWasm smart contract. The [constructor requires](https://github.com/b9lab/cw-my-nameservice/blob/add-first-library/src/contract.rs#L18) a [specific message](https://github.com/b9lab/cw-my-nameservice/blob/add-first-library/src/msg.rs#L5-L7):
-
-<CodeBlock url="https://github.com/deus-labs/cw-contracts/blob/v0.11.0/contracts/nameservice/src/msg.rs#L6-L9" title="msg.rs/InstantiateMsg">
-```rust
-pub struct InstantiateMsg {
-    pub minter: String,
-}
-```
-</CodeBlock>
-
-Which has to be serialized as JSON. The `minter` is the account that will be allowed to register new names. To make it easy, you pick Alice as the minter. Get her address:
-
-
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
-        alice=$(./build/wasmd keys show alice \
-            --keyring-backend test \
-            --address)
-        ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
-        alice=$(docker run --rm -i \
-            -v $HOME/.wasmd:/root/.wasmd \
-            wasmd:0.53.2 \
-            wasmd keys show alice \
-                --keyring-backend test \
-                --address | tr -d '\r')
-        ```
-    </TabGroupItem>
-</TabGroup>
-
-The next action is to prepare the instantiate message by setting the right value:
-
-```sh
-ns_init_msg_1='{"minter":"'$alice'"}'
-```
-
-<Accordion>
-<AccordionItem title="Comfirm that the message looks right">
-
-With:
-
-```sh
-echo $ns_init_msg_1
-```
-
-Which should return something like:
-
-```txt
-{"minter":"wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as"}
-```
-
-</AccordionItem>
-</Accordion>
-
-With the message ready, you can send the comand to instantiate your first smart contract:
-
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
-        ./build/wasmd tx wasm instantiate $ns_code_id "$ns_init_msg_1" \
-            --label "name service" --no-admin \
-            --from alice --keyring-backend test \
-            --chain-id learning-chain-1 \
-            --gas-prices 0.25stake --gas auto --gas-adjustment 1.3 \
-            --yes
-        ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
-        docker exec val-alice-1 \
-            wasmd tx wasm instantiate $ns_code_id "$ns_init_msg_1" \
-                --label "name service" --no-admin \
-                --from alice --keyring-backend test \
-                --chain-id learning-chain-1 \
-                --gas-prices 0.25stake --gas auto --gas-adjustment 1.3 \
-                --yes
-        ```
-    </TabGroupItem>
-</TabGroup>
-
-Note that the meat of the command is `instantiate $ns_code_id "$ns_init_msg_1"`, which would read as `instantiate 1 "{"minter":"wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as"}"`.
-
-Once again, you get a transaction hash. Make a note of it with your own hash, for instance:
-
-```sh
-ns_instantiate_txhash_1=9881879B2A7663638D6DA81D6F9ECC7DBF8AA12B105817B06A761749A22764E1
-```
-
-<Accordion>
-<AccordionItem title="The full content of the transaction">
-
-Now that the transaction has likely been confirmed, you can retrieve it:
-
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
-        ./build/wasmd query tx $ns_instantiate_txhash_1 \
-            --output json | jq
-        ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
-        docker exec val-alice-1 \
-            wasmd query tx $ns_instantiate_txhash_1 \
-                --output json | jq
-        ```
-    </TabGroupItem>
-</TabGroup>
-
-This returns a lot of elements, but don't miss the event of type `"instantiate"`.
-
-</AccordionItem>
-</Accordion>
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 ## Retrieve your contract address
 
 At this stage, what is important is the **address** at which your contract instance resides. This is the address you will use to interact with your instantiated contract. The authoritative way to get this information is to get it from the events, more precisely at the event of type `"instantiate"`:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query tx $ns_instantiate_txhash_1 \
             --output json | jq '.events[] | select(.type == "store_code") .attributes[] | select(.key == "code_id") .value'
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query tx $ns_instantiate_txhash_1 \
                 --output json | jq '.events[] | select(.type == "instantiate")'
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 This returns something like:
 
@@ -187,21 +48,21 @@ This returns something like:
 
 Here too, `msg_index` assists you when you have more than one instantiation in one transaction. Your smart contract address is `wasm14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9s0phg4d`, which you can retrieve with:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ns_addr1=$(./build/wasmd query tx $ns_instantiate_txhash_1 \
             --output json | jq -r '.events[] | select(.type == "instantiate") .attributes[] | select(.key == "_contract_address") .value')
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         ns_addr1=$(docker exec val-alice-1 \
             wasmd query tx $ns_instantiate_txhash_1 \
                 --output json | jq -r '.events[] | select(.type == "instantiate") .attributes[] | select(.key == "_contract_address") .value')
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Note how the address is much longer than a _regular_ address, like Alice's. With the contract instantiated, you can query a few things about it.
 
@@ -210,19 +71,19 @@ Note how the address is much longer than a _regular_ address, like Alice's. With
 
 It is possible to get the same information by code id.
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm list-contract-by-code $ns_code_id
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm list-contract-by-code $ns_code_id
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 This returns something like:
 
@@ -239,19 +100,19 @@ Of course, if you have more than one smart contracts here, you could easily get 
 
 CosmWasm has kept some information about your new instance. At any time, you can retrieve it with:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm contract $ns_addr1
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm contract $ns_addr1
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which returns something similar to:
 
@@ -274,19 +135,19 @@ contract_info:
 
 At a later stage, your contract instances may hold a token balance. At any time, you can fetch this information with:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query bank balances $ns_addr1
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query bank balances $ns_addr1
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which initially returns:
 
@@ -304,19 +165,19 @@ The instance keeps its state in storage. If you come from Ethereum, you are fami
 
 The equivalent command in CosmWasm is `query wasm contract-state`. Conveniently, it also has the `all` subcommand. So let's see what the instance has in storage with:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm contract-state all $ns_addr1
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm contract-state all $ns_addr1
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which returns:
 
@@ -331,13 +192,13 @@ pagination:
 
 The `key` looks like ASCII. Convert it:
 
-```sh
+```shell
 echo 6E616D655F6D696E746572 | xxd -r -p
 ```
 
 This returns `name_minter`. The value looks like Base64. Convert it:
 
-```sh
+```shell
 echo eyJvd25lciI6Indhc20xa2htdjZxbDRwa2h4azVyOThtNXp6NHRldHQ1NWRzbjYzdm1tNzYiLCJwZW5kaW5nX293bmVyIjpudWxsLCJwZW5kaW5nX2V4cGlyeSI6bnVsbH0= | base64 -D
 ```
 
@@ -385,18 +246,18 @@ Now that you know that:
 
 You can query the instance's state directly, without the `all` keyword. Either with the key in ASCII:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm contract-state raw $ns_addr1 \
             name_minter --ascii \
             --output json \
             | jq -r '.data' \
             | base64 -D
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm contract-state raw $ns_addr1 \
                 name_minter --ascii \
@@ -404,23 +265,23 @@ You can query the instance's state directly, without the `all` keyword. Either w
                 | jq -r '.data' \
                 | base64 -D
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Or with the key in hex:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm contract-state raw $ns_addr1 \
             6E616D655F6D696E746572 --hex \
             --output json \
             | jq -r '.data' \
             | base64 -D
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm contract-state raw $ns_addr1 \
                 6E616D655F6D696E746572 --hex \
@@ -428,8 +289,8 @@ Or with the key in hex:
                 | jq -r '.data' \
                 | base64 -D
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 <HighlightBox type="tip">
 
@@ -461,13 +322,13 @@ Try it yourself with the help of online tools:
 
 1. The string `module` hashes to: `120970d812836f19888625587a4606a5ad23cef31c8684e601771552548fc6b9` as seen [here](https://emn178.github.io/online-tools/sha256.html?input=module&input_type=utf-8&output_type=hex&hmac_enabled=0&hmac_input_type=hex) or with the command:
 
-    ```sh
+    ```shell
     echo -n module | sha256sum --text
     ```
 
 2. `wasm` hex-encodes to `7761736d` as you can confirm [here](http://www.unit-conversion.info/texttools/hexadecimal/#data), or with the command:
 
-    ```sh
+    ```shell
     echo -n wasm | xxd -p
     ```
 
@@ -483,7 +344,7 @@ Putting it all together, what you need to hash is:
 
 This yields `ade4a5f5803a439835c636395a8d648dee57b2fc90d98dc17fa887159b69638b` as seen [here](https://emn178.github.io/online-tools/sha256.html?input=120970d812836f19888625587a4606a5ad23cef31c8684e601771552548fc6b97761736d0000000000000000010000000000000001&input_type=hex&output_type=hex&hmac_enabled=0&hmac_input_type=hex) or with the command:
 
-```sh
+```shell
 echo -n 120970d812836f19888625587a4606a5ad23cef31c8684e601771552548fc6b97761736d0000000000000000010000000000000001 \
     | xxd -r -p \
     | sha256sum --binary
@@ -498,19 +359,19 @@ Press _Encode_ and on the right you see `wasm14hj2tavq8fpesdwxxcu44rty3hh90vhujr
 
 Alternatively, you can do the same with wasmd:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd keys parse ade4a5f5803a439835c636395a8d648dee57b2fc90d98dc17fa887159b69638b
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd keys parse ade4a5f5803a439835c636395a8d648dee57b2fc90d98dc17fa887159b69638b
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Congratulations! You have recomputed your smart contract instance address.
 
@@ -518,19 +379,19 @@ Congratulations! You have recomputed your smart contract instance address.
 
 As a side-note, CosmWasm implements another contract address computation function. If you come from Ethereum, this is similar to `CREATE2`. To use it, you would invoke the `tx wasm instantiate2` command, which, in turn, is using the aptly-named [`PredictableAddressGenerator`](https://github.com/CosmWasm/wasmd/blob/v0.52.0/x/wasm/keeper/addresses.go#L26). If you want to pre-calculate a future address, you can use the command:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm build-address --help
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd keys query wasm build-address --help
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 </HighlightBox>
 
@@ -551,7 +412,7 @@ pub enum ExecuteMsg {
 
 CosmWasm serializes an enum such as `ExecuteMsg` by prefixing the value proper with the type, here `Register`. Since you want to register Alice at the name, your register message, with its two fields, is:
 
-```sh
+```shell
 ns_register_queen_to_alice='{"register":{"name":"queen-of-the-hill","owner":"'$alice'"}}'
 ```
 
@@ -560,7 +421,7 @@ ns_register_queen_to_alice='{"register":{"name":"queen-of-the-hill","owner":"'$a
 
 With:
 
-```sh
+```shell
 echo $ns_register_queen_to_alice
 ```
 
@@ -585,9 +446,9 @@ MINTER
 
 And as you recall from the instantiation message, Alice is the minter. So Alice has to send this transaction. This smart contract does not need funds, but as a vehicle to demonstrate the concept, you attach funds of `100 stake` to the call:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd tx wasm execute $ns_addr1 "$ns_register_queen_to_alice" \
             --amount 100stake \
             --from alice --keyring-backend test \
@@ -595,9 +456,9 @@ And as you recall from the instantiation message, Alice is the minter. So Alice 
             --gas-prices 0.25stake --gas auto --gas-adjustment 1.3 \
             --yes
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd tx wasm execute $ns_addr1 "$ns_register_queen_to_alice" \
                 --amount 100stake \
@@ -606,12 +467,12 @@ And as you recall from the instantiation message, Alice is the minter. So Alice 
                 --gas-prices 0.25stake --gas auto --gas-adjustment 1.3 \
                 --yes
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Once more, make a note of the transaction hash. For instance:
 
-```sh
+```shell
 ns_register_queen_to_alice_txhash=7966EBDD3766243FFFFE70D0A360305DE11B0BE77A305470D23D376B65432451
 ```
 
@@ -620,23 +481,23 @@ ns_register_queen_to_alice_txhash=7966EBDD3766243FFFFE70D0A360305DE11B0BE77A3054
 
 What happened? Let's look at the events that were emitted as part of this registration:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query tx $ns_register_queen_to_alice_txhash \
             --output json \
                 | jq ".events"
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query tx $ns_register_queen_to_alice_txhash \
                 --output json \
                     | jq ".events"
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 There comes a long list of events. Note this particular one:
 
@@ -670,19 +531,19 @@ There comes a long list of events. Note this particular one:
 
 It is emitted by the bank module and is the trace that tells you that Alice paid the name service contract `100stake`. And indeed, you can confirm that now the smart contract instance holds tokens:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query bank balance $ns_addr1 stake
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query bank balance $ns_addr1 stake
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which returns:
 
@@ -700,23 +561,23 @@ This version of the code of the smart contract cannot send tokens away, so its b
 
 Now, if you look at how the transaction is built:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query tx $ns_register_queen_to_alice_txhash \
             --output json \
             | jq ".tx.body.messages"
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query tx $ns_register_queen_to_alice_txhash \
                 --output json \
                 | jq ".tx.body.messages"
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 You see a single message:
 
@@ -757,19 +618,19 @@ Although you see the word `funds` as a field of the message, it does not mean th
 
 You can use the same way you used earlier. Call up all storage:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm contract-state all $ns_addr1
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm contract-state all $ns_addr1
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which returns:
 
@@ -783,7 +644,7 @@ models:
 
 If you remove the `000D` prefix from the new key and decode it as ASCII:
 
-```sh
+```shell
 echo 6E616D655F7265736F6C766572717565656E2D6F662D7468652D68696C6C | xxd -r -p
 ```
 
@@ -799,7 +660,7 @@ The `00` prefix denotes a key part of a more complex type, while the next `0D` i
 
 Now if you Base64-decode the value with:
 
-```sh
+```shell
 echo eyJvd25lciI6Indhc20xdGV2Nnh0NHBncm5qcHh3bXZ2N2pybDhwaDR4NDd3ZzV2Y2QwYXMifQ== | base64 -d
 ```
 
@@ -836,25 +697,25 @@ pub enum QueryMsg {
 
 This is another `enum` which again is serialized by prefixing with the snake-case variant:
 
-```sh
+```shell
 ns_resolve_queen='{"resolve_record":{"name":"queen-of-the-hill"}}'
 ```
 
 Then you pass it as a query to the smart contract:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         ./build/wasmd query wasm contract-state smart $ns_addr1 "$ns_resolve_queen"
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker exec val-alice-1 \
             wasmd query wasm contract-state smart $ns_addr1 "$ns_resolve_queen"
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which returns as expected:
 
