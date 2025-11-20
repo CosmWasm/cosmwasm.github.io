@@ -428,3 +428,275 @@ ns_store_txhash=34087EB0B74233E7E3C3AA9CE6EFCB4279130AF1C2BCAE992DD1E1D1775D02ED
 ```
 
 With your specific value.
+
+## Verify your stored code
+
+The newly stored code has a newly created `id` that you need to know in order to use it.
+The authoritative way is to retrieve the code information from the transaction's events itself.
+The event of interest has the `type: "store_code"`:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ./build/wasmd query tx $ns_store_txhash --output json \
+            | jq '.events[] | select(.type == "store_code")'
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query tx $ns_store_txhash --output json \
+            | jq '.events[] | select(.type == "store_code")'
+        ```
+    </TabItem>
+</Tabs>
+
+Which returns something like:
+
+```json
+{
+  "type": "store_code",
+  "attributes": [
+    {
+      "key": "code_checksum",
+      "value": "98f9924c5fbe94dd6ad24d71f2352593e54aac6aabcfaa9b1bf000f64b33992d",
+      "index": true
+    },
+    {
+      "key": "code_id",
+      "value": "1",
+      "index": true
+    },
+    {
+      "key": "msg_index",
+      "value": "0",
+      "index": true
+    }
+  ]
+}
+```
+
+There is a code id, predictably at `1`, and a code checksum.
+
+:::tip
+
+The `msg_index` is here to assist you with identifying which code is which,
+in the rare case where you store two or more codes in a single transaction.
+
+:::
+
+Make a note of the code id as you will use it during instantiation:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ns_code_id=$(./build/wasmd query tx $ns_store_txhash --output json \
+            | jq -r '.events[] | select(.type == "store_code") .attributes[] | select(.key == "code_id") .value')
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        ns_code_id=$(docker exec val-alice-1 \
+            wasmd query tx $ns_store_txhash --output json \
+            | jq -r '.events[] | select(.type == "store_code") .attributes[] | select(.key == "code_id") .value')
+        ```
+    </TabItem>
+</Tabs>
+
+Does the code checksum match? Let's check:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        sha256sum $HOME/.wasmd/wasm/code/cw_my_nameservice.wasm
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            sha256sum /root/.wasmd/wasm/code/cw_my_nameservice.wasm
+        ```
+    </TabItem>
+</Tabs>
+
+You should see the same value as the one emitted in the event.
+
+<details>
+    <summary>If you don't trust the checksum...</summary>
+
+You can run a diff of the stored code and the one you have:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ./build/wasmd query wasm code $ns_code_id \
+            $HOME/.wasmd/wasm/code/downloaded_cw_my_nameservice.wasm
+        diff $HOME/.wasmd/wasm/code/cw_my_nameservice.wasm \
+            $HOME/.wasmd/wasm/code/downloaded_cw_my_nameservice.wasm
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query wasm code $ns_code_id \
+                /root/.wasmd/wasm/code/downloaded_cw_my_nameservice.wasm
+        docker exec val-alice-1 \
+            diff /root/.wasmd/wasm/code/cw_my_nameservice.wasm \
+                /root/.wasmd/wasm/code/downloaded_cw_my_nameservice.wasm
+        ```
+    </TabItem>
+</Tabs>
+
+No message on the `diff` means that they are identical.
+
+</details>
+
+<details>
+    <summary>What are the available commands?</summary>
+
+At any time, you can use the Cosmos SDK convention to get information:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ./build/wasmd query wasm --help
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query wasm --help
+        ```
+    </TabItem>
+</Tabs>
+
+You should get this:
+
+```text
+Querying commands for the wasm module
+
+Usage:
+  wasmd query wasm [flags]
+  wasmd query wasm [command]
+
+Available Commands:
+  build-address             build contract address
+  code                      Downloads wasm bytecode for given code id
+  code-info                 Prints out metadata of a code id
+  contract                  Prints out metadata of a contract given its address
+  contract-history          Prints out the code history for a contract given its address
+  contract-state            Querying commands for the wasm module
+  libwasmvm-version         Get libwasmvm version
+  list-code                 List all wasm bytecode on the chain
+  list-contract-by-code     List wasm all bytecode on the chain for given code id
+  list-contracts-by-creator List all contracts by creator
+  params                    Query the current wasm parameters
+  pinned                    List all pinned code ids
+
+Flags:
+  -h, --help   help for wasm
+
+Global Flags:
+      --home string         directory for config and data (default "/root/.wasmd")
+      --log_format string   The logging format (json|plain) (default "plain")
+      --log_level string    The logging level (trace|debug|info|warn|error|fatal|panic|disabled or '*:<level>,<key>:<level>') (default "info")
+      --log_no_color        Disable colored logs
+      --trace               print out full stack trace on errors
+
+Use "wasmd query wasm [command] --help" for more information about a command.
+```
+</details>
+
+<details>
+    <summary>Retrieve your code info again</summary>
+
+You already have, but if you need it later on, you can simply call:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ./build/wasmd query wasm code-info $ns_code_id
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query wasm code-info $ns_code_id
+        ```
+    </TabItem>
+</Tabs>
+
+Which returns something like:
+
+```yaml
+code_id: "1"
+creator: wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as
+data_hash: 98F9924C5FBE94DD6AD24D71F2352593E54AAC6AABCFAA9B1BF000F64B33992D
+instantiate_permission:
+  addresses: []
+  permission: Everybody
+```
+
+Make a mental note of the `instantiate_permission` as this is an advanced feature you can enable. If you are curious, you can have a look at it starting with:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ./build/wasmd tx wasm store --help | grep -e --instantiate
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd tx wasm store --help | grep -e --instantiate
+        ```
+    </TabItem>
+</Tabs>
+
+Which yields:
+
+```txt
+--instantiate-anyof-addresses strings   Any of the addresses can instantiate a contract from the code, optional
+--instantiate-everybody string          Everybody can instantiate a contract from the code, optional
+--instantiate-nobody string             Nobody except the governance process can instantiate a contract from the code, optional
+--instantiate-only-address string       Removed: use instantiate-anyof-addresses instead
+```
+
+</details>
+
+<details>
+    <summary title="">Retrieve all code infos</summary>
+
+Earlier, when you tried retrieving all code infos, it returned `[]`. Try again:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
+        ./build/wasmd query wasm list-code
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
+        docker exec val-alice-1 \
+            wasmd query wasm list-code
+        ```
+    </TabItem>
+</Tabs>
+
+Now, you get something like:
+
+```yaml
+code_infos:
+- code_id: "1"
+  creator: wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as
+  data_hash: 98F9924C5FBE94DD6AD24D71F2352593E54AAC6AABCFAA9B1BF000F64B33992D
+  instantiate_permission:
+    addresses: []
+    permission: Everybody
+pagination: ...
+```
+
+For the avoidance of doubt, trying to get the code id of your just-deployed bytecode is wrong.
+In a real setting, you are not alone on the blockchain and you can easily get confused as to which code is yours.
+
+</details>
