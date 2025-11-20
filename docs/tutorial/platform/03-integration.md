@@ -13,7 +13,7 @@ where you can also find more detailed steps and corner cases.
 The Cosmos SDK is highly customizable. Not only can you add your own modules, you can also replace stock modules with your modified ones.
 Because of this customizability, the amount of work required to integrate CosmWasm into your app-chain will vary.
 
-This section is not about experimenting with CosmWasm (see [here](./04-hello-world.mdx) for that)
+This section is not about experimenting with CosmWasm (see [here](./04-hello-world.md) for that)
 or learning how to write CosmWasm smart contracts (see [here](./05-first-contract.md) for that).
 
 ## Prerequisites
