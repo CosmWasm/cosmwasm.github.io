@@ -68,9 +68,9 @@ pub struct InstantiateMsg {}
 You use the attribute macro [`cw_serde`](https://docs.cosmwasm.com/core/entrypoints#defining-your-own-messages) in order to make your for-now-empty _instantiate_ message serializable. Make its content available to the Rust project by replacing the sample code in `src/lib.rs` with:
 
 ```rust title="src/lib.rs"
-//with-coverage
+//diff-add
 + pub mod msg;
-//no-coverage-start
+//diff-del-start
 - pub fn add(left: u64, right: u64) -> u64 {
 -     left + right
 - }
@@ -79,7 +79,7 @@ You use the attribute macro [`cw_serde`](https://docs.cosmwasm.com/core/entrypoi
 - mod tests {
 -     ...
 - }
-//no-coverage-end
+//diff-del-end
 ```
 
 Note that it says `pub` as the message needs to be known outside of the project, including tests.
@@ -222,7 +222,7 @@ Again, add the following line to `src/lib.rs`.
 
 ```rust title="src/lib.rs"
 pub mod contract;
-//with-coverage
+//diff-add
 + mod error;
 pub mod msg;
 ```
@@ -250,23 +250,23 @@ And don't forget to add the corresponding dependency:
 Now that the new error type has been declared, you can use it in `src/contract.rs`:
 
 ```diff-rs title="src/contract.rs"
-//no-coverage-start
+//diff-del-start
 - use crate::msg::InstantiateMsg;
 - use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response, StdError};
-//no-coverage-end
-//with-coverage-start
+//diff-del-end
+//diff-add-start
 + use crate::{error::ContractError, msg::InstantiateMsg};
 + use cosmwasm_std::{entry_point, DepsMut, Env, MessageInfo, Response};
 + 
 + type ContractResult = Result<Response, ContractError>;
-//with-coverage-end
+//diff-add-end
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     ...
-//no-coverage    
+//diff-del    
 - ) -> Result<Response, StdError> {
-//with-coverage
+//diff-add
 + ) -> ContractResult {
     ...
 }
@@ -372,7 +372,7 @@ name = "my-nameservice"
 version = "0.1.0"
 edition = "2021"
 
-//with-coverage-start
+//diff-add-start
 + # Linkage options. More information: https://doc.rust-lang.org/reference/linkage.html
 + [lib]
 + crate-type = ["cdylib", "rlib"]
@@ -392,7 +392,7 @@ edition = "2021"
 + panic = 'abort'
 + incremental = false
 + overflow-checks = true
-//with-coverage-end
+//diff-add-end
 
 [dependencies]
 ...
