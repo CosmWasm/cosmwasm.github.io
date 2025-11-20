@@ -116,7 +116,7 @@ Here is what these actions would look like on the command line:
       ]
       ...
       ```
-    To understand how the `wasm14hj...` address was created for your smart contract instance, head to the [hello world](./04-hello-world.html) where these is a deep-dive named "How was this address computed?".
+    To understand how the `wasm14hj...` address was created for your smart contract instance, head to the [hello world](./04-hello-world.mdx) where these is a deep-dive named "How was this address computed?".
   </TabItem>
 </Tabs>
 
@@ -240,7 +240,7 @@ As examples of Cosmos messages, you have:
 
 - [MsgStoreCode](https://github.com/CosmWasm/wasmd/blob/v0.53.0/x/wasm/types/tx.pb.go#L40-L48) is used to store a bytecode inside the CosmWasm bytecode store.
   When sending it, you just put the bytecode in `bytes` [wasm_byte_code](https://github.com/CosmWasm/wasmd/blob/v0.53.0/proto/cosmwasm/wasm/v1/tx.proto#L96).
-  To see it in action, go to [Store your contract code](./04-hello-world.md#store-your-contract-code) part of the [hello world](./04-hello-world.md).
+  To see it in action, go to [Store your contract code](./04-hello-world.mdx#store-your-contract-code) part of the [hello world](./04-hello-world.mdx).
 - [MsgExecuteContract](https://github.com/CosmWasm/wasmd/blob/v0.53.0/x/wasm/types/tx.pb.go#L342-L351) is used to instruct the CosmWasm
   module to call the [_execute_&puncsp;entry point](https://docs.cosmwasm.com/core/entrypoints/execute), a.k.a. function, on the contract instance
   identified by [`string contract`](https://github.com/CosmWasm/wasmd/blob/v0.53.0/proto/cosmwasm/wasm/v1/tx.proto#L196), and with the entry point
@@ -268,7 +268,7 @@ As examples of Cosmos messages, you have:
   1. `message MsgExecuteContract` is a Cosmos SDK message that the app-chain sends to its own CosmWasm module.
   2. `bytes msg` is the serialized CosmWasm `ExecuteMsg` that the CosmWasm module sends to the `execute` entry point of one of the smart contracts instantiated within the CosmWasm module. Its interpretation is up to the smart contract itself.
 
-  To see it in action, go to [Send a transaction to your contract](./04-hello-world.md#send-a-transaction-to-your-contract) part of the [hello world](./04-hello-world.md).
+  To see it in action, go to [Send a transaction to your contract](./04-hello-world.mdx#send-a-transaction-to-your-contract) part of the [hello world](./04-hello-world.mdx).
   To see how the smart contract handles the `ExecuteMsg`, go to the practical exercise's [First Execute Transaction](./06-first-contract-register.md).
 
 ## A smart contract's messages
@@ -323,7 +323,7 @@ For instance:
       pub funds: Vec<Coin>,
   }
   ```
-  See [the hello world's](./04-hello-world.html#send-a-transaction-to-your-contract) _Send a transaction to your contract_ to pass funds along with a contract call,
+  See [the hello world's](./04-hello-world.mdx#send-a-transaction-to-your-contract) _Send a transaction to your contract_ to pass funds along with a contract call,
   and [the practical exercise's](./16-fund-handling.html) _Proper Fund Handling_ to see it implemented in your own smart contract.
 
 * When a smart contract sends a message to another one, and this other contract fails, the originating smart contract
