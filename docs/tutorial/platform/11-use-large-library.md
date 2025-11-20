@@ -3,17 +3,27 @@ title: Use the NFT Library
 description: Instead of reinventing the wheel.
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Use the NFT Library
 
-Your smart contract that can register names sounds an awful lot like the _mint_ funtion of non-fungible tokens (NFTs). You even added a minter that gatekeeps the minting. Eventually, you can imagine adding functionality so that the name owners can transfer, or sell, those names.
+Your smart contract that can register names sounds an awful lot like the _mint_ function of non-fungible tokens (NFTs).
+You even added a minter that gatekeeps the minting. Eventually, you can imagine adding functionality so that the name
+owners can transfer, or sell, those names.
 
-<HighlightBox type="info" title="Exercise progression">
+:::info Exercise progression
 
-If you skipped the previous section, you can just switch the project to its [`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch and take it from there.
+If you skipped the previous section, you can just switch the project to its
+[`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch and take it from there.
 
-</HighlightBox>
+:::
 
-Instead of reinventing the wheel, you could reuse an NFT library. [`cw721`](https://crates.io/crates/cw721) is one such library. Its code is [here](https://github.com/public-awesome/cw-nfts). An additional advantage of using a library that acts close to a standard is that your smart contract is going to be compatible with other smart contracts that are compatible with the standard.
+Instead of reinventing the wheel, you could reuse an NFT library.
+[`cw721`](https://crates.io/crates/cw721) is one such library.
+Its code is [here](https://github.com/public-awesome/cw-nfts).
+An additional advantage of using a library that acts close to a standard is that your smart contract
+is going to be compatible with other smart contracts that are compatible with the standard.
 
 Let's refactor in order to use it. You are going to:
 
@@ -26,21 +36,21 @@ Let's refactor in order to use it. You are going to:
 
 ## Add the dependency
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         cargo add cw721 --git https://github.com/public-awesome/cw-nfts --tag "v0.19.0"
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker run --rm -it \
             -v $(pwd):/root/ -w /root \
             rust:1.80.1 \
             cargo add cw721 --git https://github.com/public-awesome/cw-nfts --tag "v0.19.0"
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Note:
 
@@ -49,34 +59,38 @@ Note:
 Additionally:
 
 * The [`ownable`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/Cargo.toml#L29) and [`cw-storage-plus`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/Cargo.toml#L31) libraries come with `cw721`, so you don't need to mention them on their own:
-
-    <CodeBlock title="Cargo.toml">
-        ```diff-toml
-          ...
-          [dependencies]
-        - cw-ownable = "2.1.0"
-        - cw-storage-plus = "2.0.0"
-          ...
-        ```
-    </CodeBlock>
+    
+    ```toml title="Cargo.toml"
+      ...
+      [dependencies]
+    //diff-del-start    
+    - cw-ownable = "2.1.0"
+    - cw-storage-plus = "2.0.0"
+    //diff-del-end
+      ...
+    ```
 
 * The current version requires [CosmWasm v1.5+](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/Cargo.toml#L16-L17), so you have to downgrade your versions, including `cw-multi-test`, even though it is [used by `cw721`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/Cargo.toml#L28):
-
-    <CodeBlock title="Cargo.toml">
-        ```diff-toml
-          ...
-          [dependencies]
-        - cosmwasm-schema = "2.1.3"
-        - cosmwasm-std = "2.1.3"
-        + cosmwasm-schema = "1.5.8"
-        + cosmwasm-std = "1.5.8"
-          ...
-
-          [dev-dependencies]
-        - cw-multi-test = "2.1.1"
-        + cw-multi-test = "1.2.0"
-        ```
-    </CodeBlock>
+    
+    ```toml title="Cargo.toml"
+      ...
+      [dependencies]
+    //diff-del-start
+    - cosmwasm-schema = "2.1.3"
+    - cosmwasm-std = "2.1.3"
+    //diff-del-end
+    //diff-add-start
+    + cosmwasm-schema = "1.5.8"
+    + cosmwasm-std = "1.5.8"
+    //diff-add-end
+      ...
+    
+      [dev-dependencies]
+    //diff-del
+    - cw-multi-test = "2.1.1"
+    //diff-add
+    + cw-multi-test = "1.2.0"
+    ```
 
 ## Decide on the types
 
@@ -280,7 +294,9 @@ Many things have changed, but in essence, you mostly have to:
 
 ### The dummy instantiation message
 
-The new [`InstantiateMsg`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/packages/cw721/src/msg.rs#L126-L143) has a long list of attributes, most of which you do not care much about in unit tests. It is worthwhile taking this into a separate function:
+The new [`InstantiateMsg`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/packages/cw721/src/msg.rs#L126-L143)
+has a long list of attributes, most of which you do not care much about in unit tests.
+It is worthwhile taking this into a separate function:
 
 <CodeBlock title="src/contract.rs">
     ```diff-rust
@@ -666,8 +682,8 @@ Note how:
   * `"\0\u{6}tokens"` is the [next prefix](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/packages/cw721/src/state.rs#L73) that the library uses to store `nft_info`, and where `"\0\u{6}"` identifies an [`IndexedMap`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/packages/cw721/src/state.rs#L100).
   * `"alice"`, the last element, is the key of the value in the indexed map.
 
-<Accordion>
-<AccordionItem title="If you are unsure about the keys in storage">
+<details>
+  <summary>If you are unsure about the keys in storage</summary>
 
 You can retrieve them all, as long as there are not too many of them, with:
 
@@ -677,25 +693,25 @@ println!("{:?}", mock_app.storage());
 
 Then, in order to get the logs while testing, you add the `-- --nocapture` flag like so:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```shell
         cargo test -- --nocapture
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker run --rm -it \
             -v $(pwd):/root/ -w /root \
             rust:1.80.1 \
             cargo test -- --nocapture
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 Which prints something along the lines of:
 
-```txt
+```text
 MemoryStorage (7 entries) {
   0x00047761736d0009636f6e747261637473636f6e747261637430: 0x7b22636f64655f6964223a312c2263726561746f72223a226465706c6f796572222c2261646d696e223a6e756c6c2c226c6162656c223a226e616d6573657276696365222c2263726561746564223a31323334357d
   0x00047761736d0017636f6e74726163745f646174612f636f6e7472616374300006746f6b656e73616c696365: 0x7b226f776e6572223a226f776e6572222c22617070726f76616c73223a5b5d2c22746f6b656e5f757269223a6e756c6c2c22657874656e73696f6e223a6e756c6c7d
@@ -709,11 +725,12 @@ MemoryStorage (7 entries) {
 
 For instance, on the second line:
 
-* `0x00047761736d0017636f6e74726163745f646174612f636f6e7472616374300006746f6b656e73616c696365` is `"\0\u{4}wasm\0\u{17}contract_data/contract0\0\u{6}tokensalice"`, which you can confirm with converters such as [this one](https://www.duplichecker.com/ascii-to-text.php).
-* And the value to its right is `{"owner":"owner","approvals":[],"token_uri":null,"extension":null}`.
+- `0x00047761736d0017636f6e74726163745f646174612f636f6e7472616374300006746f6b656e73616c696365`
+  is `"\0\u{4}wasm\0\u{17}contract_data/contract0\0\u{6}tokensalice"`,
+  which you can confirm with converters such as [this one](https://www.duplichecker.com/ascii-to-text.php).
+- And the value to its right is `{"owner":"owner","approvals":[],"token_uri":null,"extension":null}`.
 
-</AccordionItem>
-</Accordion>
+</details>
 
 ### Query(s)
 
@@ -796,18 +813,23 @@ To be able to get to the query, you have to retrace the same steps as when testi
 
 Note that:
 
-* The new response type is [`OwnerOfResponse`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/packages/cw721/src/msg.rs#L155-L157).
-* If a record is missing it returns an error instead of a `None` as you did earlier.
-* Said error is quite verbose and cannot really be guessed. Its list of bytes represents `"\0\u{6}tokensalice"`.
+- The new response type is [`OwnerOfResponse`](https://github.com/public-awesome/cw-nfts/blob/v0.19.0/packages/cw721/src/msg.rs#L155-L157).
+- If a record is missing it returns an error instead of a `None` as you did earlier.
+- Said error is quite verbose and cannot really be guessed. Its list of bytes represents `"\0\u{6}tokensalice"`.
 
 ## Conclusion
 
-Now that you delegate to the NFT library, it could be worhwhile to test that the other features you expect are present, such as approvals and transfers. It would be good to also confirm that the minter indeed gatekeeps the minting call. This is left as an exercise.
+Now that you delegate to the NFT library, it could be worthwhile to test that the other features you expect are present,
+such as approvals and transfers. It would be good to also confirm that the minter indeed gatekeeps the minting call.
+This is left as an exercise.
 
-<HighlightBox type="info" title="Exercise progression">
+:::info Exercise progression
 
-At this stage, you should have something similar to the [`add-nft-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-nft-library) branch, with [this](https://github.com/b9lab/cw-my-nameservice/compare/add-first-library..add-nft-library) as the diff.
+At this stage, you should have something similar to the
+[`add-nft-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-nft-library) branch,
+with [this](https://github.com/b9lab/cw-my-nameservice/compare/add-first-library..add-nft-library) as the diff.
 
-</HighlightBox>
+:::
 
-You have added the NFT library to increase your compatibility with other smart contracts. In the next section, you learn how to have cross-contract communication.
+You have added the NFT library to increase your compatibility with other smart contracts.
+In the next section, you learn how to have cross-contract communication.
