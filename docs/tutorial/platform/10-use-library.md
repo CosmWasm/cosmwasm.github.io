@@ -3,11 +3,14 @@ title: Use the ownable library
 description: Add a feature by incorporating code from elsewhere.
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # Use the ownable library
 
-Your smart contract lets anyone register names. This sounds a bit too much like the dot-com rush and its notorious domain parking.
-You may want to introduce some order. For instance, in the future, only an auction smart contract may eventually be allowed
-to register names to auction winners.
+Your smart contract lets anyone register names. This sounds a bit too much like the dot-com rush
+and its notorious domain parking. You may want to introduce some order. For instance, in the future,
+only an auction smart contract may eventually be allowed to register names to auction winners.
 
 A regular word used for such a _name registerer_ is **minter**. In this section you add a minter to your smart contract,
 and have it gatekeep the register function.
@@ -15,22 +18,22 @@ and have it gatekeep the register function.
 Ideally, your smart contract should make it possible to update the minter, or have the minter be able to pass the baton.
 This sounds a lot like the _ownable_ pattern found in blockchain, for instance in Ethereum.
 
-In fact, there is [such a thing] too in the CosmWasm ecosystem. In this section, you delegate to it:
+In fact, there is [such a thing](https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable)
+too in the CosmWasm ecosystem. In this section, you delegate to it:
 
-* The storage definition.
-* The update mechanics.
-* The message types.
+- The storage definition.
+- The update mechanics.
+- The message types.
 
-:::note Exercise progression
+:::info Exercise progression
 
-If you skipped the previous section, you can just switch the project to its [first-event] branch and take it from there.
+If you skipped the previous section, you can just switch the project to its
+[first-event](https://github.com/b9lab/cw-my-nameservice/tree/first-event) branch and take it from there.
 
 :::
 
 
 ## Add the dependency
-
-<!--
 
 <TabGroup sync>
     <TabGroupItem title="Local" active>
@@ -51,64 +54,75 @@ If you skipped the previous section, you can just switch the project to its [fir
 
 ## Add the storage element
 
-The object that defines access to the minter in storage is [`OwnershipStore`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L31). Note how it not only stores the [`owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L19), but also a [`pending_owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L23), which has to accept an invitation to become the new minter.
+The object that defines access to the minter in storage is
+ [`OwnershipStore`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L31).
+Note how it not only stores the [`owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L19),
+but also a [`pending_owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L23),
+which has to accept an invitation to become the new minter.
 
-In your situation, the variables are named `owner` inside the library, but when used in your smart contract, you will use the word _minter_ to avoid confusion. Update `src/state.rs`:
+In your situation, the variables are named `owner` inside the library, but when used in your smart contract,
+you will use the word _minter_ to avoid confusion. Update `src/state.rs`:
 
-<CodeBlock title="src/state.rs">
-    ```diff-rust
-      ...
+```rust title="src/state.rs"
+  ...
 
-      use cosmwasm_std::Addr;
-    + use cw_ownable::OwnershipStore;
-      use cw_storage_plus::Map;
+  use cosmwasm_std::Addr;
+//diff-add
++ use cw_ownable::OwnershipStore;
+  use cw_storage_plus::Map;
 
-      ...
+  ...
 
-      pub const NAME_RESOLVER: Map<&[u8], NameRecord> = Map::new("name_resolver");
-    + pub const MINTER: OwnershipStore = OwnershipStore::new("name_minter");
+  pub const NAME_RESOLVER: Map<&[u8], NameRecord> = Map::new("name_resolver");
+//diff-add  
++ pub const MINTER: OwnershipStore = OwnershipStore::new("name_minter");
 
-      ...
-    ```
-</CodeBlock>
+  ...
+```
 
 ## Add new message variants
 
-Only the new minter will be allowed to register new names. So it is a good first step to have this address set when deploying the instance. Add it to `InstantiateMsg`:
+Only the new minter will be allowed to register new names. So it is a good first step to have this address set
+when deploying the instance. Add it to `InstantiateMsg`:
 
-<CodeBlock title="src/msg.rs">
-    ```diff-rust
-      ...
+```rust title="src/msg.rs"
+  ...
 
-      #[cw_serde]
-    - pub struct InstantiateMsg {}
-    + pub struct InstantiateMsg {
-    +     pub minter: String,
-    + }
+  #[cw_serde]
+//diff-del  
+- pub struct InstantiateMsg {}
+//diff-add-start
++ pub struct InstantiateMsg {
++     pub minter: String,
++ }
+//diff-add-end
 
-      ...
-    ```
-</CodeBlock>
+  ...
+```
 
-Eventually, you could imagine making this optional and have another function that lets one set the minter. A straight string keeps things simple for now.
+Eventually, you could imagine making this optional and have another function that lets one set the minter.
+A straight string keeps things simple for now.
 
-When time comes to register a name, the message will have to be sent from the minter. However, at the moment, the smart contract takes the sender of the message as the eventual name owner. So you need to change the message so that the owner is mentioned:
+When time comes to register a name, the message will have to be sent from the minter.
+However, at the moment, the smart contract takes the sender of the message as the eventual name owner.
+So you need to change the message so that the owner is mentioned:
 
-<CodeBlock title="src/msg.rs">
-    ```diff-rust
-      use cosmwasm_schema::{cw_serde, QueryResponses};
-    + use cosmwasm_std::Addr;
+```rust title="src/msg.rs"
+  use cosmwasm_schema::{cw_serde, QueryResponses};
+//diff-add  
++ use cosmwasm_std::Addr;
 
-      ...
+  ...
 
-      pub struct ExecuteMsg {
-    -     Register { name: String },
-    +     Register { name: String, owner: Addr },
-      }
+  pub struct ExecuteMsg {
+//diff-del
+-     Register { name: String },
+//diff-add
++     Register { name: String, owner: Addr },
+  }
 
-      ...
-    ```
-</CodeBlock>
+  ...
+```
 
 The `QueryMsg` does not need to change as querying does not involve the minter.
 
@@ -116,38 +130,44 @@ The `QueryMsg` does not need to change as querying does not involve the minter.
 
 This is where the smart contract saves to storage the _minter_ information it received:
 
-<CodeBlock title="src/contract.rs">
-    ```diff-rust
-      use crate::{
-    -     state::{NameRecord, NAME_RESOLVER},
-    +     state::{NameRecord, MINTER, NAME_RESOLVER},
-      }
+```rust title="src/contract.rs"
+  use crate::{
+//diff-add  
+-     state::{NameRecord, NAME_RESOLVER},
+//diff-del
++     state::{NameRecord, MINTER, NAME_RESOLVER},
+  }
 
-      ...
+  ...
 
-      pub fn instantiate(
-    -     _deps_: DepsMut,
-    +     deps: DepsMut,
-          _: Env,
-          _: MessageInfo,
-    -     _msg_: InstantiateMsg
-    +     msg: InstantiateMsg
-      ) -> ContractResult {
-    +     let _ = MINTER.initialize_owner(deps.storage, deps.api, Some(msg.minter.as_str()))?;
-          Ok(Response::default())
-      }
+  pub fn instantiate(
+//diff-del
+-     _deps_: DepsMut,
+//diff-add
++     deps: DepsMut,
+      _: Env,
+      _: MessageInfo,
+//diff-del
+-     _msg_: InstantiateMsg
+//diff-add
++     msg: InstantiateMsg
+  ) -> ContractResult {
+//diff-add  
++     let _ = MINTER.initialize_owner(deps.storage, deps.api, Some(msg.minter.as_str()))?;
+      Ok(Response::default())
+  }
 
-      ...
-    ```
-</CodeBlock>
+  ...
+```
 
 Note how:
 
-* It uses this [`initialiaze_owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L45) function defined in the library.
-* The function can erase the minter if you pass `None` instead of `Some`.
-* It may return a `StdErr`, in which case the error is returned thanks to the trailing `?`.
-* The returned `StdErr` is still transformed into a `ContractError::Std` thanks to the `from` macro `Std(#[from] StdError)`.
-* You do not use the returned `Ownership<Addr>` since you know what it is.
+- It uses this [`initialiaze_owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L45)
+  function defined in the library.
+- The function can erase the minter if you pass `None` instead of `Some`.
+- It may return a `StdErr`, in which case the error is returned thanks to the trailing `?`.
+- The returned `StdErr` is still transformed into a `ContractError::Std` thanks to the `from` macro `Std(#[from] StdError)`.
+- You do not use the returned `Ownership<Addr>` since you know what it is.
 
 ## Add handling at name registration
 
@@ -157,41 +177,45 @@ This is where the smart contract verifies that it is the minter that is sending 
 2. Verify that the message sender is the minter.
 3. Adjust the record and the event with the proper owner.
 
-The verification may yield an error. So you add a new error type to make it explicit, and add a convenience curried function that will come in handy when propagating errors:
+The verification may yield an error. So you add a new error type to make it explicit,
+and add a convenience curried function that will come in handy when propagating errors:
 
-<CodeBlock title="src/error.rs">
-    ```diff-rust
-      use cosmwasm_std::StdError;
-    + use cw_ownable::OwnershipError;
-      use thiserror::Error;
+```diff-rust title="src/error.rs"
+  use cosmwasm_std::StdError;
+//diff-add  
++ use cw_ownable::OwnershipError;
+  use thiserror::Error;
 
+  ...
+
+  pub enum ContractError {
       ...
-
-      pub enum ContractError {
-          ...
-          NameTaken { name: String },
-    +     #[error("Caller ({caller}) is not minter")]
-    +     Minter {
-    +         caller: String,
-    +         inner: OwnershipError,
-    +     },
-      }
-    +
-    + impl ContractError {
-    +     pub fn from_minter<'a>(caller: &'a Addr) -> impl Fn(OwnershipError) -> ContractError + 'a {
-    +         move |inner: OwnershipError| ContractError::Minter {
-    +             caller: caller.to_string(),
-    +             inner,
-    +         }
-    +     }
-    + }
-    ```
-</CodeBlock>
+      NameTaken { name: String },
+//diff-add-start      
++     #[error("Caller ({caller}) is not minter")]
++     Minter {
++         caller: String,
++         inner: OwnershipError,
++     },
+//diff-add-end
+  }
+//diff-add-start
++
++ impl ContractError {
++     pub fn from_minter<'a>(caller: &'a Addr) -> impl Fn(OwnershipError) -> ContractError + 'a {
++         move |inner: OwnershipError| ContractError::Minter {
++             caller: caller.to_string(),
++             inner,
++         }
++     }
++ }
+//diff-add-end
+```
 
 Note that:
 
-* The message could be refined eventually, but it will do for now. The error message mentions the caller for convenience.
-* The `from_minter` function returns a closure.
+- The message could be refined eventually, but it will do for now. The error message mentions the caller for convenience.
+- The `from_minter` function returns a closure.
 
 Now you can update the handling:
 
@@ -519,28 +543,28 @@ And both `test_query` functions:
 
 The introduction of the minter warrants further testing. In particular:
 
-* Test that the minter was saved at instantiation.
-* Test that it is not possible to register a name from another account than the minter.
+- Test that the minter was saved at instantiation.
+- Test that it is not possible to register a name from another account than the minter.
 
 This is left as an exercise.
 
 ## Conclusion
 
-You have used a library that embeds some assumptions about access to storage, delegated some operations to it, and confirmed with tests that it works. This library can do a lot more, including modifying the minter. As an exercise, you may want to:
+You have used a library that embeds some assumptions about access to storage, delegated some operations to it,
+and confirmed with tests that it works. This library can do a lot more, including modifying the minter. As an exercise, you may want to:
 
-* Add a `QueryMsg` variant to query the minter's current status.
-* Add a `ExecuteMsg` variant to pass an [Action](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L211) to the minter ownership object.
+- Add a `QueryMsg` variant to query the minter's current status.
+- Add a `ExecuteMsg` variant to pass an [Action](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L211)
+  to the minter ownership object.
 
 What you have done is all within a single smart contract, it is not cross-contract message exchange.
 
-<HighlightBox type="info" title="Exercise progression">
+:::info Exercise progression
 
-At this stage, you should have something similar to the [`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch, with [this](https://github.com/b9lab/cw-my-nameservice/compare/first-event..add-first-library) as the diff.
+At this stage, you should have something similar to the
+[`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch,
+with [this](https://github.com/b9lab/cw-my-nameservice/compare/first-event..add-first-library) as the diff.
 
-</HighlightBox>
-
--->
-
+:::
 
 [such a thing]: https://github.com/larry0x/cw-plus-plus/tree/main/packages/ownable
-[first-event]: https://github.com/b9lab/cw-my-nameservice/tree/first-event
