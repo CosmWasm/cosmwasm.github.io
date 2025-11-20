@@ -32,24 +32,23 @@ If you skipped the previous section, you can just switch the project to its
 
 :::
 
-
 ## Add the dependency
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
         ```shell
         cargo add cw-ownable@2.1.0
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
+    </TabItem>
+    <TabItem value="Docker">
         ```shell
         docker run --rm -it \
             -v $(pwd):/root/ -w /root \
             rust:1.80.1 \
             cargo add cw-ownable@2.1.0
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 
 ## Add the storage element
@@ -219,222 +218,258 @@ Note that:
 
 Now you can update the handling:
 
-<CodeBlock title="src/contract.rs">
-    ```diff-rust
-      use cosmwasm_std::{
-    -     entry_point, to_json_binary, Binary, Deps, DepsMut, Env, Event, MessageInfo, Response,
-    +     entry_point, to_json_binary, Addr, Binary, Deps, DepsMut, Env, Event, MessageInfo, Response,
-          StdResult,
+```rust title="src/contract.rs"
+  use cosmwasm_std::{
+//diff-del  
+-     entry_point, to_json_binary, Binary, Deps, DepsMut, Env, Event, MessageInfo, Response,
+//diff-add
++     entry_point, to_json_binary, Addr, Binary, Deps, DepsMut, Env, Event, MessageInfo, Response,
+      StdResult,
+  };
+
+  ...
+
+  pub fn execute(
+      ...
+  ) -> ContractResult {
+      match msg {
+//diff-del      
+-         ExecuteMsg::Register { name } => execute_register(deps, info, name),
+//diff-add
++         ExecuteMsg::Register { name, owner } => execute_register(deps, info, name, &owner),
+      }
+  }
+
+  ...
+
+  fn execute_register(
+      ...
+      name: String,
+//diff-add      
++     owner: &Addr,
+  ) -> ContractResult {
+//diff-add-start  
++     MINTER
++         .assert_owner(deps.storage, &info.sender)
++         .map_err(ContractError::from_minter(&info.sender))?;
+//diff-add-end
+      let key = name.as_bytes();
+      let record = NameRecord {
+//diff-del      
+-         owner: info.sender.to_owned(),
+//diff-add
++         owner: owner.to_owned(),
       };
 
       ...
 
-      pub fn execute(
-          ...
-      ) -> ContractResult {
-          match msg {
-    -         ExecuteMsg::Register { name } => execute_register(deps, info, name),
-    +         ExecuteMsg::Register { name, owner } => execute_register(deps, info, name, &owner),
-          }
-      }
+      let registration_event = Event::new("name-register")
+          .add_attribute("name", name)
+//diff-del          
+-         .add_attribute("owner", info.sender);
+//diff-add
++         .add_attribute("owner", owner.to_string());
+      let resp = Response::default().add_event(registration_event);
 
       ...
-
-      fn execute_register(
-          ...
-          name: String,
-    +     owner: &Addr,
-      ) -> ContractResult {
-    +     MINTER
-    +         .assert_owner(deps.storage, &info.sender)
-    +         .map_err(ContractError::from_minter(&info.sender))?;
-          let key = name.as_bytes();
-          let record = NameRecord {
-    -         owner: info.sender.to_owned(),
-    +         owner: owner.to_owned(),
-          };
-
-          ...
-    
-          let registration_event = Event::new("name-register")
-              .add_attribute("name", name)
-    -         .add_attribute("owner", info.sender);
-    +         .add_attribute("owner", owner.to_string());
-          let resp = Response::default().add_event(registration_event);
-
-          ...
-      }  
-    ```
-</CodeBlock>
+  }  
+```
 
 Note how:
 
-* It is using the [`assert_owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L77) function of the library. This is production function, now one reserved for tests.
-* This function potentially returns a `OwnershipError`, which is why you use a `map_error` to transform the `Result` into a `Err(ContractError::Minter)` using the curried function defined earlier.
-* Here too, the trailing `?` is used to return the eventual error.
-* Other than that, it is just a matter of replacing the `sender` with the `owner`.
+- It is using the [`assert_owner`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L77)
+  function of the library. This is production function, now one reserved for tests.
+- This function potentially returns a `OwnershipError`, which is why you use a `map_error` to transform the `Result`
+  into a `Err(ContractError::Minter)` using the curried function defined earlier.
+- Here too, the trailing `?` is used to return the eventual error.
+- Other than that, it is just a matter of replacing the `sender` with the `owner`.
 
 ## Adjust unit tests
 
 With the handling done, you need to update tests, starting with the unit tests.
 
-<HighlightBox type="tip">
+:::tip
 
-The Ownable library makes calls to [`Api.addr_validate`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L52). Unfortunately in CosmWasm 2.0, the `MockApi.addr_validate` does not replace this function with a dummy check. So `Addr::unchecked` will not work. Fortunately, it is still possible to create relatively dummy addresses.
+The Ownable library makes calls to [`Api.addr_validate`](https://github.com/larry0x/cw-plus-plus/blob/ownable-v2.1.0/packages/ownable/src/lib.rs#L52).
+Unfortunately in CosmWasm 2.0, the `MockApi.addr_validate` does not replace this function with a dummy check.
+So `Addr::unchecked` will not work. Fortunately, it is still possible to create relatively dummy addresses.
 
-</HighlightBox>
+:::
 
 To test the instantiation you will:
 
 1. Create a quasi-proper minter address.
 2. Confirm it was recorded in storage.
 
-<CodeBlock title="src/contract.rs">
-    ```diff-rust
-      ...
+```rust title="src/contract.rs"
+  ...
+  
+  mod tests {
+      use crate::{
+          msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
+//diff-del         
+-         state::{NameRecord, NAME_RESOLVER},
+//diff-add
++         state::{NameRecord, MINTER, NAME_RESOLVER},
+      };
+//diff-del      
+-     use cosmwasm_std::{testing, Addr, Binary, Event, Response};
+//diff-add
++     use cosmwasm_std::{testing, Addr, Api, Binary, CanonicalAddr, Event, Response};
       
-      mod tests {
-          use crate::{
-              msg::{ExecuteMsg, InstantiateMsg, QueryMsg},
-    -         state::{NameRecord, NAME_RESOLVER},
-    +         state::{NameRecord, MINTER, NAME_RESOLVER},
-          };
-    -     use cosmwasm_std::{testing, Addr, Binary, Event, Response};
-    +     use cosmwasm_std::{testing, Addr, Api, Binary, CanonicalAddr, Event, Response};
-          
+      ...
+
+      fn test_instantiate() {
+          // Arrange
+          ...
+          let mocked_msg_info = testing::message_info(&mocked_addr, &[]);
+//diff-add-start          
++         let minter = mocked_deps_mut
++             .api
++             .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
++             .expect("Failed to create minter address");
+-         let instantiate_msg = InstantiateMsg {};
++         let instantiate_msg = InstantiateMsg {
++             minter: minter.to_string(),
++         };
+//diff-add-end
           ...
 
-          fn test_instantiate() {
-              // Arrange
-              ...
-              let mocked_msg_info = testing::message_info(&mocked_addr, &[]);
-    +         let minter = mocked_deps_mut
-    +             .api
-    +             .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
-    +             .expect("Failed to create minter address");
-    -         let instantiate_msg = InstantiateMsg {};
-    +         let instantiate_msg = InstantiateMsg {
-    +             minter: minter.to_string(),
-    +         };
-              ...
-
-              // Assert
-              ...
-              assert_eq!(contract_result.unwrap(), Response::default());
-    +         assert!(MINTER
-    +             .assert_owner(&mocked_deps_mut.storage, &minter)
-    +             .is_ok());
-          }
-      }  
-    ```
-</CodeBlock>
+          // Assert
+          ...
+          assert_eq!(contract_result.unwrap(), Response::default());
+//diff-add-start          
++         assert!(MINTER
++             .assert_owner(&mocked_deps_mut.storage, &minter)
++             .is_ok());
+//diff-add-end
+      }
+  }  
+```
 
 Note how:
 
-* You need to import `cosmwasm_std::Api` to have access to `addr_humanize`
-* The `Act` part remains unchanged.
+- You need to import `cosmwasm_std::Api` to have access to `addr_humanize`
+- The `Act` part remains unchanged.
 
-Similarly, you adjust the `test_execute`. You can choose to mimic a proper instantiation or directly manipulate the `MINTER` object. Here, it is mimicking an instantiation:
+Similarly, you adjust the `test_execute`. You can choose to mimic a proper instantiation or directly
+manipulate the `MINTER` object. Here, it is mimicking an instantiation:
 
-<CodeBlock title="src/contract.rs">
-    ```diff-rust
+```rust title="src/contract.rs"
+  ...
+  
+  mod tests {
       ...
-      
-      mod tests {
+
+      fn test_execute() {
+          // Arrange
+          ...
+          let mocked_addr = Addr::unchecked("addr");
+//diff-add-start          
++         let minter = mocked_deps_mut
++             .api
++             .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
++             .expect("Failed to create minter address");
++         let _ = super::instantiate(
++             mocked_deps_mut.as_mut(),
++             mocked_env.to_owned(),
++             testing::message_info(&mocked_addr, &[]),
++             InstantiateMsg {
++                 minter: minter.to_string(),
++             },
++         )
++         .expect("Failed to instantiate");
+//diff-add-end
+//diff-del
+-         let mocked_msg_info = testing::message_info(&mocked_addr, &[]);
+//diff-add
++         let mocked_msg_info = testing::message_info(&minter, &[]);
+          let name = "alice".to_owned();
+//diff-add          
++         let owner = Addr::unchecked("owner");
+//diff-del
+-         let execute_msg = ExecuteMsg::Register { name: name.clone() };
+//diff-add-start
++         let execute_msg = ExecuteMsg::Register {
++             name: name.clone(),
++             owner: owner.to_owned(),
++         };
+//diff-add-end
           ...
 
-          fn test_execute() {
-              // Arrange
-              ...
-              let mocked_addr = Addr::unchecked("addr");
-    +         let minter = mocked_deps_mut
-    +             .api
-    +             .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
-    +             .expect("Failed to create minter address");
-    +         let _ = super::instantiate(
-    +             mocked_deps_mut.as_mut(),
-    +             mocked_env.to_owned(),
-    +             testing::message_info(&mocked_addr, &[]),
-    +             InstantiateMsg {
-    +                 minter: minter.to_string(),
-    +             },
-    +         )
-    +         .expect("Failed to instantiate");
-    -         let mocked_msg_info = testing::message_info(&mocked_addr, &[]);
-    +         let mocked_msg_info = testing::message_info(&minter, &[]);
-              let name = "alice".to_owned();
-    +         let owner = Addr::unchecked("owner");
-    -         let execute_msg = ExecuteMsg::Register { name: name.clone() };
-    +         let execute_msg = ExecuteMsg::Register {
-    +             name: name.clone(),
-    +             owner: owner.to_owned(),
-    +         };
-              ...
-
-              // Assert
-              ...
-              let expected_event = Event::new("name-register")
-                   .add_attribute("name", name.to_owned())
-    -             .add_attribute("owner", mocked_addr.to_string());
-    +             .add_attribute("owner", owner.to_string());
-              ...
-    -         assert_eq!(stored.unwrap(), NameRecord { owner: mocked_addr });
-    +         assert_eq!(stored.unwrap(), NameRecord { owner: owner });
-          }
-      }  
-    ```
-</CodeBlock>
+          // Assert
+          ...
+          let expected_event = Event::new("name-register")
+              .add_attribute("name", name.to_owned())
+//diff-del               
+-             .add_attribute("owner", mocked_addr.to_string());
+//diff-add
++             .add_attribute("owner", owner.to_string());
+          ...
+//diff-del          
+-         assert_eq!(stored.unwrap(), NameRecord { owner: mocked_addr });
+//diff-add
++         assert_eq!(stored.unwrap(), NameRecord { owner: owner });
+      }
+  }  
+```
 
 Note how:
 
-* The arrange part is much longer.
+- The _Arrange_ part is much longer.
 
 As for the `test_query`, you have to add more preparation:
 
-<CodeBlock title="src/contract.rs">
-    ```diff-rust
+```rust title="src/contract.rs"
+  ...
+  
+  mod tests {
       ...
-      
-      mod tests {
-          ...
 
-          fn test_query() {
-              // Arrange
-              ...
-              let mocked_addr = Addr::unchecked(mocked_addr_value.clone());
-    +         let minter = mocked_deps_mut
-    +             .api
-    +             .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
-    +             .expect("Failed to create minter address");
-    +         let _ = super::instantiate(
-    +             mocked_deps_mut.as_mut(),
-    +             mocked_env.to_owned(),
-    +             testing::message_info(&mocked_addr, &[]),
-    +             InstantiateMsg {
-    +                 minter: minter.to_string(),
-    +             },
-    +         )
-    +         .expect("Failed to instantiate");
-    -         let mocked_msg_info = testing::message_info(&mocked_addr, &[]);
-    +         let mocked_msg_info = testing::message_info(&minter, &[]);
-    -         let _ = super::execute_register(mocked_deps_mut.as_mut(), mocked_msg_info, name.clone())
-    -             .expect("Failed to register alice");
-    +         let _ = super::execute_register(
-    +             mocked_deps_mut.as_mut(),
-    +             mocked_msg_info,
-    +             name.clone(),
-    +             &mocked_addr,
-    +         )
-    +         .expect("Failed to register alice");
-              ...
-          }
-      }  
-    ```
-</CodeBlock>
+      fn test_query() {
+          // Arrange
+          ...
+          let mocked_addr = Addr::unchecked(mocked_addr_value.clone());
+//diff-add-start          
++         let minter = mocked_deps_mut
++             .api
++             .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
++             .expect("Failed to create minter address");
++         let _ = super::instantiate(
++             mocked_deps_mut.as_mut(),
++             mocked_env.to_owned(),
++             testing::message_info(&mocked_addr, &[]),
++             InstantiateMsg {
++                 minter: minter.to_string(),
++             },
++         )
++         .expect("Failed to instantiate");
+//diff-add-end
+//diff-del
+-         let mocked_msg_info = testing::message_info(&mocked_addr, &[]);
+//diff-add
++         let mocked_msg_info = testing::message_info(&minter, &[]);
+//diff-del-start
+-         let _ = super::execute_register(mocked_deps_mut.as_mut(), mocked_msg_info, name.clone())
+-             .expect("Failed to register alice");
+//diff-del-end
+//diff-add-start
++         let _ = super::execute_register(
++             mocked_deps_mut.as_mut(),
++             mocked_msg_info,
++             name.clone(),
++             &mocked_addr,
++         )
++         .expect("Failed to register alice");
+//diff-add-end
+          ...
+      }
+  }  
+```
 
 Note how:
 
-* Only the _arrange_ part is modified.
+- Only the _Arrange_ part is modified.
 
 ## Add to unit tests
 
@@ -442,102 +477,122 @@ To complete the picture, you ought to add tests to cover the case where an accou
 
 ## Adjust mocked app tests
 
-Similarly, the mocked app tests need to be adjusted. In fact, you do not have much to modify as it is mostly a matter of setting a proper minter to permit actions. You modify the `instantiate_nameservice` convenience function to also return the minter, for reuse from the test proper:
+Similarly, the mocked app tests need to be adjusted. In fact, you do not have much to modify as it is mostly
+a matter of setting a proper minter to permit actions. You modify the `instantiate_nameservice` convenience function
+to also return the minter, for reuse from the test proper:
 
-<CodeBlock title="tests/contract.rs">
-    ```diff-rust
-    - use cosmwasm_std::{Addr, Event};
-    + use cosmwasm_std::{Addr, Api, CanonicalAddr, Event};
-      
-    + type ContractAddr = Addr;
-    + type MinterAddr = Addr;
+```rust title="tests/contract.rs"
+//diff-del
+- use cosmwasm_std::{Addr, Event};
+//diff-add
++ use cosmwasm_std::{Addr, Api, CanonicalAddr, Event};
+  
+//diff-add-start  
++ type ContractAddr = Addr;
++ type MinterAddr = Addr;
+//diff-add-end
 
-    - fn instantiate_nameservice(mock_app: &mut App) -> (u64, Addr) {
-    + fn instantiate_nameservice(mock_app: &mut App) -> (u64, ContractAddr, MinterAddr) {
-          ...
-          let nameservice_code_id = mock_app.store_code(nameservice_code);
-    +     let minter = mock_app
-    +         .api()
-    +         .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
-    +         .unwrap();
-          return (
-              nameservice_code_id,
-              mock_app
-                  .instantiate_contract(
-                      nameservice_code_id,
-                      Addr::unchecked("deployer"),
-    -                 &InstantiateMsg {},
-    +                 &InstantiateMsg {
-    +                     minter: minter.to_string(),
-    +                 },
-                      &[],
-                      "nameservice",
-                      None,
-                  )
-                  .expect("Failed to instantiate nameservice"),
-    +         minter,
-          );
-      }
-    ```
-</CodeBlock>
+//diff-del
+- fn instantiate_nameservice(mock_app: &mut App) -> (u64, Addr) {
+//diff-add
++ fn instantiate_nameservice(mock_app: &mut App) -> (u64, ContractAddr, MinterAddr) {
+      ...
+      let nameservice_code_id = mock_app.store_code(nameservice_code);
+//diff-add-start      
++     let minter = mock_app
++         .api()
++         .addr_humanize(&CanonicalAddr::from("minter".as_bytes()))
++         .unwrap();
+//diff-add-end
+      return (
+          nameservice_code_id,
+          mock_app
+              .instantiate_contract(
+                  nameservice_code_id,
+                  Addr::unchecked("deployer"),
+//diff-del                  
+-                 &InstantiateMsg {},
+//diff-add-start
++                 &InstantiateMsg {
++                     minter: minter.to_string(),
++                 },
+//diff-add-end
+                  &[],
+                  "nameservice",
+                  None,
+              )
+              .expect("Failed to instantiate nameservice"),
+//diff-add              
++         minter,
+      );
+  }
+```
 
 Note that the type aliases are here only as syntactic sugar to disambiguate the two returned `Addr`.
 
 With this done, you can adjust `test_register`:
 
-<CodeBlock title="tests/contract.rs">
-    ```diff-rust
-      fn test_register() {
+```rust title="tests/contract.rs"
+  fn test_register() {
+      ...
+//diff-del      
+-     let (_, contract_addr) = instantiate_nameservice(&mut mock_app);
+//diff-add
++     let (_, contract_addr, minter) = instantiate_nameservice(&mut mock_app);
+      ...
+      let register_msg = ExecuteMsg::Register {
+          name: name_alice.to_owned(),
+//diff-add          
++         owner: owner_addr.to_owned(),
+      };
+      ...
+      let result = mock_app.execute_contract(
+//diff-del      
+-         owner_addr.clone(),
+//diff-add
++         minter,
           ...
-    -     let (_, contract_addr) = instantiate_nameservice(&mut mock_app);
-    +     let (_, contract_addr, minter) = instantiate_nameservice(&mut mock_app);
-          ...
-          let register_msg = ExecuteMsg::Register {
-              name: name_alice.to_owned(),
-    +         owner: owner_addr.to_owned(),
-          };
-          ...
-          let result = mock_app.execute_contract(
-    -         owner_addr.clone(),
-    +         minter,
-              ...
-          );
-          ...
-      }
-    ```
-</CodeBlock>
-
+      );
+      ...
+  }
+```
+    
 And both `test_query` functions:
 
-<CodeBlock title="tests/contract.rs">
-    ```diff-rust
-      fn test_query() {
-          ...
-    -     let (_, contract_addr) = instantiate_nameservice(&mut mock_app);
-    +     let (_, contract_addr, minter) = instantiate_nameservice(&mut mock_app);
-          ...
-          let register_msg = ExecuteMsg::Register {
-              name: name_alice.to_owned(),
-    +         owner: owner_addr.to_owned(),
-          };
-          ...
-          let _ = mock_app
-              .execute_contract(
-    -             owner_addr.clone(),
-    +             minter,
-              ...
-              )
-          ...
-      }
+```rust title="tests/contract.rs"
+  fn test_query() {
       ...
-      fn test_query_empty() {
+//diff-del      
+-     let (_, contract_addr) = instantiate_nameservice(&mut mock_app);
+//diff-add
++     let (_, contract_addr, minter) = instantiate_nameservice(&mut mock_app);
+      ...
+      let register_msg = ExecuteMsg::Register {
+          name: name_alice.to_owned(),
+//diff-add          
++         owner: owner_addr.to_owned(),
+      };
+      ...
+      let _ = mock_app
+          .execute_contract(
+//diff-del          
+-             owner_addr.clone(),
+//diff-add
++             minter,
           ...
-    -     let (_, contract_addr) = instantiate_nameservice(&mut mock_app);
-    +     let (_, contract_addr, _) = instantiate_nameservice(&mut mock_app);
-          ...
-      }
-    ```
-</CodeBlock>
+          )
+      ...
+  }
+  ...
+  fn test_query_empty() {
+      ...
+//diff-del      
+-     let (_, contract_addr) = instantiate_nameservice(&mut mock_app);
+//diff-add
++     let (_, contract_addr, _) = instantiate_nameservice(&mut mock_app);
+      ...
+  }
+```
 
 ## Add to mocked app tests
 
