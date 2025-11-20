@@ -201,3 +201,97 @@ Add this signed transaction to the genesis file so that Alice starts indeed as a
 The blockchain preparation is now done, and you need not redo the above steps if you restart this exercise at a later date.
 
 :::
+
+## Run your blockchain
+
+:::info
+
+If you stopped `wasmd` earlier, you can come back here and restart `wasmd` where you left it off.
+
+:::
+
+Run Alice's validating node to start the blockchain system and to interact with it.
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```sh
+        ./build/wasmd start
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```sh
+        docker run --rm -it \
+            --name val-alice-1 \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd start
+        ```
+    </TabItem>
+</Tabs>
+
+Your node is now running and ready to receive smart contracts.
+
+<details>
+  <summary>Confirm you are set up correctly</summary>
+
+If you are new to Cosmos, you may want to confirm that you are correctly set up. Other than looking at the block height
+increasing in the log, a simple verification is to check Alice's balance if it is as expected in another terminal.
+First, store her address:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```sh
+        alice=$(./build/wasmd keys show alice \
+            --keyring-backend test \
+            --address)
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```sh
+        alice=$(docker run --rm -i \
+            -v $HOME/.wasmd:/root/.wasmd \
+            wasmd:0.53.2 \
+            wasmd keys show alice \
+                --keyring-backend test \
+                --address | tr -d '\r')
+        ```
+    </TabItem>
+</Tabs>
+
+Confirm you have the correct address with:
+
+```shell
+echo -n $alice
+```
+
+Which returns something like **wasm1tev6xt4pgrnjpxwmvv7jrl8ph4x47wg5vcd0as**.
+With that, you can query for her balance:
+
+<Tabs groupId="local-docker">
+    <TabItem value="Local" active>
+        ```sh
+        ./build/wasmd query bank balances $alice
+        ```
+    </TabItem>
+    <TabItem value="Docker">
+        ```sh
+        docker exec val-alice-1 \
+            wasmd query bank balances $alice
+        ```
+    </TabItem>
+</Tabs>
+
+The expected answer:
+
+```yaml
+balances:
+- amount: "30000000"
+  denom: stake
+pagination:
+  total: "1"
+```
+
+Indeed, she started with **100,000,000** and staked **70,000,000**, so she now has only **30,000,000**
+remaining available. The staking rewards that she has accumulated are not available until they are collected.
+
+</details>
