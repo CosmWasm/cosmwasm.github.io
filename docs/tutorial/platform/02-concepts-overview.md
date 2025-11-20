@@ -116,7 +116,7 @@ Here is what these actions would look like on the command line:
       ]
       ...
       ```
-    To understand how the `wasm14hj...` address was created for your smart contract instance, head to the [hello world](./04-hello-world.html) where these is a deep-dive named "How was this address computed?".
+    To understand how the `wasm14hj...` address was created for your smart contract instance, head to the [hello world](./04-hello-world.md) where these is a deep-dive named "How was this address computed?".
   </TabItem>
 </Tabs>
 
@@ -323,7 +323,7 @@ For instance:
       pub funds: Vec<Coin>,
   }
   ```
-  See [the hello world's](./04-hello-world.html#send-a-transaction-to-your-contract) _Send a transaction to your contract_ to pass funds along with a contract call,
+  See [the hello world's](./04-hello-world.md#send-a-transaction-to-your-contract) _Send a transaction to your contract_ to pass funds along with a contract call,
   and [the practical exercise's](./16-fund-handling.html) _Proper Fund Handling_ to see it implemented in your own smart contract.
 
 * When a smart contract sends a message to another one, and this other contract fails, the originating smart contract
