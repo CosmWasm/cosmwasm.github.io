@@ -48,7 +48,7 @@ In this section, each of your integration test will:
 You start by adding MultiTest as a development dependency to your project:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo add --dev cw-multi-test@2.1.1
         ```
@@ -191,7 +191,7 @@ for (key, _) in store_dump {
 Then, in order to get the logs while testing, you add the `-- --nocapture` flag like so:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo test -- --nocapture
         ```
@@ -220,7 +220,7 @@ The numerical values make it clear that the first two characters are `0` and [`1
 To confirm that it works, you run the same way you did for unit tests:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo test
         ```

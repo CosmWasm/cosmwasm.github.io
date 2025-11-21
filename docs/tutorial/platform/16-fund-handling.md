@@ -119,7 +119,7 @@ Now comes the meat of fund handling. When in `execute`, your smart contract rece
 
 A small difficulty in our use-case is that CosmWasm populates `funds` as it is instructed by the maker of the message. In particular, if you send a message from the command like so:
 
-```sh
+```shell
 wasmd tx wasm execute --amount 30silver,30silver ...
 ```
 

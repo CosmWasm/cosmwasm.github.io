@@ -37,7 +37,7 @@ Let's refactor in order to use it. You are going to:
 ## Add the dependency
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo add cw721 --git https://github.com/public-awesome/cw-nfts --tag "v0.19.0"
         ```
@@ -869,7 +869,7 @@ println!("{:?}", mock_app.storage());
 Then, in order to get the logs while testing, you add the `-- --nocapture` flag like so:
 
 <Tabs groupId="local-docker">
-    <TabItem value="Local" active>
+    <TabItem value="Local" default>
         ```shell
         cargo test -- --nocapture
         ```
