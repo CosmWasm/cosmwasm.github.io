@@ -1,5 +1,5 @@
 ---
-title: First Execute Transaction
+title: First execute message
 description: Add a function to your smart contract so you can register a name to an address via a transaction.
 ---
 
@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem';
 In the previous section you created a barebones smart contract. It exists but does not do much.
 In this section, you are going to have it do something: your smart contract is going to handle a transaction message.
 
-:::info Exercise progression
+:::note `Exercise progression`
 
 If you skipped the previous section, you can just switch the project to its [`first-unit-test`](https://github.com/b9lab/cw-my-nameservice/tree/first-unit-test) branch and take it from there.
 

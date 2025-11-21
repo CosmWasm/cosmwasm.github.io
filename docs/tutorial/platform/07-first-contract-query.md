@@ -1,5 +1,5 @@
 ---
-title: First Contract Query
+title: First contract query
 description: Add a function to your smart contract so you can query addresses by name.
 ---
 
