@@ -3,6 +3,9 @@ title: First Migration
 description: Introduce a change in-flight.
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # First Migration
 
 Your smart contract can now change its parameters via a Cosmos SDK governance proposal.
@@ -50,21 +53,21 @@ _Fixing_ storage as part of the migration is fraught business. That's why, in th
 
 To assist you with semantic versioning, you add the [`cw2` library](https://docs.rs/crate/cw2/1.1.2):
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
         cargo add cw2@1.1.2
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker run --rm -it \
             -v $(pwd):/root/ -w /root \
             rust:1.80.1 \
             cargo add cw2@1.1.2
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 The `cw2` library offers more than that, and in particular, it expects your smart contract to store information about itself in storage. You will add that shortly.
 

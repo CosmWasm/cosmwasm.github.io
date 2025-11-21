@@ -26,7 +26,7 @@ That's one of the purposes of **sudo** messages. A sudo message is one that come
 
 When running `wasmd` or your own app chain you can launch a governance proposal by using the command:
 
-    ```sh
+    ```shell
     wasmd tx gov submit-proposal sudo-contract --help
     ```
 

@@ -77,7 +77,7 @@ Here is what these actions would look like on the command line:
 <Tabs>
   <TabItem value="Store bytecode" default>
     Sending a transaction to store a bytecode on-chain looks like this:
-      ```sh title="Command line"
+      ```shell title="Command line"
       wasmd tx wasm store path/to/compiled_smart_contract.wasm --from ...
       ```
 
@@ -99,7 +99,7 @@ Here is what these actions would look like on the command line:
   </TabItem>
   <TabItem value="Instantiate smart contract">
     Sending a transaction to instantiate a smart contract looks like this:
-      ```sh title="Command line"
+      ```shell title="Command line"
       wasmd tx wasm instantiate 8 '{"constructor_field1":...}' --from ...
       ```
     Where **8** is the bytecode id that your instance will use.
@@ -627,7 +627,7 @@ that give access to the on-chain storage in read-only or read/write, depending o
 i.e. [query](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L48)
 or [execution](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L24) respectively.
 
-<Tabs sync>
+<Tabs groupId="local-docker">
     <TabItem value="Query">
         ```rust
         pub fn query(deps: Deps, ...) ...

@@ -3,6 +3,9 @@ title: First Cross-Module Integration
 description: Send a message to another Cosmos module, break the CosmWasm barrier.
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 # First Cross-Module Integration
 
 In the previous sections, you made your _collection manager_ smart contract sends funds onwards to the _NFT collection_ smart contract. That's convenient from the point of view of the manager, although this kicks the can down to the NFT collection.
@@ -28,21 +31,21 @@ As a first step, you change your manager contract so that it sends the received 
 
 The address of the beneficiary of these funds is information that needs to be to be stored in storage and so set at instantiation. Add the `cw-storage-plus` library:
 
-<TabGroup sync>
-    <TabGroupItem title="Local" active>
-        ```sh
+<Tabs groupId="local-docker">
+    <TabItem value="Local" default>
+        ```shell
         cargo add cw-storage-plus@1.2.0
         ```
-    </TabGroupItem>
-    <TabGroupItem title="Docker">
-        ```sh
+    </TabItem>
+    <TabItem value="Docker">
+        ```shell
         docker run --rm -it \
             -v $(pwd):/root/ -w /root \
             rust:1.80.1 \
             cargo add cw-storage-plus@1.2.0
         ```
-    </TabGroupItem>
-</TabGroup>
+    </TabItem>
+</Tabs>
 
 ## New elements
 
