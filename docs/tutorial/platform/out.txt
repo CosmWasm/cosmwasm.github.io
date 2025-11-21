@@ -1,0 +1,74 @@
+```rust title="tests/contract.rs"
+// diff-del
+- use cosmwasm_std::{to_json_binary, Addr, Empty, Event};
+// diff-add
++ use cosmwasm_std::{to_json_binary, Addr, Coin, Empty, Event, Uint128};
+  use cw721::msg::{Cw721ExecuteMsg, Cw721QueryMsg, OwnerOfResponse};
+// diff-del
+- use cw_multi_test::{App, ContractWrapper, Executor};
+// diff-add
++ use cw_multi_test::{App, AppBuilder, ContractWrapper, Executor};
+  use cw_my_collection_manager::{
+      contract::{execute, instantiate, reply},
+// diff-del
+-     msg::{ExecuteMsg, InstantiateMsg},
+// diff-add
++     msg::{ExecuteMsg, InstantiateMsg, PaymentParams},
+  };
+  ...
+  fn instantiate_collection_manager(
+      mock_app: &mut App,
+// diff-add
++     payment_params: PaymentParams,
+  ) -> (u64, Addr) {
+      ...
+          return (
+              manager_code_id,
+              mock_app
+                  .instantiate_contract(
+                      manager_code_id,
+                      Addr::unchecked("deployer-manager"),
+// diff-del
+-                     &InstantiateMsg {},
+// diff-add
++                     &InstantiateMsg { payment_params },
+                      &[],
+                      "my-collection-manager",
+                      None,
+                  )
+                  .expect("Failed to instantiate collection manager"),
+          );
+  }
+  ...
+  fn test_mint_through() {
+      // Arrange
+      let mut mock_app = App::default();
+// diff-add
++     let beneficiary_addr = Addr::unchecked("beneficiary");
+      let (_, addr_manager) = instantiate_collection_manager(
+          &mut mock_app,
+// diff-add-start
++         PaymentParams {
++             beneficiary: beneficiary_addr.to_owned(),
++         },
+// diff-add-end
+      );
+      ...
+  }
+  ...
+  fn test_mint_num_tokens() {
+      // Arrange
+      let mut mock_app = App::default();
+// diff-add
++     let beneficiary_addr = Addr::unchecked("beneficiary");
+      let (_, addr_manager) = instantiate_collection_manager(
+          &mut mock_app,
+// diff-add-start
++         PaymentParams {
++             beneficiary: beneficiary_addr.to_owned(),
++         },
+// diff-add-end
+      );
+      ...
+  }
+```
