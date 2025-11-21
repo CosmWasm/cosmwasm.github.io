@@ -1477,7 +1477,7 @@ Although you see the word `funds` as a field of the message, it does not mean th
 4. The module then [crafts the info](https://github.com/CosmWasm/wasmd/blob/v0.52.0/x/wasm/keeper/keeper.go#L408), which includes the implied fact that the funds were collected.
 5. The info is [passed to the Wasm VM](https://github.com/CosmWasm/wasmd/blob/v0.52.0/x/wasm/keeper/keeper.go#L413).
 6. This jumps to the smart contract, which [receives an info object](https://github.com/b9lab/cw-my-nameservice/blob/add-first-library/src/contract.rs#L28)  that contains the [`funds`](https://github.com/CosmWasm/cosmwasm/blob/v2.1.4/packages/std/src/types.rs#L105) detail.
-7. The contract could validate that it was paid enough for the minting. In fact, if you go to [this part](./16-fund-handling.html) of the long-running exercise, you see [it checking](https://github.com/b9lab/cw-my-collection-manager/blob/main/src/contract.rs#L107-L146) exeactly that in the list of funds that have been collected.
+7. The contract could validate that it was paid enough for the minting. In fact, if you go to [this part](./16-fund-handling.md) of the long-running exercise, you see [it checking](https://github.com/b9lab/cw-my-collection-manager/blob/main/src/contract.rs#L107-L146) exactly that in the list of funds that have been collected.
 
 </details>
 

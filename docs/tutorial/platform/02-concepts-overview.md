@@ -324,11 +324,11 @@ For instance:
   }
   ```
   See [the hello world's](./04-hello-world.md#send-a-transaction-to-your-contract) _Send a transaction to your contract_ to pass funds along with a contract call,
-  and [the practical exercise's](./16-fund-handling.html) _Proper Fund Handling_ to see it implemented in your own smart contract.
+  and [the practical exercise's](./16-fund-handling.md) _Proper Fund Handling_ to see it implemented in your own smart contract.
 
 * When a smart contract sends a message to another one, and this other contract fails, the originating smart contract
   does not by default need to roll back any state changes. Instead, the CosmWasm module provides this guarantee of atomicity,
-  unless instructed otherwise. See [the practical exercise's](./14-contract-reply.html) _First Contract Reply Integration_ for an example of the default behavior.
+  unless instructed otherwise. See [the practical exercise's](./14-contract-reply.md) _First Contract Reply Integration_ for an example of the default behavior.
 
 * Additionally, when a smart contract sends a message to another and expects a reply,
   the payload returned (CosmWasm v2 only) is the same as the one that was sent initially, guaranteed by the CosmWasm module.
@@ -594,7 +594,7 @@ However, throwing tokens _over the fence_ to the smart contract is the lesser-us
 You should preferably use the [`funds`](https://github.com/CosmWasm/wasmd/blob/v0.53.0/x/wasm/types/tx.pb.go#L350) feature of `MsgExecute`.
 As mentioned in the messages section above, the CosmWasm module will do the requested fund transfer prior to the execution,
 so that the smart contract has guarantees that the adequate token transfer has been done to its benefit.
-See [this hands-on exercise](./16-fund-handling.html) for an example.
+See [this hands-on exercise](./16-fund-handling.md) for an example.
 
 On the other hand, for IBC token transfers, it is possible for a smart contract to subscribe to IBC callbacks such that it can be notified
 as soon as it receives tokens or when the tokens it has sent cross-chain have been received or have timed out.
@@ -627,21 +627,19 @@ that give access to the on-chain storage in read-only or read/write, depending o
 i.e. [query](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L48)
 or [execution](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L24) respectively.
 
-<Tabs groupId="local-docker">
-    <TabItem value="Query">
+<Tabs>
+    <TabItem value="Query" default>
+        ([code&nbsp;link](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L48))
         ```rust
         pub fn query(deps: Deps, ...) ...
         ```
-        ([code&nbsp;link](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L48))
-
         `Deps` gives access to immutable (unmodifiable) state.
     </TabItem>
     <TabItem value="Execution">
+        ([code&nbsp;link](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L23-L28))
         ```rust
         pub fn execute(deps: DepsMut, ...) ...
         ```
-        ([code&nbsp;link](https://github.com/b9lab/cw-my-nameservice/blob/first-query-message/src/contract.rs#L23-L28))
-
         `DepsMut` gives access to mutable (modifiable) state.
     </TabItem>
 </Tabs>
@@ -743,7 +741,7 @@ Note that if there are nested returned messages,
 messages are evaluated [depth-first](https://docs.cosmwasm.com/docs/smart-contracts/contract-semantics/#dispatching-messages)
 as this cleaves to the intent of the caller.
 
-Go to [this exercise](./12-cross-contract.html) to see it in action.
+Go to [this exercise](./12-cross-contract.md) to see it in action.
 
 ### Reply mechanism
 
@@ -775,7 +773,7 @@ for the smart contract to [match the reply](https://github.com/b9lab/cw-my-colle
 to the original sub-message, in order to carry on with the execution.
 The sub-message also contains a [binary payload](https://github.com/CosmWasm/cosmwasm/blob/v2.1.0/packages/std/src/results/submessages.rs#L49) (in CosmWasm 2.0)
 that you can use as call context instead of using the storage temporarily, thereby saving gas.
-Go to [this exercise](./14-contract-reply.html) to see it in action.
+Go to [this exercise](./14-contract-reply.md) to see it in action.
 
 ```rust
 pub fn reply(..., msg: Reply) -> ContractResult {
@@ -907,11 +905,11 @@ Testing your smart contracts, as for all your software projects, should be part 
 There are different levels of testing, and you benefit from existing tools at each level.
 
 - Rust **unit tests**. They reside in your code, and are tested purely in a Rust way, without even any conversion to WebAssembly.
-  See [this exercise](./05-first-contract.html#unit-testing) for an introduction
-  and [this one](./06-first-contract-register.html#unit-testing) to experience it in more details.
+  See [this exercise](./05-first-contract.md#unit-testing) for an introduction
+  and [this one](./06-first-contract-register.md#unit-testing) to experience it in more details.
 - **Mocked-app tests**, happening all in Rust with the use of the cw-multi-test library to test your contract's
-  interactions with a mocked CosmWasm module. See [this exercise](./08-first-contract-test.html)
-  for an introduction and [this one](./12-cross-contract.html#mocked-app-tests) to experience it in more details.
+  interactions with a mocked CosmWasm module. See [this exercise](./08-first-contract-test.md)
+  for an introduction and [this one](./12-cross-contract.md#mocked-app-tests) to experience it in more details.
 - Message mocked tests. You create mocks of your SDK modules, against which your smart contracts communicate.
 
 ## Client side
