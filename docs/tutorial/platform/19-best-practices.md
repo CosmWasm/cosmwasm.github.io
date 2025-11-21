@@ -1,5 +1,5 @@
 ---
-title: Best Practices
+title: Best practices
 description: A collection of what to do and not to do.
 ---
 
