@@ -12,7 +12,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 
 ## 2.x.y -> 3.0.x
 
-### Update `cosmwasm-*` dependencies in Cargo.toml (skip the ones you don't use)
+-> Update `cosmwasm-*` dependencies in Cargo.toml (skip the ones you don't use):
 
 ```toml
 [dependencies]
