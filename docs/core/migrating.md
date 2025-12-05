@@ -747,7 +747,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 - Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "1.0.0-beta"
   cosmwasm-storage = "1.0.0-beta"
@@ -762,60 +762,69 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 - Use type `Record` instead of `Pair`
 
   ```rust
-  // before
-  use cosmwasm_std::Pair;
-
-  // after
-  use cosmwasm_std::Record;
+  //diff-del
+  - use cosmwasm_std::Pair;
+  //diff-add
+  + use cosmwasm_std::Record;
   ```
 
-- Replace `cosmwasm_std::create_entry_points!` and
-  `cosmwasm_std::create_entry_points_with_migration!` with `#[entry_point]`
+- Replace `cosmwasm_std::create_entry_points!` and `cosmwasm_std::create_entry_points_with_migration!` with
+  ```rust
+  #[entry_point]
+  pub fn ...
+  ```
   annotations. See the [0.13 -> 0.14 entry](#013---014) where `#[entry_point]`
   was introduced.
 
-- If your chain provides a custom query, add the custom query type as a generic
-  argument to `cosmwasm_std::Deps`, `DepsMut`, `OwnedDeps` and `QuerierWrapper`.
-  Otherwise, it defaults to `Empty`. E.g.
+- If your chain provides a custom query, add the custom query type as a generic argument to `cosmwasm_std::Deps`,
+  `DepsMut`, `OwnedDeps` and `QuerierWrapper`. Otherwise, it defaults to `Empty`, e.g.
 
   ```rust
    #[entry_point]
    pub fn instantiate(
+  //diff-del
   -    deps: DepsMut,
+  //diff-add
   +    deps: DepsMut<CyberQueryWrapper>,
        _env: Env,
        info: MessageInfo,
        msg: InstantiateMsg,
-  @@ -38,112 +35,95 @@ pub fn instantiate(
    }
   ```
 
   ```rust
    #[entry_point]
+  //diff-del
   -pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+  //diff-add
   +pub fn query(deps: Deps<CyberQueryWrapper>, _env: Env, msg: QueryMsg) ->   StdResult<Binary> {
        match msg {
   ```
 
   ```rust
    pub struct CyberQuerier<'a> {
+  //diff-del
   -    querier: &'a QuerierWrapper<'a>,
+  //diff-add
   +    querier: &'a QuerierWrapper<'a, CyberQueryWrapper>,
    }
 
    impl<'a> CyberQuerier<'a> {
+  //diff-del
   -    pub fn new(querier: &'a QuerierWrapper) -> Self {
+  //diff-add
   +    pub fn new(querier: &'a QuerierWrapper<'a, CyberQueryWrapper>) -> Self {
            CyberQuerier { querier }
        }
    }
   ```
 
-  Replace `QuerierWrapper::custom_query` with `QuerierWrapper::query` which is
-  now fully typed:
+  Replace `QuerierWrapper::custom_query` with `QuerierWrapper::query` which is now fully typed:
 
   ```rust
+  //diff-del
   -let res: CyberlinksAmountResponse = self.querier.custom_query(&request.into())?;
+  //diff-add
   +let res: CyberlinksAmountResponse = self.querier.query(&request.into())?;
   ```
 
@@ -826,18 +835,19 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 - Add new `transaction` field to `Env` when creating a custom mock env:
 
   ```rust
-  @@ -19,6 +19,7 @@
-
    use cosmwasm_std::{
        coins, Addr, BlockInfo, Coin, ContractInfo, Env, MessageInfo, Response, Timestamp,
+  //diff-add
   +    TransactionInfo,
    };
    use cosmwasm_storage::to_length_prefixed;
    use cosmwasm_vm::testing::{instantiate, mock_info, mock_instance};
-  @@ -52,6 +53,7 @@ fn mock_env_info_height(signer: &str, sent: &[Coin], height: u64, time: u64) ->
+  
+   fn mock_env_info_height(signer: &str, sent: &[Coin], height: u64, time: u64) ->
            contract: ContractInfo {
                address: Addr::unchecked(MOCK_CONTRACT_ADDR),
            },
+  //diff-add
   +        transaction: Some(TransactionInfo { index: 3 }),
        };
        let info = mock_info(signer, sent);
