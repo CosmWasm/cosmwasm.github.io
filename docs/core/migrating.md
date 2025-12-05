@@ -2018,7 +2018,7 @@ Integration tests:
 
 ## 0.7.2 -> 0.8
 
-**Update wasm code**
+**_Update wasm code_**
 
 `Cargo.toml` dependencies:
 
@@ -2036,7 +2036,7 @@ Integration tests:
 
 - Replace `"cosmwasm/backtraces"` with `"cosmwasm-std/backtraces"`
 
-Imports:
+**_Imports_**
 
 - Replace all `use cosmwasm::X::Y` with `use cosmwasm_std::Y`, except for mock
 - Replace all `use cosmwasm::mock::Y` with `use cosmwasm_std::testing::Y`. This
@@ -2054,7 +2054,7 @@ same in all contracts:
   [`contracts/queue`](https://github.com/CosmWasm/cosmwasm/blob/main/contracts/queue/src/lib.rs)
 - Add `pub mod XYZ` directives for any modules you use besides `contract`
 
-Contract Code:
+**_Contract code_**
 
 - Add query to extern:
   - Before: `my_func<S: Storage, A: Api>(deps: &Extern<S, A>, ...`
@@ -2105,7 +2105,7 @@ Contract Code:
 
 At this point `cargo wasm` should pass.
 
-**Update test code**
+**_Update test code_**
 
 Both:
 
@@ -2133,7 +2133,7 @@ Both:
   let env = mock_env(&deps.api, "creator", &coins(15, "earth"));
   ```
 
-Unit Tests:
+**_Unit tests_**
 
 - Replace `dependencies` with `mock_dependencies`
 
@@ -2156,7 +2156,7 @@ Integration Tests:
   - `let res = handle(...).unwrap()` =>
     `let res: HandleResponse = handle(...).unwrap()`
 
-**Update schema code**
+**_Update schema code_**
 
 All helper functions have been moved into a new `cosmwasm-schema` package.
 
@@ -2166,9 +2166,9 @@ All helper functions have been moved into a new `cosmwasm-schema` package.
   but replacing all the imports and type names with those you currently have.
 - Regenerate schemas with `cargo schema`
 
-**Polishing**
+**_Polishing_**
 
-After many changes, remember to let the linters do their jobs:
+After many changes, remember to let the linters do their job:
 
 ```text
 $ cargo fmt
