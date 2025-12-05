@@ -672,7 +672,10 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 ## 1.0.0-beta -> 1.0.0
 
 - The minimum Rust supported version is 1.56.1. Verify your Rust version is >= 1.56.1 with:
-  `rustc --version`. Please note that the required Rust version changes over time,
+  ```shell
+  $ rustc --version
+  ```
+  Please note that the required Rust version changes over time,
   and we have little control over that due to the dependencies that are used.
 
 - Simplify `mock_dependencies` calls with empty balance:
@@ -680,7 +683,9 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   ```rust
        #[test]
        fn instantiate_fails() {
+  //diff-del
   -        let mut deps = mock_dependencies(&[]);
+  //diff-add
   +        let mut deps = mock_dependencies();
 
            let msg = InstantiateMsg {};
@@ -692,7 +697,9 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   ```rust
        #[test]
        fn migrate_cleans_up_data() {
+  //diff-del
   -        let mut deps = mock_dependencies(&coins(123456, "gold"));
+  //diff-add
   +        let mut deps = mock_dependencies_with_balance(&coins(123456, "gold"));
 
            // store some sample data
@@ -706,11 +713,15 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
    #[entry_point]
    pub fn reply(deps: DepsMut, _env: Env, reply: Reply) -> StdResult<Response> {
        match (reply.id, reply.result) {
+  //diff-del
   -        (RECEIVE_DISPATCH_ID, ContractResult::Err(err)) => {
+  //diff-add
   +        (RECEIVE_DISPATCH_ID, SubMsgResult::Err(err)) => {
                Ok(Response::new().set_data(encode_ibc_error(err)))
            }
+  //diff-del
   -        (INIT_CALLBACK_ID, ContractResult::Ok(response)) => handle_init_callback(deps, response),
+  //diff-add
   +        (INIT_CALLBACK_ID, SubMsgResult::Ok(response)) => handle_init_callback(deps, response),
            _ => Err(StdError::generic_err("invalid reply id or result")),
        }
@@ -720,15 +731,16 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 - Replace `SubMsgExecutionResponse` with `SubMsgResponse`:
 
   ```rust
-  @@ -387,7 +384,7 @@ mod tests {
-           // fake a reply and ensure this works
-           let response = Reply {
-               id,
-  -            result: SubMsgResult::Ok(SubMsgExecutionResponse {
-  +            result: SubMsgResult::Ok(SubMsgResponse {
-                   events: fake_events(&account),
-                   data: None,
-               }),
+      // fake a reply and ensure this works
+      let response = Reply {
+          id,
+  //diff-del
+  -       result: SubMsgResult::Ok(SubMsgExecutionResponse {
+  //diff-add
+  +       result: SubMsgResult::Ok(SubMsgResponse {
+              events: fake_events(&account),
+              data: None,
+          }),
   ```
 
 ## 0.16 -> 1.0.0-beta
