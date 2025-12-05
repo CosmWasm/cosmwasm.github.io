@@ -447,14 +447,12 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   +.with_payload(vec![9, 8, 7, 6, 5])
   ```
 
-  The payload data will then be available in the new field `Reply.payload` in
-  the `reply` entry point. This functionality is an optional addition introduced
-  in 2.0. To keep the CosmWasm 1.x behavior, just set payload to
-  `Binary::default()`.
+  The payload data will then be available in the new field `Reply.payload` in the `reply` entry point.
+  This functionality is an optional addition introduced in 2.0. To keep the CosmWasm 1.x behavior,
+  just set payload to `Binary::default()`.
 
-- In test code, replace calls to `mock_info` with `message_info`. This takes a
-  `&Addr` as the first argument which you get by using owned `Addr` in the test
-  bodies.
+- In test code, replace calls to `mock_info` with `message_info`. This takes a `&Addr` as the first argument
+  which you get by using owned `Addr` in the test bodies.
 
 ## 1.4.x -> 1.5.0
 
