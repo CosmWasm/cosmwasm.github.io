@@ -130,7 +130,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   for each channel yourself in contract storage.
 
 - `ExternalApi`, `ExternalQuerier` and `ExternalStorage` exports have been removed,
-  as they are not intended to be used outside of cosmwasm-std.
+  as they are not intended to be used outside cosmwasm-std.
 
 - We did some big changes to `StdError`. Most of the constructors have been removed.
   Instead, you can just convert any type implementing the `Error` trait into `StdError` using the `?` operator.
@@ -237,7 +237,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   +assert_eq!(addr.as_str(), "admin");
   ```
 
-  But keep in mind that this is case sensitive (while addresses are not).
+  But keep in mind that this is case-sensitive (while addresses are not).
 
 - Replace all uses of `Mul<Decimal> for Uint128` and
   `Mul<Decimal256> for Uint256` with `Uint{128,256}::mul_floor`:
@@ -636,10 +636,9 @@ arbitrary ones.
 
 ## 1.0.0-beta -> 1.0.0
 
-- The minimum Rust supported version is 1.56.1. Verify your Rust version is >=
-  1.56.1 with: `rustc --version`. Please note that the required Rust version
-  changes over time and we have little control over that due to the dependencies
-  that are used.
+- The minimum Rust supported version is 1.56.1. Verify your Rust version is >= 1.56.1 with:
+  `rustc --version`. Please note that the required Rust version changes over time,
+  and we have little control over that due to the dependencies that are used.
 
 - Simplify `mock_dependencies` calls with empty balance:
 
@@ -818,7 +817,7 @@ arbitrary ones.
   ```
 
 - The `attr` function now accepts arguments that implement `Into<String>` rather
-  than `ToString`. This means that "stringly" types like `&str` are still
+  than `ToString`. This means that "string" types like `&str` are still
   accepted, but others (like numbers or booleans) have to be explicitly
   converted to strings; you can use the `to_string` method (from the
   `std::string::ToString` trait) for that.
@@ -1148,8 +1147,8 @@ arbitrary ones.
   }
   ```
 
-  You also need to update the constructors in test code. Below we show how to do
-  so both for JSON data as well as any custom binary format:
+  You also need to update the constructors in test code. Below we show how to do so both for JSON data
+  and for any custom binary format:
 
   ```rust
   // before (JSON)
@@ -1184,7 +1183,7 @@ arbitrary ones.
 - The minimum Rust supported version for 0.14 is 1.51.0. Verify your Rust
   version is >= 1.51.0 with: `rustc --version`
 
-- Update CosmWasm and schemars dependencies in Cargo.toml (skip the ones you
+- Update CosmWasm and `schemars` dependencies in Cargo.toml (skip the ones you
   don't use):
 
   ```
@@ -1407,7 +1406,7 @@ arbitrary ones.
   deserialization. In order to maintain type safety, deserialization into `Addr`
   must only be done from trusted sources like a contract's state or a query
   response. User inputs must be deserialized into `String`. This new `Addr` type
-  makes it easy to use human readable addresses in state:
+  makes it easy to use human-readable addresses in state:
 
   With pre-validated `Addr` from `MessageInfo`:
 
@@ -1562,7 +1561,7 @@ arbitrary ones.
 - Rename the type `Extern` to `Deps`, and radically simplify the
   `init`/`handle`/`migrate`/`query` entrypoints. Rather than
   `&mut Extern<S, A, Q>`, use `DepsMut`. And instead of `&Extern<S, A, Q>`, use
-  `Deps`. If you ever pass eg. `foo<A: Api>(api: A)` around, you must now use
+  `Deps`. If you ever pass e.g. `foo<A: Api>(api: A)` around, you must now use
   dynamic trait pointers: `foo(api: &dyn Api)`. Here is the quick search-replace
   guide on how to fix `contract.rs`:
 
@@ -1582,8 +1581,7 @@ arbitrary ones.
   - `&mut deps,` => `deps.as_mut(),`
   - `&deps,` => `deps.as_ref(),`
 
-  You may have to add `use cosmwasm_std::{Storage}` if the compile complains
-  about the trait
+  You may have to add `use cosmwasm_std::{Storage}` if the compiler complains about the trait
 
   _If you use cosmwasm-storage, in `state.rs`:_
 
@@ -1962,7 +1960,7 @@ Integration tests:
   contains all backend storage methods.
 - Storage getters (and iterators) now return a result of
   `(Option<Vec<u8>>, u64)`, where the first component is the element and the
-  second one is the gas cost. Thus in a few places `.0` must be added to access
+  second one is the gas cost. Thus, in a few places `.0` must be added to access
   the element.
 
 ## 0.7.2 -> 0.8
@@ -2039,7 +2037,7 @@ Contract Code:
     `not_found`/`parse_err`/…
   - All error generator functions now return errors instead of results, such
     that e.g. `return unauthorized();` becomes `return Err(unauthorized());`
-  - Error cases don't contain `source` fields anymore. Instead source errors are
+  - Error cases don't contain `source` fields anymore. Instead, source errors are
     converted to standard types like `String`. For this reason, both
     `snafu::ResultExt` and `snafu::OptionExt` cannot be used anymore. An error
     wrapper now looks like `.map_err(invalid_base64)` and an `Option::None` to
