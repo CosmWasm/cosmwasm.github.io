@@ -1929,7 +1929,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 - Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.10.0"
   cosmwasm-storage = "0.10.0"
@@ -1941,39 +1941,34 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   # ...
   ```
 
-Integration tests:
+**_Integration tests:_**
 
-- Calls to `Api::human_address` and `Api::canonical_address` now return a pair
-  of result and gas information. Change
+- Calls to `Api::human_address` and `Api::canonical_address` now return a pair of result and gas information. Change
 
   ```rust
-  // before
-  verifier: deps.api.canonical_address(&verifier).unwrap(),
-
-  // after
-  verifier: deps.api.canonical_address(&verifier).0.unwrap(),
+  //diff-del
+  -verifier: deps.api.canonical_address(&verifier).unwrap(),
+  //diff-add
+  +verifier: deps.api.canonical_address(&verifier).0.unwrap(),
   ```
 
   The same applies for all calls of `Querier` and `Storage`.
 
-All Tests:
+**_All Tests:_**
 
-All usages of `mock_env` will have to remove the first argument (no need of
-API).
+- All usages of `mock_env` will have to remove the first argument (no need of API).
 
-```rust
-// before
-let env = mock_env(&deps.api, "creator", &coins(1000, "earth"));
+  ```rust
+  //diff-del
+  let env = mock_env(&deps.api, "creator", &coins(1000, "earth"));
+  //diff-add
+  let env = mock_env("creator", &coins(1000, "earth"));
+  ```
 
-// after
-let env = mock_env("creator", &coins(1000, "earth"));
-```
+**_Contracts:_**
 
-Contracts:
-
-- All code that uses `message.sender` or `contract.address` should deal with
-  `HumanAddr` not `CanonicalAddr`. Many times this means you can remove a
-  conversion step.
+- All code that uses `message.sender` or `contract.address` should deal with `HumanAddr` not `CanonicalAddr`.
+  Many times this means you can remove a conversion step.
 
 ## 0.8 -> 0.9
 
