@@ -175,8 +175,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   ```
 
   If you were using cosmwasm-std's `ibc3` feature, you can remove it, as it is the default now.
-  Depending on your usage, you might have to enable the `stargate` feature instead,
-  since it was previously implied by `ibc3`.
+  Depending on your usage, you might have to enable the `stargate` feature instead, since it was previously implied by `ibc3`.
 
   Also remove any uses of the `backtraces` feature. You can use a `RUST_BACKTRACE=1` environment variable for this now.
 
@@ -229,163 +228,195 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   //diff-add-end
   ```
 
-  If you really want to compare the string representation (e.g. in tests), you
-  can use `Addr::as_str`:
+  If you really want to compare the string representation (e.g. in tests), you can use `Addr::as_str`:
 
-  ```diff
+  ```rust
+  //diff-del
   -assert_eq!(addr, "admin");
+  //diff-add
   +assert_eq!(addr.as_str(), "admin");
   ```
 
   But keep in mind that this is case-sensitive (while addresses are not).
 
-- Replace all uses of `Mul<Decimal> for Uint128` and
-  `Mul<Decimal256> for Uint256` with `Uint{128,256}::mul_floor`:
+- Replace all uses of `Mul<Decimal> for Uint128` and `Mul<Decimal256> for Uint256` with `Uint{128,256}::mul_floor`:
 
-  ```diff
+  ```rust
+  //diff-del
   -Uint128::new(123456) * Decimal::percent(1);
+  //diff-add
   +Uint128::new(123456).mul_floor(Decimal::percent(1));
   ```
 
 - When calling `Coin::new`, you now have to explicitly specify the integer type:
 
-  ```diff
+  ```rust
+  //diff-del
   -Coin::new(1234, "uatom")
+  //diff-add
   +Coin::new(1234u128, "uatom")
   ```
 
-- When creating a `Binary` or `Size` instance from an inner value, you now have
-  to explicitly call `new`:
+- When creating a `Binary` or `Size` instance from an inner value, you now have to explicitly call `new`:
 
-  ```diff
+  ```rust
+  //diff-del
   -Binary(vec![1u8])
+  //diff-add
   +Binary::new(vec![1u8])
   ```
 
-- When accessing the inner value of a `CanonicalAddr` or `Binary`, use
-  `as_slice` instead:
+- When accessing the inner value of a `CanonicalAddr` or `Binary`, use `as_slice` instead:
 
-  ```diff
+  ```rust
+  //diff-del
   -&canonical_addr.0
+  //diff-add
   +canonical_addr.as_slice()
   ```
 
-- If you use any `u128` or `i128` in storage or message types, replace them with
-  `Uint128` and `Int128` respectively to preserve the current serialization.
-  Failing to do this will result in deserialization errors!
+- If you use any `u128` or `i128` in storage or message types, replace them with `Uint128` and `Int128` respectively
+  to preserve the current serialization. Failing to do this will result in deserialization errors!
 
-  ```diff
+  ```rust
   #[cw_serde]
   struct MyStorage {
+  //diff-del
   -  a: u128,
+  //diff-del
   -  b: i128,
+  //diff-add
   +  a: Uint128,
+  //diff-add
   +  b: Int128,
   }
   const map: Map<u128, MyStorage> = Map::new("map");
 
+  //diff-del
   -const item: Item<u128> = Item::new("item");
+  //diff-add
   +const item: Item<Uint128> = Item::new("item");
   ```
 
-- Replace all uses of `IbcReceiveResponse::set_ack` and
-  `IbcReceiveResponse::default` with calls to `IbcReceiveResponse::new`:
+- Replace all uses of `IbcReceiveResponse::set_ack` and `IbcReceiveResponse::default` with calls to `IbcReceiveResponse::new`:
 
-  ```diff
+  ```rust
+  //diff-del
   -Ok(IbcReceiveResponse::new().set_ack(b"{}"))
+  //diff-add
   +Ok(IbcReceiveResponse::new(b"{}"))
 
+  //diff-del
   -Ok(IbcReceiveResponse::default())
+  //diff-add
   +Ok(IbcReceiveResponse::new(b""))
   ```
 
 - Replace all uses of `CosmosMsg::Stargate` with `CosmosMsg::Any`:
 
-  ```diff
+  ```rust
+  //diff-del
   -CosmosMsg::Stargate { type_url, value }
+  //diff-add
   +CosmosMsg::Any(AnyMsg { type_url, value })
   ```
 
-- Replace all direct construction of `StdError` with the use of the
-  corresponding constructor:
+- Replace all direct construction of `StdError` with the use of the corresponding constructor:
 
-  ```diff
+  ```rust
+  //diff-del
   -StdError::GenericErr { msg }
+  //diff-add
   +StdError::generic_err(msg)
   ```
 
-- Replace addresses in unit tests with valid Bech32 addresses. This has to be
-  done for all addresses that are validated or canonicalized during the test or
-  within the contract. The easiest way to do this is by using
+- Replace addresses in unit tests with valid Bech32 addresses. This has to be done for all addresses that
+  are validated or canonicalized during the test or within the contract. The easiest way to do this is by using
   `MockApi::addr_make`. It generates a Bech32 address from any string:
 
-  ```diff
+  ```rust
+  //diff-del-start
   -let msg = InstantiateMsg {
   -    verifier: "verifier".to_string(),
   -    beneficiary: "beneficiary".to_string(),
   -};
+  //diff-del-end
+  //diff-add-start
   +let msg = InstantiateMsg {
   +    verifier: deps.api.addr_make("verifier").to_string(),
   +    beneficiary: deps.api.addr_make("beneficiary").to_string(),
   +};
+  //diff-add-end
   ```
 
-- Replace addresses in integration tests using `cosmwasm-vm` with valid Bech32
-  addresses. This has to be done for all addresses that are validated or
-  canonicalized during the test or within the contract. The easiest way to do
-  this is by using `MockApi::addr_make`. It generates a Bech32 address from any
-  string:
+- Replace addresses in integration tests using `cosmwasm-vm` with valid Bech32 addresses.
+  This has to be done for all addresses that are validated or canonicalized during the test or within the contract.
+  The easiest way to do this is by using `MockApi::addr_make`. It generates a Bech32 address from any string:
 
-  ```diff
+  ```rust
+  //diff-del-start
   -let msg = InstantiateMsg {
   -    verifier: "verifier".to_string(),
   -    beneficiary: "beneficiary".to_string(),
   -};
+  //diff-del-end
+  //diff-add-start
   +let msg = InstantiateMsg {
   +    verifier: instance.api().addr_make("verifier").to_string(),
   +    beneficiary: instance.api().addr_make("beneficiary").to_string(),
   +};
+  //diff-add-end
   ```
 
-- The `update_balance`, `set_denom_metadata`, `set_withdraw_address`,
-  `set_withdraw_addresses` and `clear_withdraw_addresses` functions were removed
-  from the `MockQuerier`. Use the newly exposed modules to access them directly:
+- The `update_balance`, `set_denom_metadata`, `set_withdraw_address`, `set_withdraw_addresses` and
+  `clear_withdraw_addresses` functions were removed from the `MockQuerier`.
+  Use the newly exposed modules to access them directly:
 
-  ```diff
+  ```rust
+  //diff-del
   -querier.update_balance("addr", coins(1000, "ATOM"));
+  //diff-add
   +querier.bank.update_balance("addr", coins(1000, "ATOM"));
+  //diff-del
   -querier.set_withdraw_address("delegator", "withdrawer");
+  //diff-add
   +querier.distribution.set_withdraw_address("delegator", "withdrawer");
+  //diff-del
   -querier.update_staking(denom, &[], &[]);
+  //diff-add
   +querier.staking.update(denom, &[], &[]);
+  //diff-del
   -querier.update_ibc(port_id, &[]);
+  //diff-add
   +querier.ibc.update(port_id, &[]);
   ```
 
-- If you were using `QueryRequest::Stargate`, you might want to enable the
-  `cosmwasm_2_0` cargo feature and migrate to `QueryRequest::Grpc` instead.
-  While the stargate query sometimes returns protobuf-encoded data and sometimes
-  JSON encoded data, depending on the chain, the gRPC query always returns
-  protobuf-encoded data.
+- If you were using `QueryRequest::Stargate`, you might want to enable the `cosmwasm_2_0` cargo feature
+  and migrate to `QueryRequest::Grpc` instead. While the stargate query sometimes returns protobuf-encoded data
+  and sometimes JSON encoded data, depending on the chain, the gRPC query always returns protobuf-encoded data.
 
-  ```diff
+  ```rust
+  //diff-del-start
   -deps.querier.query(&QueryRequest::Stargate {
   -    path: "/service.Path/ServiceMethod".to_string(),
   -    data: Binary::new(b"DATA"),
   -})?;
+  //diff-del-end
+  //diff-add-start
   +deps.querier.query(&QueryRequest::Grpc(GrpcQuery {
   +    path: "/service.Path/ServiceMethod".to_string(),
   +    data: Binary::new(b"DATA"),
   +}))?;
+  //diff-add-end
   ```
 
-- A new `payload` field allows you to send arbitrary data from the original
-  contract into the `reply`. If you construct `SubMsg` manually, add the
-  `payload` field:
+- A new `payload` field allows you to send arbitrary data from the original contract into the `reply`.
+  If you construct `SubMsg` manually, add the `payload` field:
 
-  ```diff
+  ```rust
    SubMsg {
        id: 12,
+  //diff-add
   +    payload: Binary::default(),
        msg: my_bank_send,
        gas_limit: Some(12345u64),
@@ -395,9 +426,10 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 
   or with data:
 
-  ```diff
+  ```rust
    SubMsg {
        id: 12,
+  //diff-add
   +    payload: Binary::new(vec![9, 8, 7, 6, 5]),
        msg: my_bank_send,
        gas_limit: Some(12345u64),
@@ -407,7 +439,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 
   If you use a constructor function, you can set the payload as follows:
 
-  ```diff
+  ```rust
    SubMsg::new(BankMsg::Send {
      to_address: payout,
      amount: coins(123456u128,"gold")
@@ -459,7 +491,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 - If you want to use a feature that is only available on CosmWasm 1.4+ chains,
   use this feature:
 
-  ```diff
+  ```rust
   -cosmwasm-std = { version = "1.4.0", features = ["stargate"] }
   +cosmwasm-std = { version = "1.4.0", features = ["stargate", "cosmwasm_1_4"] }
   ```
@@ -486,7 +518,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 - If you want to use a feature that is only available on CosmWasm 1.3+ chains,
   use this feature:
 
-  ```diff
+  ```rust
   -cosmwasm-std = { version = "1.3.0", features = ["stargate"] }
   +cosmwasm-std = { version = "1.3.0", features = ["stargate", "cosmwasm_1_3"] }
   ```
@@ -513,7 +545,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 - If you want to use a feature that is only available on CosmWasm 1.2+ chains,
   use this feature:
 
-  ```diff
+  ```rust
   -cosmwasm-std = { version = "1.1.0", features = ["stargate"] }
   +cosmwasm-std = { version = "1.1.0", features = ["stargate", "cosmwasm_1_2"] }
   ```
@@ -527,7 +559,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   arithmetic [will be removed](https://github.com/CosmWasm/cosmwasm/issues/1485)
   at some point.
 
-  ```diff
+  ```rust
   let a = Uint128::new(123);
   let b = Decimal::percent(150)
 
@@ -558,7 +590,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   Your contract should have a `cosmwasm_schema` dependency in its `Cargo.toml`
   file. Move it from `dev-dependencies`to regular `dependencies`.
 
-  ```diff
+  ```toml
     [dependencies]
   + cosmwasm-schema = { version = "1.1.0" }
     cosmwasm-std = { version = "1.1.0", features = ["stargate"] }
@@ -575,7 +607,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   derives and sometimes `serde` annotations. Remove all those attributes and
   replace them with `#[cosmwasm_schema::cw_serde]`.
 
-  ```diff
+  ```rust
   + use cosmwasm_schema::{cw_serde, QueryResponses};
 
     // *snip*
@@ -598,7 +630,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   clients relying on the generated schemas will also know how to interpret
   response data from your contract.
 
-  ```diff
+  ```rust
     #[cw_serde]
   + #[derive(QueryResponses)]
     pub enum QueryMsg {
@@ -642,7 +674,7 @@ arbitrary ones.
 
 - Simplify `mock_dependencies` calls with empty balance:
 
-  ```diff
+  ```rust
        #[test]
        fn instantiate_fails() {
   -        let mut deps = mock_dependencies(&[]);
@@ -654,7 +686,7 @@ arbitrary ones.
 
   Or use the new `mock_dependencies_with_balance` if you need a balance:
 
-  ```diff
+  ```rust
        #[test]
        fn migrate_cleans_up_data() {
   -        let mut deps = mock_dependencies(&coins(123456, "gold"));
@@ -666,7 +698,7 @@ arbitrary ones.
 
 - Replace `ContractResult` with `SubMsgResult` in `Reply` handling:
 
-  ```diff
+  ```rust
   @@ -35,10 +35,10 @@ pub fn instantiate(
    #[entry_point]
    pub fn reply(deps: DepsMut, _env: Env, reply: Reply) -> StdResult<Response> {
@@ -684,7 +716,7 @@ arbitrary ones.
 
 - Replace `SubMsgExecutionResponse` with `SubMsgResponse`:
 
-  ```diff
+  ```rust
   @@ -387,7 +384,7 @@ mod tests {
            // fake a reply and ensure this works
            let response = Reply {
@@ -731,7 +763,7 @@ arbitrary ones.
   argument to `cosmwasm_std::Deps`, `DepsMut`, `OwnedDeps` and `QuerierWrapper`.
   Otherwise, it defaults to `Empty`. E.g.
 
-  ```diff
+  ```rust
    #[entry_point]
    pub fn instantiate(
   -    deps: DepsMut,
@@ -743,14 +775,14 @@ arbitrary ones.
    }
   ```
 
-  ```diff
+  ```rust
    #[entry_point]
   -pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
   +pub fn query(deps: Deps<CyberQueryWrapper>, _env: Env, msg: QueryMsg) ->   StdResult<Binary> {
        match msg {
   ```
 
-  ```diff
+  ```rust
    pub struct CyberQuerier<'a> {
   -    querier: &'a QuerierWrapper<'a>,
   +    querier: &'a QuerierWrapper<'a, CyberQueryWrapper>,
@@ -767,7 +799,7 @@ arbitrary ones.
   Replace `QuerierWrapper::custom_query` with `QuerierWrapper::query` which is
   now fully typed:
 
-  ```diff
+  ```rust
   -let res: CyberlinksAmountResponse = self.querier.custom_query(&request.into())?;
   +let res: CyberlinksAmountResponse = self.querier.query(&request.into())?;
   ```
@@ -778,7 +810,7 @@ arbitrary ones.
 
 - Add new `transaction` field to `Env` when creating a custom mock env:
 
-  ```diff
+  ```rust
   @@ -19,6 +19,7 @@
 
    use cosmwasm_std::{
@@ -822,7 +854,7 @@ arbitrary ones.
   converted to strings; you can use the `to_string` method (from the
   `std::string::ToString` trait) for that.
 
-  ```diff
+  ```rust
     let steal_funds = true;
   - attr("steal_funds", steal_funds),
   + attr("steal_funds", steal_funds.to_string()),
@@ -837,7 +869,7 @@ arbitrary ones.
   If you don't want to use it, you **have to** disable default features when
   depending on `cosmwasm-std`. Example:
 
-  ```diff
+  ```rust
   - cosmwasm-std = { version = "0.15.0" }
   + cosmwasm-std = { version = "0.16.0", default-features = false }
   ```
@@ -845,7 +877,7 @@ arbitrary ones.
 - The `Event::attr` setter has been renamed to `Event::add_attribute` - this is
   for consistency with other types, like `Response`.
 
-  ```diff
+  ```rust
   - let event = Event::new("ibc").attr("channel", "connect");
   + let event = Event::new("ibc").add_attribute("channel", "connect");
   ```
@@ -857,7 +889,7 @@ arbitrary ones.
 
   This is a step toward better API stability.
 
-  ```diff
+  ```rust
     #[entry_point]
     pub fn migrate(deps: DepsMut, env: Env, msg: MigrateMsg) -> StdResult<Response> {
         // ...
@@ -882,7 +914,7 @@ arbitrary ones.
     }
   ```
 
-  ```diff
+  ```rust
   - Ok(Response {
   -     data: Some((old_size as u32).to_be_bytes().into()),
   -     ..Response::default()
@@ -890,7 +922,7 @@ arbitrary ones.
   + Ok(Response::new().set_data((old_size as u32).to_be_bytes()))
   ```
 
-  ```diff
+  ```rust
   - let res = Response {
   -     messages: msgs,
   -     attributes: vec![attr("action", "reflect_subcall")],
@@ -906,7 +938,7 @@ arbitrary ones.
 - For IBC-enabled contracts only: constructing `IbcReceiveResponse` and
   `IbcBasicResponse` follows the same principles now as `Response` above.
 
-  ```diff
+  ```rust
     pub fn ibc_packet_receive(
         deps: DepsMut,
         env: Env,
@@ -931,7 +963,7 @@ arbitrary ones.
   are wrapped in a `Msg` type specific to the given entry point. Channels,
   packets and acknowledgements have to be unpacked from those.
 
-  ```diff
+  ```rust
     #[entry_point]
   - pub fn ibc_channel_open(_deps: DepsMut, _env: Env, channel: IbcChannel) -> StdResult<()> {
   + pub fn ibc_channel_open(_deps: DepsMut, _env: Env, msg: IbcChannelOpenMsg) -> StdResult<()> {
@@ -941,7 +973,7 @@ arbitrary ones.
     }
   ```
 
-  ```diff
+  ```rust
     #[entry_point]
     pub fn ibc_channel_connect(
         deps: DepsMut,
@@ -955,7 +987,7 @@ arbitrary ones.
     }
   ```
 
-  ```diff
+  ```rust
     #[entry_point]
     pub fn ibc_channel_close(
         deps: DepsMut,
@@ -969,7 +1001,7 @@ arbitrary ones.
     }
   ```
 
-  ```diff
+  ```rust
     #[entry_point]
     pub fn ibc_packet_receive(
         deps: DepsMut,
@@ -983,7 +1015,7 @@ arbitrary ones.
     }
   ```
 
-  ```diff
+  ```rust
     #[entry_point]
     pub fn ibc_packet_receive(
         deps: DepsMut,
@@ -998,7 +1030,7 @@ arbitrary ones.
     }
   ```
 
-  ```diff
+  ```rust
     #[entry_point]
     pub fn ibc_packet_timeout(
         deps: DepsMut,
@@ -1086,7 +1118,7 @@ arbitrary ones.
 - Rename the `send` field to `funds` whenever constructing a `WasmMsg::Execute`
   or `WasmMsg::Instantiate` value.
 
-  ```diff
+  ```rust
     let exec = WasmMsg::Execute {
         contract_addr: coin.address.into(),
         msg: to_binary(&msg)?,
@@ -1098,14 +1130,14 @@ arbitrary ones.
 - `Uint128` field can no longer be constructed using a struct literal. Call
   `Uint128::new` (or `Uint128::zero`) instead.
 
-  ```diff
+  ```rust
   - const TOKENS_PER_WEIGHT: Uint128 = Uint128(1_000);
   - const MIN_BOND: Uint128 = Uint128(5_000);
   + const TOKENS_PER_WEIGHT: Uint128 = Uint128::new(1_000);
   + const MIN_BOND: Uint128 = Uint128::new(5_000);
   ```
 
-  ```diff
+  ```rust
   - assert_eq!(escrow_balance, Uint128(0));
   + assert_eq!(escrow_balance, Uint128::zero());
   ```
@@ -1113,7 +1145,7 @@ arbitrary ones.
 - If constructing a `Response` using struct literal syntax, add the `events`
   field.
 
-  ```diff
+  ```rust
     Ok(Response {
         messages: vec![],
         attributes,
@@ -1544,7 +1576,7 @@ arbitrary ones.
 - In your contract's `.cargo/config` remove `--features backtraces`, which is
   now available in Rust nightly only:
 
-  ```diff
+  ```rust
   @@ -1,6 +1,6 @@
    [alias]
    wasm = "build --release --target wasm32-unknown-unknown"
