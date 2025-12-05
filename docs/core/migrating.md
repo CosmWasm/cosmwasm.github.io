@@ -1307,17 +1307,17 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
   ```rust
   //diff-del-start
-  - ctx.add_message(BankMsg::Send {
-  -     from_address: env.contract.address,
-  -     to_address: to_addr,
-  -     amount: balance,
-  - });
+  -ctx.add_message(BankMsg::Send {
+  -    from_address: env.contract.address,
+  -    to_address: to_addr,
+  -    amount: balance,
+  -});
   //diff-del-end
   //diff-add-start
-  + ctx.add_message(BankMsg::Send {
-  +     to_address: to_addr,
-  +    amount: balance,
-  + });
+  +ctx.add_message(BankMsg::Send {
+  +    to_address: to_addr,
+  +   amount: balance,
+  +});
   //diff-add-end
   ```
 
@@ -1381,20 +1381,20 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
   ```rust
   //diff-del-start
-  - pub fn init(deps: DepsMut, env: Env, info: MessageInfo, msg: InitMsg) -> Result<InitResponse, HackError> {
-  -     // ...
-  -     let mut ctx = Context::new();
-  -     ctx.add_attribute("Let the", "hacking begin");
-  -     Ok(ctx.try_into()?)
-  - }
+  -pub fn init(deps: DepsMut, env: Env, info: MessageInfo, msg: InitMsg) -> Result<InitResponse, HackError> {
+  -    // ...
+  -    let mut ctx = Context::new();
+  -    ctx.add_attribute("Let the", "hacking begin");
+  -    Ok(ctx.try_into()?)
+  -}
   //diff-del-end
   //diff-add-start
-  + pub fn init(deps: DepsMut, env: Env, info: MessageInfo, msg: InitMsg) -> Result<Response, HackError> {
-  +     // ...
-  +     let mut ctx = Context::new();
-  +     ctx.add_attribute("Let the", "hacking begin");
-  +     Ok(ctx.into())
-  + }
+  +pub fn init(deps: DepsMut, env: Env, info: MessageInfo, msg: InitMsg) -> Result<Response, HackError> {
+  +    // ...
+  +    let mut ctx = Context::new();
+  +    ctx.add_attribute("Let the", "hacking begin");
+  +    Ok(ctx.into())
+  +}
   //diff-add-end
   ```
 
@@ -1422,50 +1422,50 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
   ```rust
   //diff-del-start
-  - pub fn handle_impl(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
-  -     // ...
+  -pub fn handle_impl(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
+  -    // ...
   -
-  -     // release counter_offer to creator
-  -     let mut ctx = Context::new();
-  -     ctx.add_message(BankMsg::Send {
-  -         to_address: state.creator,
-  -         amount: state.counter_offer,
-  -     });
+  -    // release counter_offer to creator
+  -    let mut ctx = Context::new();
+  -    ctx.add_message(BankMsg::Send {
+  -        to_address: state.creator,
+  -        amount: state.counter_offer,
+  -    });
   -
-  -     // release collateral to sender
-  -     ctx.add_message(BankMsg::Send {
-  -         to_address: state.owner,
-  -         amount: state.collateral,
-  -     });
+  -    // release collateral to sender
+  -    ctx.add_message(BankMsg::Send {
+  -        to_address: state.owner,
+  -        amount: state.collateral,
+  -    });
   -
-  -     // ...
+  -    // ...
   -
-  -     ctx.add_attribute("action", "execute");
-  -     Ok(ctx.into())
-  -  }
+  -    ctx.add_attribute("action", "execute");
+  -    Ok(ctx.into())
+  -}
   //diff-del-end
   //diff-add-start
-  + pub fn execute_impl(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
-  +     // ...
+  +pub fn execute_impl(deps: DepsMut, env: Env, info: MessageInfo) -> Result<Response, ContractError> {
+  +    // ...
   +
-  +     // release counter_offer to creator
-  +     let mut resp = Response::new();
-  +     resp.add_message(BankMsg::Send {
-  +         to_address: state.creator,
-  +         amount: state.counter_offer,
-  +     });
+  +    // release counter_offer to creator
+  +    let mut resp = Response::new();
+  +    resp.add_message(BankMsg::Send {
+  +        to_address: state.creator,
+  +        amount: state.counter_offer,
+  +    });
   +
-  +     // release collateral to sender
-  +     resp.add_message(BankMsg::Send {
-  +         to_address: state.owner,
-  +         amount: state.collateral,
-  +     });
+  +    // release collateral to sender
+  +    resp.add_message(BankMsg::Send {
+  +        to_address: state.owner,
+  +        amount: state.collateral,
+  +    });
   +
-  +     // ...
+  +    // ...
   +
-  +     resp.add_attribute("action", "execute");
-  +     Ok(resp)
-  + }
+  +    resp.add_attribute("action", "execute");
+  +    Ok(resp)
+  +}
   //diff-add-end
   ```
 
@@ -1492,22 +1492,22 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
     ```rust
     //diff-del-start
-    - pub struct State {
-    -     pub owner: CanonicalAddr,
-    - }
+    -pub struct State {
+    -    pub owner: CanonicalAddr,
+    -}
     -   
-    - let state = State {
-    -     owner: deps.api.canonical_address(&info.sender /* of type HumanAddr */)?,
-    - };
+    -let state = State {
+    -    owner: deps.api.canonical_address(&info.sender /* of type HumanAddr */)?,
+    -};
     //diff-del-end
     //diff-add-start
-    + pub struct State {
-    +     pub owner: Addr,
-    + }
+    +pub struct State {
+    +    pub owner: Addr,
+    +}
     +
-    + let state = State {
-    +     owner: info.sender.clone() /* of type Addr */,
-    + };
+    +let state = State {
+    +    owner: info.sender.clone() /* of type Addr */,
+    +};
     //diff-add-end
     ```
 
@@ -1515,36 +1515,36 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
     ```rust
     //diff-del-start
-    - pub struct State {
-    -     pub verifier: CanonicalAddr,
-    -     pub beneficiary: CanonicalAddr,
-    -     pub funder: CanonicalAddr,
-    - }
-    - 
-    - deps.storage.set(
-    -     CONFIG_KEY,
-    -     &to_vec(&State {
-    -         verifier: deps.api.canonical_address(&msg.verifier /* of type HumanAddr */)?,
-    -         beneficiary: deps.api.canonical_address(&msg.beneficiary /* of type HumanAddr */)?,
-    -         funder: deps.api.canonical_address(&info.sender /* of type HumanAddr */)?,
-    -     })?,
-    - );
+    -pub struct State {
+    -    pub verifier: CanonicalAddr,
+    -    pub beneficiary: CanonicalAddr,
+    -    pub funder: CanonicalAddr,
+    -}
+    -
+    -deps.storage.set(
+    -    CONFIG_KEY,
+    -    &to_vec(&State {
+    -        verifier: deps.api.canonical_address(&msg.verifier /* of type HumanAddr */)?,
+    -        beneficiary: deps.api.canonical_address(&msg.beneficiary /* of type HumanAddr */)?,
+    -        funder: deps.api.canonical_address(&info.sender /* of type HumanAddr */)?,
+    -    })?,
+    -);
     //diff-del-end
     //diff-add-start
-    + pub struct State {
-    +     pub verifier: Addr,
-    +     pub beneficiary: Addr,
-    +     pub funder: Addr,
-    + }
-    +  
-    + deps.storage.set(
-    +     CONFIG_KEY,
-    +    &to_vec(&State {
-    +         verifier: deps.api.addr_validate(&msg.verifier /* of type String */)?,
-    +         beneficiary: deps.api.addr_validate(&msg.beneficiary /* of type String */)?,
-    +         funder: info.sender /* of type Addr */,
-    +     })?,
-    + );
+    +pub struct State {
+    +    pub verifier: Addr,
+    +    pub beneficiary: Addr,
+    +    pub funder: Addr,
+    +}
+    + 
+    +deps.storage.set(
+    +    CONFIG_KEY,
+    +   &to_vec(&State {
+    +        verifier: deps.api.addr_validate(&msg.verifier /* of type String */)?,
+    +        beneficiary: deps.api.addr_validate(&msg.beneficiary /* of type String */)?,
+    +        funder: info.sender /* of type Addr */,
+    +    })?,
+    +);
     //diff-add-end
     ```
 
@@ -1577,12 +1577,14 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.12 -> 0.13
 
-- The minimum Rust supported version for 0.13 is 1.47.0. Verify your Rust
-  version is >= 1.47.0 with: `rustc --version`
+- The minimum Rust supported version for 0.13 is 1.47.0. Verify your Rust version is >= 1.47.0 with:
+  ```shell
+  $ rustc --version
+  ```
 
 - Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.13.0"
   cosmwasm-storage = "0.13.0"
@@ -1596,9 +1598,9 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.11 -> 0.12
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.12.0"
   cosmwasm-storage = "0.12.0"
@@ -1610,31 +1612,31 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   # ...
   ```
 
-- In your contract's `.cargo/config` remove `--features backtraces`, which is
-  now available in Rust nightly only:
+- In your contract's `.cargo/config` remove `--features backtraces`, which is now available in Rust nightly only:
 
   ```rust
-  @@ -1,6 +1,6 @@
    [alias]
    wasm = "build --release --target wasm32-unknown-unknown"
    wasm-debug = "build --target wasm32-unknown-unknown"
+  //diff-del
   -unit-test = "test --lib --features backtraces"
+  //diff-add
   +unit-test = "test --lib"
    integration-test = "test --test integration"
    schema = "run --example schema"
   ```
 
-  In order to use backtraces for debugging, run
-  `RUST_BACKTRACE=1 cargo +nightly unit-test --features backtraces`.
+  In order to use backtraces for debugging, run:
+  ```shell
+  RUST_BACKTRACE=1 cargo +nightly unit-test --features backtraces`
+  ```
 
-- Rename the type `Extern` to `Deps`, and radically simplify the
-  `init`/`handle`/`migrate`/`query` entrypoints. Rather than
-  `&mut Extern<S, A, Q>`, use `DepsMut`. And instead of `&Extern<S, A, Q>`, use
-  `Deps`. If you ever pass e.g. `foo<A: Api>(api: A)` around, you must now use
-  dynamic trait pointers: `foo(api: &dyn Api)`. Here is the quick search-replace
-  guide on how to fix `contract.rs`:
+- Rename the type `Extern` to `Deps`, and radically simplify the `init`/`handle`/`migrate`/`query` entrypoints.
+  Rather than `&mut Extern<S, A, Q>`, use `DepsMut`. And instead of `&Extern<S, A, Q>`, use `Deps`.
+  If you ever pass e.g. `foo<A: Api>(api: A)` around, you must now use dynamic trait pointers: `foo(api: &dyn Api)`.
+  Here is the quick search-replace guide on how to fix `contract.rs`:
 
-  _In production (non-test) code:_
+  **_In production (non-test) code:_**
 
   - `<S: Storage, A: Api, Q: Querier>` => ``
   - `&mut Extern<S, A, Q>` => `DepsMut`
@@ -1645,14 +1647,14 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   On the top, remove `use cosmwasm_std::{Api, Extern, Querier, Storage}`. Add
   `use cosmwasm_std::{Deps, DepsMut}`.
 
-  _In test code only:_
+  **_In test code only:_**
 
   - `&mut deps,` => `deps.as_mut(),`
   - `&deps,` => `deps.as_ref(),`
 
   You may have to add `use cosmwasm_std::{Storage}` if the compiler complains about the trait
 
-  _If you use cosmwasm-storage, in `state.rs`:_
+  **_If you use cosmwasm-storage, in `state.rs`:_**
 
   - `<S: Storage>` => ``
   - `<S: ReadonlyStorage>` => ``
@@ -1660,8 +1662,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   - `&mut S` => `&mut dyn Storage`
   - `&S` => `&dyn Storage`
 
-- If you have any references to `ReadonlyStorage` left after the above, please
-  replace them with `Storage`
+- If you have any references to `ReadonlyStorage` left after the above, please replace them with `Storage`.
 
 ## 0.10 -> 0.11
 
