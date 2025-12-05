@@ -745,7 +745,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.16 -> 1.0.0-beta
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```toml
   [dependencies]
@@ -859,7 +859,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.15 -> 0.16
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```toml
   [dependencies]
@@ -1104,7 +1104,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.14 -> 0.15
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```toml
   [dependencies]
@@ -1280,7 +1280,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   rustc --version
   ```
 
-- Update CosmWasm and `schemars` dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] and `schemars` dependencies in Cargo.toml (skip the ones you don't use):
 
   ```toml
   [dependencies]
@@ -1582,7 +1582,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   $ rustc --version
   ```
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```toml
   [dependencies]
@@ -1666,7 +1666,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.10 -> 0.11
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```
   [dependencies]
@@ -1931,7 +1931,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 ## 0.9 -> 0.10
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```
   [dependencies]
@@ -1981,7 +1981,7 @@ Contracts:
 
 ## 0.8 -> 0.9
 
-- Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
+- Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
   ```
   [dependencies]
