@@ -458,7 +458,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 
 - Update `cosmwasm-*` dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "1.5.0"
   cosmwasm-storage = "1.5.0"
@@ -474,7 +474,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 
 - Update `cosmwasm-*` dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "1.4.0"
   cosmwasm-storage = "1.4.0"
@@ -486,22 +486,23 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   # ...
   ```
 
-- If you want to use a feature that is only available on CosmWasm 1.4+ chains,
-  use this feature:
+- If you want to use a feature that is only available on CosmWasm 1.4+ chains, use this feature:
 
   ```rust
+  //diff-del
   -cosmwasm-std = { version = "1.4.0", features = ["stargate"] }
+  //diff-add
   +cosmwasm-std = { version = "1.4.0", features = ["stargate", "cosmwasm_1_4"] }
   ```
 
-  Please note that `cosmwasm_1_2` implies `cosmwasm_1_1`, and `cosmwasm_1_3`
-  implies `cosmwasm_1_2`, and so on, so there is no need to set multiple.
+  Please note that `cosmwasm_1_2` implies `cosmwasm_1_1`, and `cosmwasm_1_3` implies `cosmwasm_1_2`,
+  and so on, so there is no need to set multiple.
 
 ## 1.2.x -> 1.3.0
 
 - Update `cosmwasm-*` dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "1.3.0"
   cosmwasm-storage = "1.3.0"
@@ -513,11 +514,12 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   # ...
   ```
 
-- If you want to use a feature that is only available on CosmWasm 1.3+ chains,
-  use this feature:
+- If you want to use a feature that is only available on CosmWasm 1.3+ chains, use this feature:
 
   ```rust
+  //diff-del
   -cosmwasm-std = { version = "1.3.0", features = ["stargate"] }
+  //diff-add
   +cosmwasm-std = { version = "1.3.0", features = ["stargate", "cosmwasm_1_3"] }
   ```
 
@@ -528,7 +530,7 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
 
 - Update `cosmwasm-*` dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "1.2.0"
   cosmwasm-storage = "1.2.0"
@@ -540,28 +542,28 @@ Note that you can also view the [complete CHANGELOG] to understand the differenc
   # ...
   ```
 
-- If you want to use a feature that is only available on CosmWasm 1.2+ chains,
-  use this feature:
+- If you want to use a feature that is only available on CosmWasm 1.2+ chains, use this feature:
 
   ```rust
+  //diff-del
   -cosmwasm-std = { version = "1.1.0", features = ["stargate"] }
+  //diff-add
   +cosmwasm-std = { version = "1.1.0", features = ["stargate", "cosmwasm_1_2"] }
   ```
 
-  Please note that `cosmwasm_1_2` implies `cosmwasm_1_1`, so there is no need to
-  set both.
+  Please note that `cosmwasm_1_2` implies `cosmwasm_1_1`, so there is no need to set both.
 
-- If you use mixed type multiplication between `Uint{64,128,256}` and
-  `Decimal{,256}`, check out
-  `mul_floor`/`checked_mul_floor`/`mul_ceil`/`checked_mul_ceil`. Mixed type
-  arithmetic [will be removed](https://github.com/CosmWasm/cosmwasm/issues/1485)
-  at some point.
+- If you use mixed type multiplication between `Uint{64,128,256}` and `Decimal{,256}`,
+  check out `mul_floor`/`checked_mul_floor`/`mul_ceil`/`checked_mul_ceil`. Mixed type
+  arithmetic [will be removed](https://github.com/CosmWasm/cosmwasm/issues/1485) at some point.
 
   ```rust
   let a = Uint128::new(123);
   let b = Decimal::percent(150)
 
+  //diff-del
   -let c = a * b;
+  //diff-add
   +let c = a.mul_floor(b);
   ```
 
