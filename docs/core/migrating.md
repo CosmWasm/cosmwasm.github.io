@@ -2176,7 +2176,7 @@ $ cargo clippy
 ```
 
 [complete CHANGELOG]: https://github.com/CosmWasm/cosmwasm/blob/main/CHANGELOG.md
-[CosmWasm]: https://github.com/CosmWasm.
+[CosmWasm]: https://github.com/CosmWasm
 [builder-style setters]: https://github.com/CosmWasm/cosmwasm/blob/402e3281ff5bc1cd7b4b3e36c2bb9914f07eaaf6/packages/std/src/results/response.rs#L103-L167
 [msgmigratecontract]: https://github.com/CosmWasm/wasmd/blob/v0.15.0/x/wasm/internal/types/tx.proto#L86-L96
 [distribution docs]: https://docs.cosmos.network/main/build/modules/distribution
