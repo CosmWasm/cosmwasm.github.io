@@ -5,10 +5,11 @@ sidebar_position: 9
 
 # Migrating contracts
 
-This guide explains what is needed to upgrade contracts when migrating over major releases of `cosmwasm`.
-Note that you can also view the [complete CHANGELOG] to understand the differences.
+This chapter explains what is needed to upgrade smart contracts when migrating over major releases of [CosmWasm].
 
-[complete CHANGELOG]: https://github.com/CosmWasm/cosmwasm/blob/main/CHANGELOG.md
+:::tip
+You can also view the **[complete CHANGELOG]** to understand the differences.
+:::
 
 ## 2.x.y -> 3.0.x
 
@@ -2153,3 +2154,6 @@ After many changes, remember to let the linters do their jobs:
 $ cargo fmt
 $ cargo clippy
 ```
+
+[complete CHANGELOG]: https://github.com/CosmWasm/cosmwasm/blob/main/CHANGELOG.md
+[CosmWasm]: https://github.com/CosmWasm.
