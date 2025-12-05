@@ -1668,7 +1668,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 - Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.11.0"
   cosmwasm-storage = "0.11.0"
@@ -1680,14 +1680,11 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   # ...
   ```
 
-- Contracts now support any custom error type `E: ToString + From<StdError>`.
-  Previously this has been `StdError`, which you can still use. However, you can
-  now create a much more structured error experience for your unit tests that
-  handles exactly the error cases of your contract. In order to get a convenient
-  implementation for `ToString` and `From<StdError>`, we use the crate
-  [thiserror](https://crates.io/crates/thiserror), which needs to be added to
-  the contracts dependencies in `Cargo.toml`. To create the custom error, create
-  an error module `src/errors.rs` as follows:
+- Contracts now support any custom error type `E: ToString + From<StdError>`. Previously this has been `StdError`,
+  which you can still use. However, you can now create a much more structured error experience for your unit tests
+  that handles exactly the error cases of your contract. In order to get a convenient implementation for `ToString`
+  and `From<StdError>`, we use the crate [thiserror], which needs to be added to the contracts dependencies
+  in `Cargo.toml`. To create the custom error, create an error module `src/errors.rs` as follows:
 
   ```rust
   use cosmwasm_std::{CanonicalAddr, StdError};
@@ -1711,24 +1708,20 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   }
   ```
 
-  Then add `mod errors;` to `src/lib.rs` and `use crate::errors::MyCustomError;`
-  to `src/contract.rs`. Now adapt the return types as follows:
+  Then add `mod errors;` to `src/lib.rs` and `use crate::errors::MyCustomError;` to `src/contract.rs`.
+  Now adapt the return types as follows:
 
   - `fn init`: `Result<InitResponse, MyCustomError>`,
   - `fn migrate` (if you have it): `Result<MigrateResponse, MyCustomError>`,
   - `fn handle`: `Result<HandleResponse, MyCustomError>`,
   - `fn query`: `Result<Binary, MyCustomError>`.
 
-  If one of your functions does not use the custom error, you can continue to
-  use `StdError` as before. I.e. you can have `handle` returning
-  `Result<HandleResponse, MyCustomError>` and `query` returning
-  `StdResult<Binary>`.
+  If one of your functions does not use the custom error, you can continue to use `StdError` as before.
+  For example, you can have `handle` returning `Result<HandleResponse, MyCustomError>` and `query` returning `StdResult<Binary>`.
 
-  You can have a top-level `init`/`migrate`/`handle`/`query` that returns a
-  custom error but some of its implementations only return errors from the
-  standard library (`StdResult<HandleResponse>` aka.
-  `Result<HandleResponse, StdError>`). Then use `Ok(std_result?)` to convert
-  between the result types. E.g.
+  You can have a top-level `init`/`migrate`/`handle`/`query` that returns a custom error but some of its implementations
+  only return errors from the standard library (`StdResult<HandleResponse>` aka. `Result<HandleResponse, StdError>`).
+  Then use `Ok(std_result?)` to convert between the result types, e.g.:
 
   ```rust
   pub fn handle<S: Storage, A: Api, Q: Querier>(
@@ -1761,95 +1754,96 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   }
   ```
 
-  Once you get familiar with the concept, you can create different error types
-  for each of the contract's functions.
+  Once you get familiar with the concept, you can create different error types for each of the contract's functions.
 
-  You can also try a different error library than
-  [thiserror](https://crates.io/crates/thiserror). The
-  [staking development contract](https://github.com/CosmWasm/cosmwasm/tree/main/contracts/staking)
-  shows how this would look like using [snafu](https://crates.io/crates/snafu).
+  You can also try a different error library than [thiserror]. The [staking development contract]
+  shows how this would look like using [snafu].
 
-- Change order of arguments such that `storage` is always first followed by
-  namespace in `Bucket::new`, `Bucket::multilevel`, `ReadonlyBucket::new`,
-  `ReadonlyBucket::multilevel`, `PrefixedStorage::new`,
-  `PrefixedStorage::multilevel`, `ReadonlyPrefixedStorage::new`,
-  `ReadonlyPrefixedStorage::multilevel`, `bucket`, `bucket_read`, `prefixed` and
-  `prefixed_read`.
+- Change order of arguments such that `storage` is always first followed by namespace in `Bucket::new`,
+  `Bucket::multilevel`, `ReadonlyBucket::new`, `ReadonlyBucket::multilevel`, `PrefixedStorage::new`,
+  `PrefixedStorage::multilevel`, `ReadonlyPrefixedStorage::new`, `ReadonlyPrefixedStorage::multilevel`,
+  `bucket`, `bucket_read`, `prefixed` and `prefixed_read`.
 
   ```rust
-  // before
-  let mut bucket = bucket::<_, Data>(b"data", &mut store);
-
-  // after
-  let mut bucket = bucket::<_, Data>(&mut store, b"data");
+  //diff-del
+  -let mut bucket = bucket::<_, Data>(b"data", &mut store);
+  //diff-add
+  +let mut bucket = bucket::<_, Data>(&mut store, b"data");
   ```
 
-- Rename `InitResponse::log`, `MigrateResponse::log` and `HandleResponse::log`
-  to `InitResponse::attributes`, `MigrateResponse::attributes` and
-  `HandleResponse::attributes`. Replace calls to `log` with `attr`:
+- Rename `InitResponse::log`, `MigrateResponse::log` and `HandleResponse::log` to `InitResponse::attributes`,
+  `MigrateResponse::attributes` and `HandleResponse::attributes`. Replace calls to `log` with `attr`:
 
   ```rust
-  // before
-  Ok(HandleResponse {
-    log: vec![log("action", "change_owner"), log("owner", owner)],
-    ..HandleResponse::default()
-  })
-
-  // after
-  Ok(HandleResponse {
-    attributes: vec![attr("action", "change_owner"), attr("owner", owner)],
-    ..HandleResponse::default()
-  })
+  //diff-del-start
+  -Ok(HandleResponse {
+  -  log: vec![log("action", "change_owner"), log("owner", owner)],
+  -  ..HandleResponse::default()
+  -})
+  //diff-del-end
+  
+  //diff-add-start
+  +Ok(HandleResponse {
+  +  attributes: vec![attr("action", "change_owner"), attr("owner", owner)],
+  +  ..HandleResponse::default()
+  +})
+  //diff-add-end
   ```
 
 - Rename `Context::add_log` to `Context::add_attribute`:
 
   ```rust
-  // before
-  let mut ctx = Context::new();
-  ctx.add_log("action", "release");
-  ctx.add_log("destination", &to_addr);
+  //diff-del-start
+  -let mut ctx = Context::new();
+  -ctx.add_log("action", "release");
+  -ctx.add_log("destination", &to_addr);
+  //diff-del-end
 
-  // after
-  let mut ctx = Context::new();
-  ctx.add_attribute("action", "release");
-  ctx.add_attribute("destination", &to_addr);
+  //diff-add-start
+  +let mut ctx = Context::new();
+  +ctx.add_attribute("action", "release");
+  +ctx.add_attribute("destination", &to_addr);
+  //diff-add-end
   ```
 
 - Add result type to `Bucket::update` and `Singleton::update`:
 
   ```rust
-  // before
-  bucket.update(b"maria", |mayd: Option<Data>| {
-    let mut d = mayd.ok_or(StdError::not_found("Data"))?;
-    old_age = d.age;
-    d.age += 1;
-    Ok(d)
-  })
+  //diff-del-start
+  -bucket.update(b"maria", |mayd: Option<Data>| {
+  -  let mut d = mayd.ok_or(StdError::not_found("Data"))?;
+  -  old_age = d.age;
+  -  d.age += 1;
+  -  Ok(d)
+  -})
+  //diff-del-end
 
-  // after
-  bucket.update(b"maria", |mayd: Option<Data>| -> StdResult<_> {
-    let mut d = mayd.ok_or(StdError::not_found("Data"))?;
-    old_age = d.age;
-    d.age += 1;
-    Ok(d)
-  })
+  //diff-add-start
+  +bucket.update(b"maria", |mayd: Option<Data>| -> StdResult<_> {
+  +  let mut d = mayd.ok_or(StdError::not_found("Data"))?;
+  +  old_age = d.age;
+  +  d.age += 1;
+  +  Ok(d)
+  +})
+  //diff-add-end
   ```
 
 - Remove all `canonical_length` arguments from mock APIs in tests:
 
   ```rust
-  // before
-  let mut deps = mock_dependencies(20, &[]);
-  let mut deps = mock_dependencies(20, &coins(123456, "gold"));
-  let deps = mock_dependencies_with_balances(20, &[(&rich_addr, &rich_balance)]);
-  let api = MockApi::new(20);
+  //diff-del-start
+  -let mut deps = mock_dependencies(20, &[]);
+  -let mut deps = mock_dependencies(20, &coins(123456, "gold"));
+  -let deps = mock_dependencies_with_balances(20, &[(&rich_addr, &rich_balance)]);
+  -let api = MockApi::new(20);
+  //diff-del-end
 
-  // after
-  let mut deps = mock_dependencies(&[]);
-  let mut deps = mock_dependencies(&coins(123456, "gold"));
-  let deps = mock_dependencies_with_balances(&[(&rich_addr, &rich_balance)]);
-  let api = MockApi::default();
+  //diff-add-start
+  +let mut deps = mock_dependencies(&[]);
+  +let mut deps = mock_dependencies(&coins(123456, "gold"));
+  +let deps = mock_dependencies_with_balances(&[(&rich_addr, &rich_balance)]);
+  +let api = MockApi::default();
+  //diff-add-end
   ```
 
 - Add `MessageInfo` as separate arg after `Env` for `init`, `handle`, `migrate`.
@@ -1859,38 +1853,40 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   compiler will warn you anywhere you use `env.message`
 
   ```rust
-  // before
-  pub fn init<S: Storage, A: Api, Q: Querier>(
-      deps: &mut Extern<S, A, Q>,
-      env: Env,
-      msg: InitMsg,
-  ) {
-      deps.storage.set(
-          CONFIG_KEY,
-          &to_vec(&State {
-              verifier: deps.api.canonical_address(&msg.verifier)?,
-              beneficiary: deps.api.canonical_address(&msg.beneficiary)?,
-              funder: deps.api.canonical_address(&env.message.sender)?,
-          })?,
-      );
-  }
+  //diff-del-start
+  -pub fn init<S: Storage, A: Api, Q: Querier>(
+  -    deps: &mut Extern<S, A, Q>,
+  -    env: Env,
+  -    msg: InitMsg,
+  -) {
+  -    deps.storage.set(
+  -        CONFIG_KEY,
+  -        &to_vec(&State {
+  -            verifier: deps.api.canonical_address(&msg.verifier)?,
+  -            beneficiary: deps.api.canonical_address(&msg.beneficiary)?,
+  -            funder: deps.api.canonical_address(&env.message.sender)?,
+  -        })?,
+  -    );
+  -}
+  //diff-del-end
 
-  // after
+  //diff-add-start
   pub fn init<S: Storage, A: Api, Q: Querier>(
-      deps: &mut Extern<S, A, Q>,
-      _env: Env,
-      info: MessageInfo,
-      msg: InitMsg,
-  ) {
-      deps.storage.set(
-          CONFIG_KEY,
-          &to_vec(&State {
-              verifier: deps.api.canonical_address(&msg.verifier)?,
-              beneficiary: deps.api.canonical_address(&msg.beneficiary)?,
-              funder: deps.api.canonical_address(&info.sender)?,
-          })?,
-      );
-  }
+  +    deps: &mut Extern<S, A, Q>,
+  +    _env: Env,
+  +    info: MessageInfo,
+  +    msg: InitMsg,
+  +) {
+  +    deps.storage.set(
+  +        CONFIG_KEY,
+  +        &to_vec(&State {
+  +            verifier: deps.api.canonical_address(&msg.verifier)?,
+  +            beneficiary: deps.api.canonical_address(&msg.beneficiary)?,
+  +            funder: deps.api.canonical_address(&info.sender)?,
+  +        })?,
+  +    );
+  +}
+  //diff-add-end
   ```
 
 - Test code now has `mock_info` which takes the same args `mock_env` used to.
@@ -2197,3 +2193,6 @@ $ cargo clippy
 [builder-style setters]: https://github.com/CosmWasm/cosmwasm/blob/402e3281ff5bc1cd7b4b3e36c2bb9914f07eaaf6/packages/std/src/results/response.rs#L103-L167
 [msgmigratecontract]: https://github.com/CosmWasm/wasmd/blob/v0.15.0/x/wasm/internal/types/tx.proto#L86-L96
 [distribution docs]: https://docs.cosmos.network/main/build/modules/distribution
+[thiserror]: https://crates.io/crates/thiserror
+[staking development contract]: https://github.com/CosmWasm/cosmwasm/tree/main/contracts/staking
+[snafu]: https://crates.io/crates/snafu
