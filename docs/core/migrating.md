@@ -1106,7 +1106,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 - Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.15.0"
   cosmwasm-storage = "0.15.0"
@@ -1118,9 +1118,8 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   # ...
   ```
 
-- Combine `messages` and `submessages` on the `Response` object. The new format
-  uses `messages: Vec<SubMsg<T>>`, so copy `submessages` content, and wrap old
-  messages using `SubMsg::new`. Here is how to change messages:
+- Combine `messages` and `submessages` on the `Response` object. The new format uses `messages: Vec<SubMsg<T>>`,
+  so copy `submessages` content, and wrap old messages using `SubMsg::new`. Here is how to change messages:
 
   ```rust
   let send = BankMsg::Send { to_address, amount };
@@ -1170,50 +1169,56 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   res.add_submessage(msg);
   ```
 
-  Note that this means you can mix "messages" and "submessages" in any execution
-  order. You are no more restricted to doing "submessages" first.
+  Note that this means you can mix "messages" and "submessages" in any execution order.
+  You are no more restricted to doing "submessages" first.
 
-- Rename the `send` field to `funds` whenever constructing a `WasmMsg::Execute`
-  or `WasmMsg::Instantiate` value.
+- Rename the `send` field to `funds` whenever constructing a `WasmMsg::Execute` or `WasmMsg::Instantiate` value.
 
   ```rust
     let exec = WasmMsg::Execute {
         contract_addr: coin.address.into(),
         msg: to_binary(&msg)?,
+  //diff-del
   -     send: vec![],
+  //diff-add
   +     funds: vec![],
     };
   ```
 
-- `Uint128` field can no longer be constructed using a struct literal. Call
-  `Uint128::new` (or `Uint128::zero`) instead.
+- `Uint128` field can no longer be constructed using a struct literal. Call `Uint128::new` (or `Uint128::zero`) instead.
 
   ```rust
+  //diff-del-start
   - const TOKENS_PER_WEIGHT: Uint128 = Uint128(1_000);
   - const MIN_BOND: Uint128 = Uint128(5_000);
+  //diff-del-end
+  //diff-add-start
   + const TOKENS_PER_WEIGHT: Uint128 = Uint128::new(1_000);
   + const MIN_BOND: Uint128 = Uint128::new(5_000);
+  //diff-add-end
   ```
 
   ```rust
+  //diff-del
   - assert_eq!(escrow_balance, Uint128(0));
+  //diff-add
   + assert_eq!(escrow_balance, Uint128::zero());
   ```
 
-- If constructing a `Response` using struct literal syntax, add the `events`
-  field.
+- If constructing a `Response` using struct literal syntax, add the `events` field.
 
   ```rust
     Ok(Response {
         messages: vec![],
         attributes,
+  //diff-add
   +     events: vec![],
         data: None,
     })
   ```
 
-- For IBC-enabled contracts only: You need to adapt to the new
-  `IbcAcknowledgementWithPacket` structure and use the embedded `data` field:
+- For IBC-enabled contracts only: You need to adapt to the new `IbcAcknowledgementWithPacket` structure
+  and use the embedded `data` field:
 
   ```rust
   // before
