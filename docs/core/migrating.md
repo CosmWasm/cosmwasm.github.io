@@ -1974,7 +1974,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 - Update [CosmWasm] dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.9.0"
   cosmwasm-storage = "0.9.0"
@@ -2001,28 +2001,20 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 Contract code and uni tests:
 
-- `cosmwasm_storage::get_with_prefix`, `cosmwasm_storage::set_with_prefix`,
-  `cosmwasm_storage::RepLog::commit`, `cosmwasm_std::ReadonlyStorage::get`,
-  `cosmwasm_std::ReadonlyStorage::range`, `cosmwasm_std::Storage::set` and
-  `cosmwasm_std::Storage::remove` now returns the value directly that was
-  wrapped in a result before.
-- Error creator functions are now in type itself, e.g.
-  `StdError::invalid_base64` instead of `invalid_base64`. The free functions are
-  deprecated and will be removed before 1.0.
-- Remove `InitResponse.data` in `init`. Before 0.9 this was not stored to chain
-  but ignored.
-- Use `cosmwasm_storage::transactional` instead of the removed
-  `cosmwasm_storage::transactional_deps`.
+- `cosmwasm_storage::get_with_prefix`, `cosmwasm_storage::set_with_prefix`, `cosmwasm_storage::RepLog::commit`,
+  `cosmwasm_std::ReadonlyStorage::get`, `cosmwasm_std::ReadonlyStorage::range`, `cosmwasm_std::Storage::set` and
+  `cosmwasm_std::Storage::remove` now returns the value directly that was wrapped in a result before.
+- Error creator functions are now in type itself, e.g. `StdError::invalid_base64` instead of `invalid_base64`.
+  The free functions are deprecated and will be removed before 1.0.
+- Remove `InitResponse.data` in `init`. Before 0.9 this was not stored to chain but ignored.
+- Use `cosmwasm_storage::transactional` instead of the removed `cosmwasm_storage::transactional_deps`.
 - Replace `cosmwasm_std::Never` with `cosmwasm_std::Empty`.
 
 Integration tests:
 
-- Replace `cosmwasm_vm::ReadonlyStorage` with `cosmwasm_vm::Storage`, which now
-  contains all backend storage methods.
-- Storage getters (and iterators) now return a result of
-  `(Option<Vec<u8>>, u64)`, where the first component is the element and the
-  second one is the gas cost. Thus, in a few places `.0` must be added to access
-  the element.
+- Replace `cosmwasm_vm::ReadonlyStorage` with `cosmwasm_vm::Storage`, which now contains all backend storage methods.
+- Storage getters (and iterators) now return a result of `(Option<Vec<u8>>, u64)`, where the first component
+  is the element and the second one is the gas cost. Thus, in a few places `.0` must be added to access the element.
 
 ## 0.7.2 -> 0.8
 
