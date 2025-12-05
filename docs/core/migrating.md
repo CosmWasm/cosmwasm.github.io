@@ -861,7 +861,7 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
 
 - Update CosmWasm dependencies in Cargo.toml (skip the ones you don't use):
 
-  ```
+  ```toml
   [dependencies]
   cosmwasm-std = "0.16.0"
   cosmwasm-storage = "0.16.0"
@@ -873,44 +873,46 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   # ...
   ```
 
-- The `attr` function now accepts arguments that implement `Into<String>` rather
-  than `ToString`. This means that "string" types like `&str` are still
-  accepted, but others (like numbers or booleans) have to be explicitly
-  converted to strings; you can use the `to_string` method (from the
-  `std::string::ToString` trait) for that.
+- The `attr` function now accepts arguments that implement `Into<String>` rather than `ToString`.
+  This means that "string" types like `&str` are still accepted, but others (like numbers or booleans)
+  have to be explicitly converted to strings; you can use the `to_string` method
+  (from the `std::string::ToString` trait) for that.
 
   ```rust
     let steal_funds = true;
+  //diff-del
   - attr("steal_funds", steal_funds),
+  //diff-add
   + attr("steal_funds", steal_funds.to_string()),
   ```
 
   It also means that `&&str` is no longer accepted.
 
-- The `iterator` feature in `cosmwasm-std`, `cosmwasm-vm` and `cosmwasm-storage`
-  is now enabled by default. If you want to use it, you don't have to explicitly
-  enable it anymore.
+- The `iterator` feature in `cosmwasm-std`, `cosmwasm-vm` and `cosmwasm-storage` is now enabled by default.
+  If you want to use it, you don't have to explicitly enable it anymore.
 
-  If you don't want to use it, you **have to** disable default features when
-  depending on `cosmwasm-std`. Example:
+  If you don't want to use it, you **have to** disable default features when depending on `cosmwasm-std`,
+  for example:
 
   ```rust
+  //diff-del
   - cosmwasm-std = { version = "0.15.0" }
+  //diff-add
   + cosmwasm-std = { version = "0.16.0", default-features = false }
   ```
 
-- The `Event::attr` setter has been renamed to `Event::add_attribute` - this is
-  for consistency with other types, like `Response`.
+- The `Event::attr` setter has been renamed to `Event::add_attribute` - this is for consistency with other types,
+  like `Response`.
 
   ```rust
+  //diff-del
   - let event = Event::new("ibc").attr("channel", "connect");
+  //diff-add
   + let event = Event::new("ibc").add_attribute("channel", "connect");
   ```
 
-- `Response` can no longer be built using a struct literal. Please use
-  `Response::new` as well as relevant
-  [builder-style setters](https://github.com/CosmWasm/cosmwasm/blob/402e3281ff5bc1cd7b4b3e36c2bb9914f07eaaf6/packages/std/src/results/response.rs#L103-L167)
-  to set the data.
+- `Response` can no longer be built using a struct literal. Please use `Response::new` as well as relevant
+  [builder-style setters] to set the data.
 
   This is a step toward better API stability.
 
@@ -925,29 +927,37 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
         };
         let data_msg = format!("burnt {} keys", count).into_bytes();
 
+  //diff-del-start
   -     Ok(Response {
   -         messages: vec![SubMsg::new(send)],
   -         attributes: vec![attr("action", "burn"), attr("payout", msg.payout)],
   -         events: vec![],
   -         data: Some(data_msg.into()),
   -     })
+  //diff-del-end
+  //diff-add-start
   +     Ok(Response::new()
   +         .add_message(send)
   +         .add_attribute("action", "burn")
   +         .add_attribute("payout", msg.payout)
   +         .set_data(data_msg))
+  //diff-add-end
     }
   ```
 
   ```rust
+  //diff-del-start
   - Ok(Response {
   -     data: Some((old_size as u32).to_be_bytes().into()),
   -     ..Response::default()
   - })
+  //diff-del-end
+  //diff-add
   + Ok(Response::new().set_data((old_size as u32).to_be_bytes()))
   ```
 
   ```rust
+  //diff-del-start
   - let res = Response {
   -     messages: msgs,
   -     attributes: vec![attr("action", "reflect_subcall")],
@@ -955,13 +965,16 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
   -     data: None,
   - };
   - Ok(res)
+  //diff-del-end
+  //diff-add-start
   + Ok(Response::new()
   +     .add_attribute("action", "reflect_subcall")
   +     .add_submessages(msgs))
+  //diff-add-end
   ```
 
-- For IBC-enabled contracts only: constructing `IbcReceiveResponse` and
-  `IbcBasicResponse` follows the same principles now as `Response` above.
+- For IBC-enabled contracts only: constructing `IbcReceiveResponse` and `IbcBasicResponse` follows the same principles
+  now as `Response` above.
 
   ```rust
     pub fn ibc_packet_receive(
@@ -971,28 +984,34 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
     ) -> StdResult<IbcReceiveResponse> {
         // ...
 
+  //diff-del-start
   -     Ok(IbcReceiveResponse {
   -         acknowledgement,
   -         messages: vec![],
   -         attributes: vec![],
   -         events: vec![Event::new("ibc").attr("packet", "receive")],
   -     })
+  //diff-del-end
+  //diff-add-start
   +     Ok(IbcReceiveResponse::new()
   +         .set_ack(acknowledgement)
   +         .add_event(Event::new("ibc").add_attribute("packet", "receive")))
+  //diff-add-end
     }
   ```
 
-- For IBC-enabled contracts only: IBC entry points have different signatures.
-  Instead of accepting bare packets, channels and acknowledgements, all of those
-  are wrapped in a `Msg` type specific to the given entry point. Channels,
-  packets and acknowledgements have to be unpacked from those.
+- For IBC-enabled contracts only: IBC entry points have different signatures. Instead of accepting bare packets,
+  channels and acknowledgements, all of those are wrapped in a `Msg` type specific to the given entry point.
+  Channels, packets and acknowledgements have to be unpacked from those.
 
   ```rust
     #[entry_point]
+  //diff-del
   - pub fn ibc_channel_open(_deps: DepsMut, _env: Env, channel: IbcChannel) -> StdResult<()> {
+  //diff-add-start
   + pub fn ibc_channel_open(_deps: DepsMut, _env: Env, msg: IbcChannelOpenMsg) -> StdResult<()> {
   +     let channel = msg.channel();
+  //diff-add-end
 
         // do things
     }
@@ -1003,9 +1022,12 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
     pub fn ibc_channel_connect(
         deps: DepsMut,
         env: Env,
+  //diff-del
   -     channel: IbcChannel,
+  //diff-add
   +     msg: IbcChannelConnectMsg,
     ) -> StdResult<IbcBasicResponse> {
+  //diff-add
   +     let channel = msg.channel();
 
         // do things
@@ -1017,9 +1039,12 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
     pub fn ibc_channel_close(
         deps: DepsMut,
         env: Env,
+  //diff-del
   -     channel: IbcChannel,
+  //diff-add
   +     msg: IbcChannelCloseMsg,
     ) -> StdResult<IbcBasicResponse> {
+  //diff-add
   +     let channel = msg.channel();
 
         // do things
@@ -1031,9 +1056,12 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
     pub fn ibc_packet_receive(
         deps: DepsMut,
         env: Env,
+  //diff-del
   -     packet: IbcPacket,
+  //diff-add
   +     msg: IbcPacketReceiveMsg,
     ) -> StdResult<IbcReceiveResponse> {
+  //diff-add
   +     let packet = msg.packet;
 
         // do things
@@ -1045,7 +1073,9 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
     pub fn ibc_packet_receive(
         deps: DepsMut,
         env: Env,
+  //diff-del
   -     ack: IbcAcknowledgementWithPacket,
+  //diff-add
   +     msg: IbcPacketReceiveMsg,
     ) -> StdResult<IbcBasicResponse> {
         // They are the same struct just a different name
@@ -1060,9 +1090,12 @@ unified file (parseable by machines) rather than a bunch of arbitrary ones.
     pub fn ibc_packet_timeout(
         deps: DepsMut,
         env: Env,
+  //diff-del
   -     packet: IbcPacket,
+  //diff-add
   +     msg: IbcPacketTimeoutMsg,
     ) -> StdResult<IbcBasicResponse> {
+  //diff-add
   +     let packet = msg.packet;
 
         // do things
@@ -2181,3 +2214,4 @@ $ cargo clippy
 
 [complete CHANGELOG]: https://github.com/CosmWasm/cosmwasm/blob/main/CHANGELOG.md
 [CosmWasm]: https://github.com/CosmWasm.
+[builder-style setters]: https://github.com/CosmWasm/cosmwasm/blob/402e3281ff5bc1cd7b4b3e36c2bb9914f07eaaf6/packages/std/src/results/response.rs#L103-L167
