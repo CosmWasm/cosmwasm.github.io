@@ -73,6 +73,7 @@ const config: Config = {
           label: 'GitHub',
           position: 'right',
         },
+        {to: 'blog', label: 'CosmWasm Blog', position: 'left'},
       ],
     },
     footer: {

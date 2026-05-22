@@ -49,7 +49,19 @@
   font-size: 1.5rem;
 }
 
+.navbar__item {
+  font-family: 'Iceland', sans-serif;
+  font-weight: normal;
+  font-size: 1.5rem;
+}
+
 .footer__title {
+  font-family: 'Iceland', sans-serif;
+  font-weight: normal;
+  font-size: 1.5em;
+}
+
+.footer__link-item {
   font-family: 'Iceland', sans-serif;
   font-weight: normal;
   font-size: 1.5em;
