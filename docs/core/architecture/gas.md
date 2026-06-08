@@ -29,16 +29,30 @@ For CosmWasm gas, the target gas consumption is **1 Teragas per second** (Tera =
 This idea is [inspired by NEAR]; see their excellent documentation for more details. Summarizing:
 
 $$
-1\ Teragas = (shortly)\ 1\ Tgas  = 10^{12}\ gas
+GasTargetPerSec = 1\ Teragas = (shortly)\ 1\ Tgas  = 10^{12}\ [{gas \over s}]
 $$
 
 In order to meet this target, we execute Argon2 in a test contract ([#1120]). This is a CPU and
 memory intense job that does not call out into the host. At a constant gas cost per operation of 1
-(before CosmWasm 1.0), this consumed **96837752** gas and took 15 ms on our CI system.
+(before CosmWasm 1.0), this consumed **96837752** gas and took **15 ms** on our CI system.
 The ideal cost per Wasm operation for this system is:
  
 $$
-{10^{12} :  {96837752 \over {15 \times 10^{-3}}}} = 154
+GasPerOperation = {GasTargetPerSec \times RuntimeInSeconds \over NumberOf Operations}
+$$
+
+in our case, having:
+
+$GasTargetPerSec = 10^{12}$
+
+$RuntimeInSeconds = 15 \times 10^{-3}$
+
+$NumberOfOperations = 96837752$
+
+we get:
+
+$$
+GasPerOperation = {{10^{12} \times (15 \times 10^{-3})} \over 96837752} \approx 154
 $$
  
 This is rounded to $\lfloor 154 \rfloor = \mathbf{150}$ for simplicity.
@@ -53,10 +67,10 @@ $$
 {5270718300 \over 150} = 35138122
 $$
  
-This took 6 ms on our benchmark server, so the new cost per operation is:
+This took **6 ms** on our benchmark server, so the new gas cost per operation is:
  
 $$
-{10^{12} : {35138122 \over {6 \times 10^{-3}}}} = 171
+GasPerOperation = {{10^{12} \times (6 \times 10^{-3})} \over 35138122} \approx 171
 $$
 
 This is rounded to $\lfloor 171 \rfloor = \mathbf{170}$ for simplicity.
