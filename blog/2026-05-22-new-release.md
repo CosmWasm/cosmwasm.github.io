@@ -2,7 +2,6 @@
 title: CosmWasm 3.0.7
 ---
 
-
 We’re excited to announce the release of **CosmWasm 3.0.7**.
 This minor patch release includes contributions from our community. 
 You can find the full list of changes in the
