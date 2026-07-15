@@ -141,3 +141,9 @@ Below is a breakdown of what this change entails:
 - Cost for accounting Wasm operators is 115×14 = **1610**.                                                        
 - Wasm accounting operators: Br, BrIf, BrOnCast, BrOnCastFail, BrOnNonNull, BrOnNull, BrTable, Call, CallIndirect,
   CallRef, Catch, Delegate, Else, End, If, Loop, Rethrow, Return, ReturnCall, ReturnCallIndirect, ReturnCallRef, Throw, ThrowRef
+
+[#1599]: https://github.com/CosmWasm/cosmwasm/pull/1599
+[JSON numbers]: https://www.json.org/
+[default-gas-multiplier]: https://github.com/CosmWasm/wasmd/blob/04cb6e5408cc54c27247b0b327dfa99769d5103c/x/wasm/types/gas_register.go#L34
+[inspired by NEAR]: https://docs.near.org/concepts/protocol/gas
+[#1120]: https://github.com/CosmWasm/cosmwasm/pull/1120
