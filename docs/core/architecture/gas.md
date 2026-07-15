@@ -124,14 +124,20 @@ overflow, the gas values were lowered in this issue [#1599].
 
 Below is a breakdown of what this change entails:
 
-|                                                     | CosmWasm 1.x | CosmWasm 2.0 | CosmWasm 2.1.x | CosmWasm 2.1.2 |
-|-----------------------------------------------------|:------------:|:------------:|:--------------:|:--------------:|
-| **Cost target**                                     |  1 Tgas/ms   |   1 Tgas/s   |    1 Tgas/s    |    1 Tgas/s    |
-| **Exceeds 64-bit unsigned<br/>integer range after** |   5 hours    | 5 124 hours  |  5 124 hours   |  5 124 hours   |
-| **Cost per Wasm operation**                         |   150 000    |     150      |      170       |  115 (×14) ¹⁾  |
-| **Multiplier**                                      | 140 000 000  |   140 000    |    140 000     |    140 000     |
+|                                                     | CosmWasm 1.x | CosmWasm 2.0 | CosmWasm 2.1.x | CosmWasm 2.1.2 | CosmWasm 2.1.4<br/>and newer |
+|-----------------------------------------------------|:------------:|:------------:|:--------------:|:--------------:|:----------------------------:|
+| **Cost target**                                     |  1 Tgas/ms   |   1 Tgas/s   |    1 Tgas/s    |    1 Tgas/s    |           1 Tgas/s           |
+| **Exceeds 64-bit unsigned<br/>integer range after** |   5 hours    | 5 124 hours  |  5 124 hours   |  5 124 hours   |         5 124 hours          |
+| **Cost per Wasm operation**                         |   150 000    |     150      |      170       |  115 (×14) ¹⁾  |         115 (×14) ²⁾         |
+| **Multiplier**                                      | 140 000 000  |   140 000    |    140 000     |    140 000     |           140 000            |
                                                                                                                         
 ¹⁾ **Remarks to CosmWasm 2.1.2**
 - Cost for non-accounting Wasm operators is **115**.
 - Cost for accounting Wasm operators is 115×14 = **1610**.
 - Wasm accounting operators: Br, BrIf, BrTable, Call, CallIndirect, Else, End, Loop, Return
+
+²⁾ **Remarks to CosmWasm 2.1.4**
+- Cost for non-accounting Wasm operators is **115**.
+- Cost for accounting Wasm operators is 115×14 = **1610**.                                                        
+- Wasm accounting operators: Br, BrIf, BrOnCast, BrOnCastFail, BrOnNonNull, BrOnNull, BrTable, Call, CallIndirect,
+  CallRef, Catch, Delegate, Else, End, If, Loop, Rethrow, Return, ReturnCall, ReturnCallIndirect, ReturnCallRef, Throw, ThrowRef
