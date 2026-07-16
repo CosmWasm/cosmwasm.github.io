@@ -11,3 +11,5 @@ and no longer receive maintenance, security patches, or compatibility support:
 
 This is aligned with EOL notices for
 [Cosmos SDK](https://docs.cosmos.network/sdk/latest/release-family#end-of-life-notices) `v0.50.x`.
+
+{/* truncate */}
