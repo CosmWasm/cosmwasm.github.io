@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem';
 You have created a name-registering smart contract that is compatible with the NFT standard.
 This is a good time to have it receive messages from another smart contract.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch the `my-nameservice` project to its
 [`add-nft-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-nft-library) branch and take it from there.
@@ -257,7 +257,7 @@ Note how:
     which will be returned to the original message sender.
   - Revert any state changes the function may have done.
 
-:::tip Reentrancy?
+:::tip[Reentrancy?]
 
 Take note of how the onward message is sent as part of the returned response.
 This ensures that your function has completed its own actions before the next actions are considered.
@@ -267,7 +267,7 @@ actions before the (implicit) `return` statement.
 
 :::
 
-:::danger `info.funds` reuse vulnerability
+:::danger[`info.funds` reuse vulnerability]
 
 It is as true with CosmWasm as it is [with Ethereum](https://trustchain.medium.com/ethereum-msg-value-reuse-vulnerability-5afd0aa2bcef):
 beware blindly reusing `info.funds`. Indeed, you may send more funds than you have received, or run into analogous situations.
@@ -625,7 +625,7 @@ You could test more things such as:
 
 These are left as an exercise.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 

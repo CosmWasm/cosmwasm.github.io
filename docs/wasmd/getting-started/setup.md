@@ -44,8 +44,15 @@ wasmd version
 
 :::warning
 
-Running a node on Windows OS is not supported yet. However, you can use WSL (Windows Subsystem for
-Linux) to run a node on Windows. Alternatively, you can build a Wasmd client for Windows with:
-`make build-windows-client`.
+Running a node on Windows OS is **NOT SUPPORTED**.
+
+:::
+
+:::danger
+
+We support `x86_64` and `aarch64` CPU architectures only for development purposes.
+
+In production, chains MUST use **wasmd** only with **`x86_64`** **libwasmvm** libraries.
+All validators in a production chain MUST have the same, **`x86_64`** CPU architecture when using **wasmd**.
 
 :::

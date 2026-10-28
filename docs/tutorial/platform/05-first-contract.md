@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 
 In the hello world, you used an already-made smart contract that implements a name service. It is a [rudimentary one](https://github.com/deus-labs/cw-contracts/blob/v0.11.0/contracts/nameservice/src/contract.rs). This somewhat longer-running exercise intends to build progressively a better nameservice, which could be [this one](https://github.com/public-awesome/names/blob/v1.2.8/contracts/name-minter/src/contract.rs), from the ground up.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 In practice, you will progressively build [this name service](https://github.com/b9lab/cw-my-nameservice). The exercise is built such that you can skip ahead by switching to the appropriate [branch](https://github.com/b9lab/cw-my-nameservice/branches) as mentioned at the top of the page of each exercise section.
 
@@ -46,7 +46,7 @@ Move into the project directory.
 cd my-nameservice
 ```
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the [`initial-cargo`](https://github.com/b9lab/cw-my-nameservice/tree/initial-cargo) branch.
 
@@ -130,7 +130,7 @@ Indeed, you need to add the relevant dependency:
     </TabItem>
 </Tabs>
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the [`instantiation-message`](https://github.com/b9lab/cw-my-nameservice/tree/instantiation-message) branch,
 with [this](https://github.com/b9lab/cw-my-nameservice/compare/initial-cargo..instantiation-message) as the diff.
@@ -196,7 +196,7 @@ Once again, there is a missing dependency: `cosmwasm_std`. Add it:
     </TabItem>
 </Tabs>
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the [`instantiation-function`](https://github.com/b9lab/cw-my-nameservice/tree/instantiation-function) branch, with [this](https://github.com/b9lab/cw-my-nameservice/compare/instantiation-message..instantiation-function) as the diff.
 
@@ -277,7 +277,7 @@ Note how:
 - It uses the new error type in a new alias type for the oft-used `Result<Response, ContractError>` type.
 - It uses the new type as the return of the `instantiate` function.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the [`improve-error-reporting`](https://github.com/b9lab/cw-my-nameservice/tree/improve-error-reporting) branch, with [this](https://github.com/b9lab/cw-my-nameservice/compare/instantiation-function..improve-error-reporting) as the diff.
 
@@ -400,7 +400,7 @@ edition = "2021"
 
 You can now build your smart contract, then store and deploy on-chain the generated wasm found in `target/wasm32-unknown-unknown/release/my_nameservice.wasm`. Refer to the hello world for how to do it.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the [`compilation-elements`](https://github.com/b9lab/cw-my-nameservice/tree/compilation-elements) branch, with [this](https://github.com/b9lab/cw-my-nameservice/compare/improve-error-reporting..compilation-elements) as the diff.
 
@@ -479,7 +479,7 @@ test contract::tests::test_instantiate ... ok
 
 ## Conclusion
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the [`first-unit-test`](https://github.com/b9lab/cw-my-nameservice/tree/first-unit-test) branch,
 with [this](https://github.com/b9lab/cw-my-nameservice/compare/compilation-elements..first-unit-test) as the diff.

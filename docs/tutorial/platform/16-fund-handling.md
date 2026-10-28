@@ -8,7 +8,7 @@ description: Expect a payment, and return the change.
 Your _collection manager_ smart contract can forward all funds it receives to a beneficiary.
 That's a good way to avoid stranding funds on its balance, but this is level 1 of handling payments.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch:
 
@@ -618,7 +618,7 @@ and to send messages to the bank to make token transfers.
 You could add tests that test the new private functions in isolation, or that funds are returned for non-mint operations.
 This is left as an exercise.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 

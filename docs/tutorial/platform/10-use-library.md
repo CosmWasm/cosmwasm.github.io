@@ -25,7 +25,7 @@ too in the CosmWasm ecosystem. In this section, you delegate to it:
 - The update mechanics.
 - The message types.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch the project to its
 [first-event](https://github.com/b9lab/cw-my-nameservice/tree/first-event) branch and take it from there.
@@ -614,7 +614,7 @@ and confirmed with tests that it works. This library can do a lot more, includin
 
 What you have done is all within a single smart contract, it is not cross-contract message exchange.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the
 [`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch,

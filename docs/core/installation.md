@@ -10,14 +10,14 @@ Before diving right into writing code, you need to install some tooling in order
 CosmWasm is luckily rather self-contained and therefore needs little external tooling to compile.
 Our only external dependency is Rust, which you need to install for your platform.
 
-:::info Installing Rust
+:::info[Installing Rust]
 
 We recommend installing Rust using the official [rustup installer]. This makes it easy to stay on
 the most recent Rust version and to install compiler targets.
 
 :::
 
-:::tip Optimizing compiler
+:::tip[Optimizing compiler]
 
 For production builds you probably also want to install [Docker], too.
 This is because we offer the [CosmWasm Optimizing Compiler], which uses
@@ -82,7 +82,7 @@ setting up a new project in form of a template!
 
 In order to generate a fresh project, run this command and off we go:
 
-:::tip    
+:::tip
 Make sure to change `PROJECT_NAME` to the name of your contract!
 :::
 

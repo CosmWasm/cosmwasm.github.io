@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 
 Your smart contract can now change its parameters via a Cosmos SDK governance proposal.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch:
 
@@ -561,7 +561,7 @@ Note how:
 
 You can now upgrade your smart contract from an earlier version.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 

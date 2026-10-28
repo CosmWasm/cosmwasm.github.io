@@ -8,7 +8,7 @@ description: Send a synchronous and read-only query from one smart contract to a
 In the previous section you had your _collection manager_ smart contract send a message to your _name service_
 smart contract so that the latter executes something. The _manager_ sends this message at the end of its own execution.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch:
 
@@ -372,7 +372,7 @@ Your manager smart contract now:
 - Queries another smart contract synchronously in a read-only mode.
 - Sends a message to another smart contract asynchronously at the end of its own execution.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 

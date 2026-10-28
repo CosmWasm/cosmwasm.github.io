@@ -11,7 +11,7 @@ import TabItem from '@theme/TabItem';
 In the previous section you created a barebones smart contract. It exists but does not do much.
 In this section, you are going to have it do something: your smart contract is going to handle a transaction message.
 
-:::note `Exercise progression`
+:::note[Exercise progression]
 
 If you skipped the previous section, you can just switch the project to its [`first-unit-test`](https://github.com/b9lab/cw-my-nameservice/tree/first-unit-test) branch and take it from there.
 
@@ -260,7 +260,7 @@ test contract::tests::test_execute ... ok
 
 ## Conclusion
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar
 to the [`first-execute-message`](https://github.com/b9lab/cw-my-nameservice/tree/first-execute-message) branch,

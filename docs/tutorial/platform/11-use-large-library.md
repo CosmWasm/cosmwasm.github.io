@@ -12,7 +12,7 @@ Your smart contract that can register names sounds an awful lot like the _mint_ 
 You even added a minter that gatekeeps the minting. Eventually, you can imagine adding functionality so that the name
 owners can transfer, or sell, those names.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch the project to its
 [`add-first-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-first-library) branch and take it from there.
@@ -1034,7 +1034,7 @@ Now that you delegate to the NFT library, it could be worthwhile to test that th
 such as approvals and transfers. It would be good to also confirm that the minter indeed gatekeeps the minting call.
 This is left as an exercise.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the
 [`add-nft-library`](https://github.com/b9lab/cw-my-nameservice/tree/add-nft-library) branch,
