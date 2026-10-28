@@ -14,7 +14,7 @@ correctly on a blockchain, or with each other.
 
 You are fixing that in this section.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch the project to its
 [`first-query-message`](https://github.com/b9lab/cw-my-nameservice/tree/first-query-message)
@@ -339,7 +339,7 @@ fn test_query_empty() {
 
 You have created your first mocked-app test whereby your smart contract is tested against a mocked CosmWasm module.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the
 [`first-multi-test`](https://github.com/b9lab/cw-my-nameservice/tree/first-multi-test) branch,

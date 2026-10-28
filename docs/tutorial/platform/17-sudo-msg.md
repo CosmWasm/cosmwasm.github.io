@@ -7,7 +7,7 @@ description: The Cosmos way to manage your smart contract.
 
 Your _collection manager_ smart contract can now impose a payment when minting a new name.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch:
 
@@ -155,7 +155,7 @@ Take this opportunity to replace your dummy query lambda, used in the mocked app
   ...
 ```
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this intermediate stage the `my-collection-manager` project should have something similar to the 
 [`payment-params-query`](https://github.com/b9lab/cw-my-collection-manager/tree/payment-params-query) branch,
@@ -437,7 +437,7 @@ Note that:
 Now your smart contract is able to receive instructions from the underlying app chain to update the payment parameters.
 By leveraging the Cosmos SDK's governance module, you only have to code the effect of successful proposals.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 

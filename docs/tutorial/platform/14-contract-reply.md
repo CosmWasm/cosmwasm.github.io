@@ -8,7 +8,7 @@ description: Receive an asynchronous reply from a message sent to another smart 
 In a previous section, your _manager_ smart contract sent an asynchronous message to the _collection_ smart contract,
 in a fire-and-forget manner.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch:
 
@@ -184,7 +184,7 @@ On this test too, you just confirm that the data returned is as expected:
 
 This completes this section's changes on `my-nameservice`.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage the `my-nameservice` project should have something similar to the
 [`execute-return-data`](https://github.com/b9lab/cw-my-nameservice/tree/execute-return-data) branch,
@@ -562,7 +562,7 @@ You could add more tests to verify that:
 
 This is left as an exercise.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 

@@ -70,7 +70,7 @@ With this done, `.build/wasmd` or Docker's `wasmd:0.53.2` is your blockchain exe
 After you have compiled your blockchain code, and before you can turn your focus to CosmWasm, you need a running blockchain.
 This step has you prepare the blockchain application, test keys and a genesis file.
 
-:::warning Are you a validator?
+:::warning[Are you a validator?]
 
 If you have previously used wasmd, you may already have data in your `~/.wasmd` folder.
 It is typically safe to erase the `config` sub-folder. But **if you are a validator** on one of the wasmd networks,
@@ -1418,7 +1418,7 @@ balance:
     denom: stake
 ```
 
-:::warning Oops!
+:::warning[Oops!]
 
 This version of the code of the smart contract cannot send tokens away, so its balance is in effect stranded.
 Better care next time...

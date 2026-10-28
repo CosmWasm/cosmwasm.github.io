@@ -9,7 +9,7 @@ As it stands, your `execute` function only returns a `Response::default()`. That
 Eventually, as your smart contract communicates with others or even other modules, it needs to pass
 more information as part of its response. This section is a step in this direction.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch the project to its
 [`first-multi-test`](https://github.com/b9lab/cw-my-nameservice/tree/first-multi-test) branch and take it from there.
@@ -166,7 +166,7 @@ Note that:
 
 There is more to execution responses than events, as you will learn in subsequent sections.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the
 [`first-event`](https://github.com/b9lab/cw-my-nameservice/tree/first-event) branch,

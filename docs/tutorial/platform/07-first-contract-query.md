@@ -8,7 +8,7 @@ description: Add a function to your smart contract so you can query addresses by
 In the previous section, you added a message to register an address under a name in storage.
 In this section, you make it possible to easily query for said stored values.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch the project to its
 [`first-execute-message`](https://github.com/b9lab/cw-my-nameservice/tree/first-execute-message)
@@ -187,7 +187,7 @@ test contract::tests::test_query ... ok
 
 You have created a query message and added its handling so that users and other smart contracts can check the registration status of names.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage, you should have something similar to the
 [`first-query-message`](https://github.com/b9lab/cw-my-nameservice/tree/first-query-message) branch,

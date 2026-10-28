@@ -12,7 +12,7 @@ In the previous sections, you made your _collection manager_ smart contract send
 to the _NFT collection_ smart contract. That's convenient from the point of view of the manager,
 although this kicks the can down to the NFT collection.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 If you skipped the previous section, you can just switch:
 
@@ -461,7 +461,7 @@ You smart contract now sends a message across the CosmWasm module barrier and in
 It does so by forwarding all funds received. This is a rudimentary way of handling funds.
 In particular, for a collection manager that plans on eventually being a marketplace.
 
-:::info Exercise progression
+:::info[Exercise progression]
 
 At this stage:
 
